@@ -3,4 +3,5 @@
     // lopanggo20030614
 
     echo "kemmyxz"
+    echo "kemmyxz"
 ?>
