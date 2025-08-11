@@ -93,169 +93,204 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
-    <link rel="stylesheet" href='https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=Sawarabi+Mincho&display=swap'>
-    <title>Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VMC Basket - Log In</title>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="./CSS/style.css">
 
-    <style>
-    .login-body{
-        background-size: cover;
-        background-image: url(admin/images/userlogin/LoginBG.png);
-        background-repeat: no-repeat;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    
-    }
+<style>
+body {
+    background-color: #fff;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+/* Gradient circles on left side */
+.gradient-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+}
 
+.circle1, .circle2 {
+    position: absolute;
+    border-radius: 862px;
+    filter: blur(100px);
+}
 
-    .container {
-        display: flex;
-        width: 70%;
-        height: 80vh;
-        background: rgb(234, 227, 227);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin-top: 5%;
-    }
+.circle1 {
+    width: 700px;
+    height: 700px;
+    flex-shrink: 0;
+    background: linear-gradient(136deg, #FFA6AB 17.46%, #5679FF 93.71%);
+    top: -200px;
+    left: -150px;
+}
 
-    .left-panel {
-        background: url(admin/images/userlogin/Log\ In\ Picture.png) center/cover;
-        width: 50%;
-        color: white;
-        text-align: center;
-        padding-left: 2%;
-        padding-top: 2%;
-    }
+.circle2 {
+    width: 700px;
+    height: 700px;
+    transform: rotate(-168.542deg);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FFED98 22.87%, #5679FF 82.65%);
+    top: 500px;
+    right: -650px;
+}
 
-    .left-panel .login-logo{
-        width: 71%;
-        display: flex;
-        align-items: center;
-        margin-top: 2%;
-        margin: 0;
-        justify-content: space-between;
-    }
-    .login-logo img{
-        height: 120px;
-        width: auto;   
-    }
-    .login-logo h3{
-        font-family: 'ubuntu sans', sans-serif;
-        font-size: 35px;
-        font-weight: bold;
-        width: 100%;
-        display: flex;
-    }
-    .left-panel h1{
-        font-family: 'ubuntu sans', sans-serif;
-        font-size: 55px;
-        font-weight: bold;
-        text-align: left;
-        margin-top: 15%;
-        margin-left: 5%;
-    }
-    .left-panel p{
-        font-family: 'poppins', sans-serif;
-        font-size: 20px;
-        text-align: left;
-        margin-top: 5%;
-        margin-left: 5%;
-    }
-    .right-panel {
-        justify-content: center;
-        align-items: center;
-        width:55%;
-        background-color: #f2f2f2;
-    }
-    .login-content h2{
-        font-family: 'ubuntu sans', sans-serif;
-        font-size: 64px;
-        font-weight: bold;
-        margin: 0%;
-    }
-    .login-content p{
-        font-family: 'poppins', sans-serif;
-        font-size: 20px;
-        margin-top: 5%; 
-        padding: 0;
-    }
+.container-login {
+    display: flex;
+    width: 90%;
+    height: 90vh;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    border: 1px solid black;
+    overflow: hidden;
+}
+.left-panel {
+    flex: 1;
+    background: url('admin/images/log-in-bg.png') center;
+    padding: 40px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-    .login-content{
-        width: auto;
-        height: 50vh;
-        text-align: center;
-        margin: 15% 5%;
-    }
-    .input-group {
-        margin: 10px 0;
-    }
+.left-panel h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    margin: 0; /* remove browser default margin */
+}
 
-    input {
-        width: 80%;
-        height: 3vh;
-        padding: 10px;
-        margin-top: 5%;
-        border: 2px solid #003153;
-        border-radius: 4px;
-    }
+.left-panel p {
+    font-size: 1.4rem;
+    margin: 15px 0 0 0; /* keep only top space */
+}
 
-    button {
-        width: 30%;
-        height: 5vh;
-        padding: 10px;
-        background: #003153;
-        color: white;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        margin-top: 5%;
-    }
+.right-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    justify-content: flex-start; /* Push content to top */
+    padding: 30px 40px;
+}
 
-    button:hover {
-        background: #0963bd;
-    }
+.right-panel img {
+    height: auto; 
+    max-width: 30%;
+    align-self: center;
+}
+.right-panel h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #003153;
+    text-align: center;
+}
+.right-panel form {
+    padding: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
+.right-panel p {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-    </style>
+.input-group {
+    margin-bottom: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Space between inputs */
+.right-panel .input-group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Move link above button with spacing */
+.right-panel a {
+  margin: 10px 0 30px 0; 
+  text-decoration: none;
+  color: #3D87F5;
+  font-size: 0.9rem;
+}
+
+/* Full width button */
+.right-panel .custom-navy-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+</style>
 </head>
 
-<body class="login-body">
-    <div class="container">
-        <div class="left-panel">
-            <div class="login-logo">
-                <img src="admin/images/userlogin/Log In Logo.png" alt="Logo">
-                <h3>VMC Basket</h3>
-            </div>
-            <h1>Hello, Montessarians!</h1>
-            <p>Log in now to start shopping for all your academic essentials.</p>
-        </div>
-        <div class="right-panel">
-            <div class="login-content">
-                <h2>Log In</h2>
-                <p>Please use your student number to log in.</p>
+<body>
 
-                <form id="loginForm" method="POST" action="">
-                <?php if (!empty($error)): ?>
-                    <div class="error-message" style="color: red; margin-bottom: 15px; text-align: center;">
-                        <?php echo htmlspecialchars($error); ?>
-                    </div>
-                <?php endif; ?>
+<div class="gradient-bg">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+</div>
 
-
-                    <div class="input-group">
-                        <input type="text" id="studentNumber" name="studentNumber" placeholder="Student Number" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="password" id="password" name="password" placeholder="Password" required>
-                    </div>
-                    <p><a href="forgot_pass.php">Forgot Password?</a></p>
-                    <button type="submit" name="login">Log In</button>
-                </form>
-            </div>
-        </div>
+<div class="container-login">
+    <div class="left-panel">
+        <h1>Hello Montessorians!</h1>
+        <p>Log in now to start shopping for all your academic essentials.</p>
     </div>
+
+    <div class="right-panel">
+        <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
+        <h2>Log In</h2>
+        <p>Please use your student number to log in.</p>
+
+        <form id="loginForm" method="POST" action="">
+            <?php if (!empty($error)): ?>
+                <div style="color: red; margin-bottom: 15px; text-align: center;">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="input-group">
+                <input type="text" id="studentNumber" name="studentNumber" placeholder="Student Number" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+
+            <a href="forgot_pass.php">Forgot Password?</a>
+            <button type="submit" name="login" class="custom-navy-btn">Log In</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

@@ -1,580 +1,371 @@
-<?php
-session_start();
-require 'admin/inc/config.php';
-// If user is not logged in, redirect to login
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login.php");
-//     exit();
-// }
-
-// Prevent browser from caching the page
-header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1
-header("Pragma: no-cache"); // HTTP 1.0
-header("Expires: 0"); // Proxies
-
-// Fetch recommended products
-
-$recommendations = "SELECT p.*, 
-                   GROUP_CONCAT(DISTINCT pv.gender) as genders,
-                   GROUP_CONCAT(DISTINCT pv.size) as sizes,
-                   p.rating
-                   FROM products p
-                   LEFT JOIN product_variants pv ON p.id = pv.product_id
-                   WHERE p.type='uniform' OR p.type='supplies'
-                   GROUP BY p.id, p.product_name, p.price, p.image, p.type, p.rating";
-$rec_result = $conn->query($recommendations);
-?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMC Basket-Homepage</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"><link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="./CSS/style.css">
-    <style>
-        .row > div {
-            display: flex; /* Ensure all cards in a row are the same height */
-        }
-        .product-card {
-            background-color: #C8D9E6;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VMC Basket</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="./CSS/style.css">
 
-            /* New for equal height & layout */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            width: 100%; 
-            min-height: 410px;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .product-card img {
-            width: 100%;
-            height: 250px; /* or adjust as needed */
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .product-card:hover img {
-            transform: scale(1.1); 
-        }
-        
-        .product-title{
-            font-weight: medium;
-            margin-left: 100px;
-            margin-top: 50px;
-            margin-bottom: 20px;
-        }
-
-        /* Product Info */
-        .product-info {
-            color: #000000;
-            text-align: left;
-            padding: 10px 5px;
-        }
-
-        .product-info h3 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .product-info p {
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-
-        .price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .product-line{
-            border: 1px solid #000000;
-        }
-
-        /* Star Rating */
-        .rating {
-            color: #000000;
-            font-size: 14px;
-        }
-
-        .rating i {
-            margin-right: 2px;
-        }
-
-        .filter{
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #00527F;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-        .filter-color{
-            color: white;
-            background-color:#00527F;
-        }
-        .filter-title{
-            font-family: "Ubuntu", sans-serif;
-            color: #00527F;
-            font-weight: bold;
-        }
-        /* Heart Button */
-        .heart-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        border: none;
-        background: none;
-        font-size: 22px;
-        color: black;
-        cursor: pointer;
-        z-index: 10;
-        }
-
-        .heart-btn img {
-        width: 24px; /* Adjust size */
-        height: auto;
-        }
-
-        .rating {
-        display: flex;
-        align-items: center;
-        color: #000000;
-        font-size: 14px;
+  <style>
+    /* Background gradient */
+    body {
+      background-color: #fff;
+      overflow-y: hidden;
+      overflow-x: hidden;
+    }
+    /* Gradient circles on left side */
+    .gradient-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 60%;
+      height: 100%;
+      z-index: -1;
     }
 
-    .rating i {
-        margin-right: 2px;
-        font-size: 16px;
+    .circle1, .circle2 {
+      position: absolute;
+      border-radius: 862px;
+      filter: blur(100px);
     }
 
-    .rating .text-warning {
-        color: #FFC107 !important;
+    .circle1 {
+      width: 700px;
+      height: 700px;
+      flex-shrink: 0;
+      background: linear-gradient(136deg, #FFA6AB 17.46%, #5679FF 93.71%);
+      top: -200px;
+      left: -150px;
     }
 
-    .rating span {
-        font-size: 12px;
-        color: #666;
+    .circle2 {
+      width: 700px;
+      height: 700px;
+      transform: rotate(-168.542deg);
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #FFED98 22.87%, #5679FF 82.65%);
+      top: 500px;
+      right: -150px;
     }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="top-text"><h1>ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE</h1></div>
-        <div class="top-container">
-            <ul>
-                <li><a href="basket.php"><img src="admin/images/Home Page/basket-nav.png" alt="Basket"></a></li>  
-                <li><a href="favorites.php"><img src="admin/images/Home Page/heart-nav.png"></a></li>
-                <li><a href="profile.php"> <img src="admin/images/Home Page/profile-user-nav.png" alt="profile"></a></li>
-            </ul>
-        </div>
-    </header>
 
-    <!-- Navbar -->
-    <div class="navbar shadow-sm">
-        <div class="logo ms-4">
-            <a href="index.php"><img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="logo"></a>
-            <h2>VMC Basket</h2>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.php" class="active">Home</a></li>
-                <li><a href="shop.php">Shop</a></li>
-                <li><a href="contact.php">Contact us</a></li>
-            </ul>
-        </nav>
-        <div class="search" style="display: flex;  align-items: center; justify-content: space-between; width: auto;">
-            <div class="search-container me-4">
-                <input type="text" class="form-control" placeholder="">
-                <button><img src="admin/images/search-icon.png" alt="Search"></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Sections of VMC Basket Homepage -->
-
-<!-- HERO SECTION / CAROUSEL -->
-<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-        
-    </div>
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="admin/images/Home Page/VMC-Carousel1 copy.png" class="d-block w-100" alt="VMC Uniforms">
-        </div>
-        <div class="carousel-item">
-            <img src="admin/images/vmc-carousel2.png" class="d-block w-100" alt="VMC Uniforms">
-        </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </button>
-</div>
-
-<!-- TAGLINE -->
-<div class="tagline d-flex justify-content-between align-items-center text-white text-center px-5 py-3">
-    <h2>Total Quality Education, Our Thrust</h2>
-    <h2>Shop Now Montessorians!</h2>
-</div>
-
-<!-- CATEGORY ICONS -->
-<div class="custom-icon container text-center my-5">
-    <div class="row justify-content-center">
-        <div class="col-4 col-md-3">
-            <a href="shop.php" style="text-decoration: none; color: black;">
-                <img src="admin/images/Home Page/Uniform.png " class="category-icon" alt="Official Uniforms">
-                <p class="container-text">Official Uniforms</p>
-            </a>
-        </div>
-        <div class="col-4 col-md-3">
-            <a href="shop.php" style="text-decoration: none; color: black;">
-                <img src="admin/images/Home Page/Supplies.png " class="category-icon" alt="School Supplies">
-                <p class="container-text">School Supplies</p>
-            </a>
-        </div>
-        <div class="col-4 col-md-3">
-            <a href="shop.php" style="text-decoration: none; color: black;">
-                <img src="admin/images/Home Page/NewArrivals.png " class="category-icon" alt="New Release">
-                <p class="container-text">New Release</p>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- ANNOUNCEMENT CORNER -->
-<div class="announcement-container py-5">
-    <div class="container text-center">
-        <h2 class="homepage-title mb-3">Announcement Corner</h2>
-        <p>Any announcements regarding our school uniforms or other school-related apparel will be displayed in this corner!</p>
-        <div id="announcementCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#announcementCarousel" data-bs-slide-to="0" class="active"></button>
-                <button type="button" data-bs-target="#announcementCarousel" data-bs-slide-to="1"></button>
-                <button type="button" data-bs-target="#announcementCarousel" data-bs-slide-to="2"></button>
-            </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="admin/images/Home Page/Announcement Corner.png" class="d-block w-100 announcement-img" alt="Announcement">
-                </div>
-                <div class="carousel-item">
-                    <img src="admin/images/Home Page/Announcement Corner.png" class="d-block w-100 announcement-img" alt="Announcement">
-                </div>
-                <div class="carousel-item">
-                    <img src="admin/images/Home Page/Announcement Corner.png" class="d-block w-100 announcement-img" alt="Announcement">
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Fullscreen Image Viewer -->
-<div id="fullscreenViewer" class="fullscreen-viewer">
-    <img id="fullscreenImage" src="" alt="Full-size Announcement">
-</div>
-
-
-<!-- SHOP BY YEAR-LEVEL -->
-<div class="container text-center my-5" style= "margin-top: 50px;">
-    <h2 class="homepage-title mb-4">Shop by Year-level</h2>
-    <div class="year-level row g-4 justify-content-center">
-        <!-- First Row -->
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/Pre-School & Elementary.png" class="img-fluid rounded shadow" alt="Pre-School & Elementary"></a>
-        </div>
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/Junior High School.png" class="img-fluid rounded shadow" alt="Junior High"></a>
-        </div>
-        <!-- Second Row -->
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/Senior High School.png" class="img-fluid rounded shadow" alt="Senior High"></a>
-        </div>
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/College.png" class="img-fluid rounded shadow" alt="College"></a>
-        </div>
-    </div>
-</div>
-
-<!-- FEATURED PRODUCTS -->
-<!-- Products -->
-<div class="container text-center mb-4" style="margin-top: 100px;">
-    <h2 class="homepage-title mb-4">Featured Products</h2>
-
-        <div class="container mb-5">
-            <div class="row g-4">
-                <?php
-                if ($rec_result && $rec_result->num_rows > 0):
-                    $count = 0; // Initialize counter
-                    while ($rec_row = $rec_result->fetch_assoc()):
-                        if ($count >= 8) break; // Break loop after 8 products
-                ?>
-                <div class="col-md-4 col-lg-3">
-                    <div class="product-card" onclick="location.href='product_details.php?id=<?= $rec_row['id'] ?>'">
-                        <button class="heart-btn" onclick="toggleFavorite(event, this, <?= $rec_row['id'] ?>)">
-                            <img src="./admin/images/heart-outline.png" alt="Favorite">
-                        </button>
-                        <img src="admin/<?= htmlspecialchars($rec_row['image']) ?>" alt="<?= htmlspecialchars($rec_row['product_name']) ?>">
-                        <div class="product-info">
-                            <h3><?= htmlspecialchars($rec_row['product_name']) ?></h3>
-                            <?php if (strtolower($rec_row['type']) !== 'supplies'): ?>
-                                <p>Available sizes: <?= htmlspecialchars($rec_row['sizes'] ?? 'N/A') ?></p>
-                            <?php endif; ?>
-                            <p><?= htmlspecialchars($rec_row['genders'] ?? '') ?></p>
-                            <hr class="product-line">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="price">₱<?= number_format($rec_row['price'], 2) ?></h4>
-                                <div class="rating">
-                                    <?php
-                                    $rating = $rec_row['rating'] ?? 0;
-                                    $fullStars = floor($rating);
-                                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
-                                    
-                                    // Output full stars
-                                    for ($i = 0; $i < $fullStars; $i++): ?>
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                    <?php endfor;
-
-                                    // Output half star if applicable
-                                    if ($hasHalfStar): ?>
-                                        <i class="bi bi-star-half text-warning"></i>
-                                    <?php endif;
-
-                                    // Output empty stars
-                                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
-                                    for ($i = 0; $i < $emptyStars; $i++): ?>
-                                        <i class="bi bi-star text-warning"></i>
-                                    <?php endfor; ?>
-                                    <span class="ms-1">(<?= number_format($rating, 1) ?>)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php 
-                        $count++; // Increment counter
-                    endwhile; 
-                else: ?>
-                    <p>No recommended products available.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    
-</div>
-
-
-   
-    <div class="text-center mt-4">
-    <a href="shop.php" class="see-more-btn">See More</a>
-    </div>
-
-    
-    <!-- FAQ SECTION -->
-<div class="faq-container py-5">
-    <div class="container">
-        <h2 class="homepage-title mb-4 text-center">Frequently Asked Questions</h2>
-        <div class="accordion" id="faqAccordion">
-            <!-- Question 1 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq1">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer1">
-                        What types of products are available on this site?
-                    </button>
-                </h2>
-                <div id="answer1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        VMC Basket offers a wide range of essential products that every student at Villagers Montessori College may need throughout the school year. This includes various school supplies, exclusive VMC notebooks, and official school apparel such as uniforms and PE uniforms available for all year levels.
-                        Our goal is to make it easier for students and parents to find everything they need in one convenient online platform.
-                    </div>
-                </div>
-            </div>
-            <!-- Question 2 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq2">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer2">
-                        How do I know which size to order?
-                    </button>
-                </h2>
-                <div id="answer2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        To help you choose the right fit, size information is provided in the description section of each product. We highly recommend reviewing the size chart carefully before placing your order to ensure the perfect fit, especially for uniforms and PE attire.
-                        If you’re unsure, feel free to reach out to us or visit the school bookstore for sample sizing.
-                    </div>
-                </div>
-            </div>
-            <!-- Question 3 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq3">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer3">
-                        What payment methods do you accept?
-                    </button>
-                </h2>
-                <div id="answer3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Currently, VMC Basket only accepts payment through over-the-counter transactions at the school's cashier.
-                        Once you place your order online, you may settle your payment at the school, making it safe and secure for all students and parents.
-                    </div>
-                </div>
-            </div>
-            <!-- Question 4 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq4">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer4">
-                        Is delivery available for my order?
-                    </button>
-                </h2>
-                <div id="answer4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        VMC Basket does not offer door-to-door delivery at this time. All orders must be claimed physically at the school's bookstore. 
-                        This ensures that students and parents can personally check their orders upon claiming and helps maintain smooth and organized distribution within the campus.
-                    </div>
-                </div>
-            </div>
-            <!-- Question 5 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq5">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer5">
-                        What if I need to return or exchange an item?
-                    </button>
-                </h2>
-                <div id="answer5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        If you need to return or exchange a product, we’re here to assist you. Simply go to the "My Purchase" page within your user account and locate the specific product you wish to return. You will find a return request form available there. Please note that the option to return will only be available if the product has not yet been rated. 
-                        Once your request is submitted, our team will review it and assist you with the return or exchange process.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-</body>
-
-<script>
-    function toggleFavorite(event, btn) {
-    event.stopPropagation(); // Prevents redirection
-    let heartImg = btn.querySelector("img");
-    
-    if (heartImg.src.includes("heart-outline.png")) {
-        heartImg.src = "./Images/heart.png"; // Change to filled heart
-    } else {
-        heartImg.src = "./Images/heart-outline.png"; // Change back to outlined heart
+    .hero-section {
+      position: relative;
+      padding: 4rem 0;
     }
+
+    .welcome-title{
+      font-size: 40px;
+    }
+
+    .welcome-sentence{
+      font-size: 25px;
+      margin-bottom: 40px;
+    }
+    .logo-pic1{
+      height: 180px;
+    }
+
+    .logo-pic2{
+      height: 120px;
+    }
+
+    /* Floating animation for images */
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Star spin animation */
+    .spin {
+      animation: spin 3.5s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .slide-in {
+      opacity: 0;
+      transform: translateX(-50px);
+      animation: slideIn 0.8s ease forwards;
+    }
+
+    /* Delay for staggered animation */
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.6s; }
+    .delay-3 { animation-delay: 1s; }
+    .delay-4 { animation-delay: 1.4s; }
+    .delay-5 { animation-delay: 1.8s; }
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+@media (max-width: 575.98px) {
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 75vh;
+      margin: 0; 
+    }
+    .circle2 {
+      width: 300px;
+      height: 300px;
+      bottom: 100px;
+      right: -120px;
+      filter: blur(50px);
+    }
+    .circle1 {
+      width: 350px;
+      height: 300px;
+      top: -100px;
+      left: -100px;
+      filter: blur(80px);
+    }
+    .welcome-title {
+      font-size: 20px;
+      text-align: start;
+    }
+
+    .welcome-sentence {
+      font-size: 15px;
+      text-align: start;
+      margin-bottom: 20px;
+    }
+
+    .logo-pic1 {
+      height: 120px;
+    }
+
+    .logo-pic2 {
+      height: 100px;
+    }
+
+  .custom-navy-btn {
+    font-size: 1rem !important;
+    padding: 0.5rem 1.2rem !important;
+    margin: 0 auto;
+  }
+  .right-column {
+    display: none;
+  }
+
+  .d-flex.align-items-center.mb-4 img {
+    margin-bottom: 10px;
+  }
+
+  .hero-section {
+    padding: 2rem 1rem;
+  }
+}
+/* Tablet Portrait (min-width: 576px and max-width: 767.98px) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+    margin: 0; 
+  }
+
+  .circle2 {
+    width: 400px;
+    height: 400px;
+    bottom: 80px;
+    right: -150px;
+    filter: blur(70px);
+  }
+
+  .circle1 {
+    width: 450px;
+    height: 400px;
+    top: -120px;
+    left: -120px;
+    filter: blur(90px);
+  }
+
+  .welcome-title {
+    font-size: 26px;
+    text-align: start;
+  }
+
+  .welcome-sentence {
+    font-size: 18px;
+    text-align: start;
+    margin-bottom: 25px;
+  }
+
+  .logo-pic1 {
+    height: 150px;
+  }
+
+  .logo-pic2 {
+    height: 130px;
+  }
+
+  .custom-navy-btn {
+    font-size: 1.1rem !important;
+    padding: 0.6rem 1.5rem !important;
+    margin: 0 auto;
+  }
+
+  .right-column {
+    display: none; /* Hide decorative images like mobile */
+  }
+
+  .d-flex.align-items-center.mb-4 img {
+    margin-bottom: 12px;
+  }
+
+  .hero-section {
+    padding: 2.5rem 1.5rem;
+  }
 }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Select all images inside the announcement carousel
-        const announcementImages = document.querySelectorAll(".announcement-img");
+/* Tablet Landscape (min-width: 768px and max-width: 991.98px) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    margin: 0; 
+  }
 
-        // Select fullscreen viewer elements
-        const fullscreenViewer = document.getElementById("fullscreenViewer");
-        const fullscreenImage = document.getElementById("fullscreenImage");
+  .circle2 {
+    width: 500px;
+    height: 500px;
+    bottom: 60px;
+    right: -150px;
+    filter: blur(80px);
+  }
 
-        // Show fullscreen image on click
-        announcementImages.forEach(img => {
-            img.addEventListener("click", function () {
-                fullscreenImage.src = this.src; // Set the fullscreen image
-                fullscreenViewer.style.display = "flex"; // Show fullscreen viewer
-            });
-        });
+  .circle1 {
+    width: 550px;
+    height: 500px;
+    top: -130px;
+    left: -130px;
+    filter: blur(100px);
+  }
 
-        // Hide fullscreen viewer when clicking outside the image
-        fullscreenViewer.addEventListener("click", function () {
-            fullscreenViewer.style.display = "none";
-        });
-    });
-</script>
+  .welcome-title {
+    font-size: 30px;
+    text-align: start;
+  }
 
-<!-- Footer -->
-<footer>
-    <div class="footer-container">
-        <div class="footer-logo">
-            <img src="admin/images/Footer/VMS-LOGO-Official-01.png" alt="logo">
-            <div class="logo-text">
-                <h2>VMC Basket</h2>
-                <h4>Villagers Montesorri College E-commerce Website</h4>
-            </div>
-        </div>
+  .welcome-sentence {
+    font-size: 20px;
+    text-align: start;
+    margin-bottom: 30px;
+  }
 
-        <div class="footer-links mt-5">
-            <div class="about">
-                <p>your one-stop destination for all university merchandise needs! Discover a vast collection of high-quality uniforms, organizational shirts, and accessories tailored to showcase your university pride.</p>
-            </div>
-            <div class="footer-nav">
-                <h4>Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="shop.html">Shop</a></li>
-                    <li><a href="contact.html">Contact us</a></li>
-                </ul>
-            </div>
-            <div class="services">
-                <h4>Customer Services</h4>
-                <ul>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Size Guide</a></li>
-                    <li><a href="#">Exchange & Returns</a></li>
-                </ul>
-            </div>
-            <div class="myAccount">
-                <h4>My Account</h4>
-                <ul>
-                    <li><a href="#">Submit Feedback</a></li>
-                    <li><a href="#">Favorites</a></li>
-                    <li><a href="#">Shopping cart</a></li>
-                </ul>
-            </div>
-        </div>
+  .logo-pic1 {
+    height: 160px;
+  }
 
-        <div class="socials mt-4">
-            <div class="footer-acknowledgement">
-                <div class="policy">
-                    <ul>
-                        <li><a href="#">About |</a></li>
-                        <li><a href="#">Privacy Policy |</a></li>
-                        <li><a href="#">Terms of Services</a></li>
-                    </ul>
-                </div>
-                <div class="copy">
-                    <h4>©2024 Villagers Montesorri College. All rights reserved.</h4>
-                </div>
-            </div>
-            
-            <div class="footer-social mt-4">
-                <a href="#"><img src="admin/images/Footer/www.png" alt="Website"></a> 
-                <a href="facebook.com"><img src="admin/images/Footer/facebook-footer.png" alt="facebook"></a>
-                <a href="#"><img src="admin/images/Footer/instagram.png" alt="instagram"></a>
-                <a href="#"><img src="admin/images/Footer/youtube.png" alt="youtube"></a> 
-            </div>
-        </div>
-    </div> 
-</footer>
+  .logo-pic2 {
+    height: 140px;
+  }
+
+  .custom-navy-btn {
+    font-size: 1.2rem !important;
+    padding: 0.7rem 1.8rem !important;
+    margin: 0 auto;
+  }
+
+  /* You can keep right-column visible on landscape if desired */
+  .right-column {
+    display: none; /* set to flex/block if you want it to show */
+  }
+
+  .d-flex.align-items-center.mb-4 img {
+    margin-bottom: 14px;
+  }
+
+  .hero-section {
+    padding: 3rem 2rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Gradient Circles -->
+  <div class="gradient-bg">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+  </div>
+  
+  <div class="container hero-section">
+    <div class="row align-items-center">
+      
+      <!-- Left Column -->
+      <div class="col-lg-6 text-start" style="font-size: 1.25rem;">
+  
+    <!-- Logos -->
+    <div class="d-flex align-items-center mb-4 slide-in delay-1">
+      <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo" class="logo-pic1 me-3">
+      <img src="admin/images/VMC School Logo.png" alt="School Logo" class="logo-pic2">
+    </div>
+
+    <!-- Title -->
+    <h2 class="mb-4 welcome-title slide-in delay-2">
+      <span class="highlight-pink">Shop Smart,</span>
+    </h2>
+    <h2 class="welcome-title slide-in delay-3">
+      <span class="highlight-blue">Study Proud Montessorian!</span>
+    </h2>
+
+    <!-- Sentence -->
+    <p class="mt-4 welcome-sentence slide-in delay-4">
+      Equipping Villagers Montessori College with <br> Academic Essentials — One Basket at a Time.
+    </p>
+
+    <!-- Button -->
+    <a href="login.php" class="text-decoration-none">
+      <button class="custom-navy-btn text-decoration-none mt-5 slide-in delay-5" 
+              style="font-size: 1.25rem; padding: 0.75rem 2rem;">
+        Get Started
+      </button>
+    </a>
+  </div>  
+
+      <!-- Right Column -->
+      <div class="right-column col-lg-6 position-relative">
+        <img src="admin/images/circle-deco.png" class="position-absolute float-animation" style="bottom:-150px; left: -300px; width:1000px;">
+        <img src="admin/images/backpack.png" alt="Backpack" class="position-absolute float-animation" style="bottom:-80px; left: 0px; width:350px;">
+        <img src="admin/images/notebook.png" alt="Notebook" class="position-absolute float-animation" style="bottom: 70px; right:-20px; width:300px;">
+        <img src="admin/images/eraser.png" alt="Eraser" class="position-absolute float-animation" style="top: 30px; left: 120px; width: 280px;">
+        <img src="admin/images/circle-deco.png" class="position-absolute float-animation" style="top: -10px; left: 10px; width:1000px;">
+        <img src="admin/images/pencil.png" alt="Pencil" class="position-absolute float-animation" style="top: -70px; right: -60px; width:200px;">
+        <img src="admin/images/sharpener.png" alt="Sharpener" class="position-absolute float-animation" style="top: 100px; right:-90px; width:350px;">
+        <img src="admin/images/crayons.png" alt="Crayons" class="position-absolute float-animation" style="top: 300px; left: 50px; width: 250px;">
+        <img src="admin/images/star-deco.png" class="position-absolute float-animation spin" style="bottom: 300px; left: 200px; width:30px;">
+        <img src="admin/images/star-deco.png" class="position-absolute float-animation spin" style="bottom: 180px; right:-20px; width:30px;">
+        <img src="admin/images/star-deco.png" class="position-absolute float-animation spin" style="top: -10px; right: 230px; width:30px;">
+        <img src="admin/images/star-deco.png" class="position-absolute float-animation spin" style="top: 400px; left: 650px; width:30px;">
+        <img src="admin/images/star-deco.png" class="position-absolute float-animation spin" style="top: 250px; left: 250px; width:30px;">
+      </div>
+    </div>
+  </div>
+
+</body>
 </html>
