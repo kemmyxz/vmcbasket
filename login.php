@@ -158,10 +158,12 @@ body {
     border-radius: 6px;
     border: 1px solid black;
     overflow: hidden;
+    padding: 0px;
 }
 .left-panel {
     flex: 1;
-    background: url('admin/images/log-in-bg.png') center;
+    background: url('admin/images/log-in-bg.png') center center / cover no-repeat;
+    background-color: #26387D;
     padding: 40px;
     color: #fff;
     display: flex;
@@ -251,6 +253,47 @@ input {
 a:hover {
     text-decoration: underline;
 }
+/* Phones and tablets */
+@media (max-width: 991.98px) {
+    .left-panel {
+        display: none;
+    }
+
+    .container-login {
+        width: 90%;
+        height: auto;
+        border-radius: 0;
+        border: none;
+    }
+
+    .right-panel {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .right-panel img {
+        max-width: 50%; /* make logo a bit larger for smaller screens */
+    }
+    .right-panel h2 {
+        font-size: 2rem;
+    }
+
+    .circle2 {
+        width: 300px;
+        height: 300px;
+        bottom: 100px;
+        right: -120px;
+        filter: blur(50px);
+    }
+    .circle1 {
+        width: 350px;
+        height: 300px;
+        top: -100px;
+        left: -70px;
+        filter: blur(80px);
+    }
+}
+
 </style>
 </head>
 
@@ -287,7 +330,7 @@ a:hover {
                 <input type="password" id="password" name="password" placeholder="Password" required>
             </div>
 
-            <a href="forgot_pass.php">Forgot Password?</a>
+            <a href="forgot_password.php">Forgot Password?</a>
             <button type="submit" name="login" class="custom-navy-btn">Log In</button>
         </form>
     </div>

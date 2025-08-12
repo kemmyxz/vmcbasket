@@ -101,45 +101,155 @@ if (isset($_POST['reset_password'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="CSS/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="./CSS/style.css">
 <style>
-/*For Reset Password*/
-.resetpassBG {
-    background: url('./admin/images/userlogin/LoginBG.png') no-repeat center center/cover;
+body {
+    background-color: #fff;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+/* Gradient circles on left side */
+.gradient-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
 }
 
-.reset-container {
-    width: 85%;
-    background: white;
-    -webkit-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+.circle1, .circle2 {
+    position: absolute;
+    border-radius: 862px;
+    filter: blur(100px);
+}
+
+.circle1 {
+    width: 700px;
+    height: 700px;
+    flex-shrink: 0;
+    background: linear-gradient(136deg, #FFA6AB 17.46%, #5679FF 93.71%);
+    top: -200px;
+    left: -150px;
+}
+
+.circle2 {
+    width: 700px;
+    height: 700px;
+    transform: rotate(-168.542deg);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FFED98 22.87%, #5679FF 82.65%);
+    top: 500px;
+    right: -650px;
+}
+
+.container {
+    display: flex;
+    width: 90%;
+    height: 90vh;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    border: 1px solid black;
     overflow: hidden;
 }
+.right-panel {
+    flex: 1;
+    background: url('admin/images/log-in-bg.png') center center / cover no-repeat;
+    background-color: #26387D;
+    padding: 30px 40px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-.reset-title {
-    font-family: "Ubuntu", sans-serif;
-    font-size: 35px;
+.right-panel h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    margin: 0; /* remove browser default margin */
+}
+
+.right-panel p {
+    font-size: 1.4rem;
+    margin: 15px 0 0 0; /* keep only top space */
+}
+.left-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    justify-content: flex-start; /* Push content to top */
+    padding: 40px;
+}
+
+.left-panel img {
+    height: auto; 
+    max-width: 30%;
+    align-self: center;
+}
+.left-panel h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
     color: #003153;
+    text-align: center;
+}
+.left-panel form {
+    padding: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.logo-title-right{
-    font-family: "Ubuntu", sans-serif;
-    font-size: 30px;
-    color: #FFFFFF;
+.left-panel p {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.reset-title-right{
-    font-family: "Ubuntu", sans-serif;
-    font-size: 35px;
-    color: #FFFFFF;
+.input-group {
+    margin-bottom: 15px;
 }
 
-.reset-info {
-    background: url('./admin/images/userlogin/Log in Picture.png') no-repeat center center/cover;
-    position: relative;
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Space between inputs */
+.left-panel .input-group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Move link above button with spacing */
+.left-panel a {
+  margin: 10px 0 30px 0; 
+  text-decoration: none;
+  color: #3D87F5;
+  font-size: 0.9rem;
+}
+
+/* Full width button */
+.left-panel .custom-navy-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
 }
 
 .reset-input {
@@ -159,20 +269,6 @@ input.form-control {
     border-radius: 5px;
     padding: 0px;
     font-size: 16px;
-}
-
-.logo-circle {
-    background: white;
-    width: 120px;
-    height: 70px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.vmc-logo {
-    width: 60px;
 }
 
 /* Right Side Text */
@@ -218,44 +314,36 @@ input.form-control {
 }
 </style>
 </head>
-<body class="resetpassBG">
-<div class="container-fluid d-flex align-items-center justify-content-center vh-100">
-    
 
-        <div class="reset-container" id="step1">
-            <div class="row g-4">
-                <!-- Left Side: Form -->
-                <div class="col-md-7 p-5 d-flex flex-column justify-content-center text-center">
-                    <h2 class="fw-bold reset-title">Reset Password</h2>
-                    <p class="text-muted text-center">Please enter your email address and we will send the OTP for you to reset your password.</p>
+<body>
+    <div class="gradient-bg">
+        <div class="circle1"></div>
+        <div class="circle2"></div>
+    </div>
 
-                    <form method="POST" action="">
-                        <div class="mb-4 mt-5">
-                        <input type="email" name="email" class="form-control" placeholder="Enter your email address" required>
-                        </div>
+    <div class="container">
+        <div class = "left-panel" id="step1">
+            <!-- Left Side: Form -->
+                <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
+                <h2>Reset Password</h2>
+                <p>Please enter your email address and we will send the OTP for you to reset your password.</p>
 
-                        <div class="d-flex justify-content-center gap-3 mt-5">
-                            
-                            <button type="submit" class="btn btn-primary btn-submit w-50" name="send_otp">Continue</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Right Side: Image and Info -->
-                <div class="col-md-5 d-none d-md-block reset-info">
-
-                    <div class="d-flex justify-space-between align-items-center ms-3 mt-3"> 
-                       <div class="logo-circle">
-                       <img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="VMC Basket Logo" class="vmc-logo">
-                       </div>
-                        <h4 class="logo-title-right ms-2">VMC Basket</h4>
-                     </div>
-
-                    <div class="mt-5 ms-5 me-5 p-2 d-flex flex-column justify-content-center align-items-center">
-                        <h3 class="reset-title-right fw-bold text-start">Want to reset your Password?</h3>
-                        <p class="text-white text-start ms-3 mt-2 ms-md-1">Don’t worry it happens. Reset your password and start shopping for all your academic essentials.</p>
+                <form method="POST" action="">
+                    <div class="mb-4 mt-5">
+                    <input type="email" name="email" class="form-control" placeholder="Enter your email address" required>
                     </div>
-                </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-5">
+                        
+                        <button type="submit" class="custom-navy-btn" name="send_otp">Continue</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Side: Image and Info -->
+            <div class = "right-panel">
+                <h2>Want to reset your Password?</h2>
+                <p>Don’t worry it happens. Reset your password and start shopping for all your academic essentials.</p>
             </div>
         </div>
 

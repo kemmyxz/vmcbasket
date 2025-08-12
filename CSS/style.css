@@ -805,20 +805,4 @@ footer {
     margin-right: 0;
     margin-bottom: 10px;
   }
-
-  @media (max-width: 576px) {
-    .successful_icon {
-      width: 100%;
-    }
-
-    .otp-input {
-      width: 30px;
-      height: 30px;
-      text-align: center;
-      font-size: 15px;
-      border: 2px solid #000;
-      margin: 5px;
-      border-radius: 5px;
-    }
-  }
 }
