@@ -15,10 +15,10 @@ if (isset($_SESSION['student_no'])) {
 
     // Destroy session
     session_destroy();
-    header("Location: login.php"); // Redirect to login page
+    header("Location: index.php"); // Redirect to login page
     exit();
 } else {
-    header("Location: login.php"); // Redirect to login page if not logged in
+    header("Location: index.php"); // Redirect to login page if not logged in
     exit();
 }
 ?>

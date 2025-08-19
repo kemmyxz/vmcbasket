@@ -175,8 +175,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -184,18 +182,14 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VMC Basket-Product Details</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css"
-    rel="stylesheet">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=Ubuntu:wght@400;500;700&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="CSS/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 
   <style>
     .product-details-title {
@@ -206,11 +200,11 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
     }
 
     .carousel-bg {
-      background-color: #E8EDEF;
+      background-color: linear-gradient(180deg, #FFF 0%, rgba(200, 224, 243, 0.50) 100%);
     }
 
     .product-infobg {
-      background-color: #C8D9E6;
+      background-color: white;
     }
 
     /* Make carousel and product info same height */
@@ -272,8 +266,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
     }
 
     .product-info-box {
-      background-color: #d6e7f4;
-      /* similar to the light blue in your screenshot */
+      background-color: white;
       border-radius: 10px;
     }
 
@@ -335,15 +328,16 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
 
     .product-extra-info {
-      background-color: #f8fbfd;
+      background-color: #E3EFF9;
     }
 
     .info-box {
-      background-color: #f8fbfd;
+      background-color: #E3EFF9;
+      border: 1px solid black;
     }
 
     .size-box {
-      background-color: #FFFFFF;
+      background-color: #E3EFF9;
       font-size: 0.9rem;
     }
 
@@ -361,24 +355,10 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
       background-color: #f8fbfd;
     }
 
-    .bg-light-yellow {
-      background-color: #fffbe6;
-    }
-
-    .btn-rating-filter {
-      margin: 0.4rem;
-      border: 1px solid #ccc;
-      background-color: #f9f9f9;
-      font-size: 0.875rem;
-      padding: 0.4rem 0.75rem;
-      border-radius: 0.5rem;
-      color: #333;
-    }
-
-    .btn-rating-filter.active {
-      background-color: #0056d2;
-      color: #fff;
-      border-color: #0056d2;
+    .ratings-bg {
+      background-color: #FFFCE4;
+      border: 1px solid black;
+      border-radius: 5px;
     }
 
     .review-card img.img-thumbnail {
@@ -389,49 +369,101 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 </head>
 
 <body>
-  <!-- Header -->
-  <header>
-    <div class="top-text">
-      <h1>ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE</h1>
-    </div>
-    <div class="top-container">
-      <ul>
-        <li><a href="basket.php"><img src="admin/images/Home Page/basket-nav.png" alt="Basket"></a></li>
-        <li><a href="favorites.php"><img src="admin/images/Home Page/heart-nav.png"></a></li>
-        <li><a href="profile.php"> <img src="admin/images/Home Page/profile-user-nav.png" alt="profile"></a></li>
-      </ul>
-    </div>
-  </header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-custom shadow-sm fixed-top">
+        <div class="container-fluid d-flex align-items-center">
+            <!-- Hamburger -->
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
 
-  <!-- Navbar -->
-  <div class="navbar shadow-sm">
-    <div class="logo ms-4">
-      <a href="index.php"><img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="logo"></a>
-      <h2>VMC Basket</h2>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="index.php">Home</a></li>
-        <li><a href="shop.php" class="active">Shop</a></li>
-        <li><a href="contact.php">Contact us</a></li>
-      </ul>
+            <!-- Logo -->
+            <a class="navbar-brand" href="home.php">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
+            </a>
+
+            <!-- Search bar (desktop) -->
+            <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Right-aligned buttons for small devices -->
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="gap: 10px;">
+                <!-- Search icon (mobile) -->
+                <button class="btn p-0" type="button" id="mobileSearchToggle">
+                    <i class="fas fa-search fa-lg"></i>
+                </button>
+            </div>
+
+            <!-- Cart -->
+            <button class="basket-btn">
+                <i class="fas fa-shopping-basket"></i>
+            </button>
+
+            <!-- Collapsible search bar (mobile) -->
+            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+            </div>
+        </div>
     </nav>
-    <div class="search" style="display: flex;  align-items: center; justify-content: space-between; width: auto;">
-      <div class="search-container me-4">
-        <input type="text" class="form-control" placeholder="">
-        <button><img src="admin/images/search-icon.png" alt="Search"></button>
-      </div>
-    </div>
-  </div>
 
-  <div class="container my-4">
-    <h4 class=" mb-3 product-details-title">Product Details</h4>
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-body p-0">
+            <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="profile-section">
+                <img src="admin/images/profile_pic.png">
+                <h4 class="mt-2">Janella Clare Gomez</h4>
+            </div>
+
+            <div class="px-3">
+                <div class="mb-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                    Profile
+                    </button>
+                    <div class="collapse ps-3" id="profileMenu">
+                    <a href="profile.php">My Account</a>
+                    <a href="purchase_history.php">My Purchase</a>
+                    <a href="favorites.php">My Favorites</a>
+                    </div>
+                </div>
+
+            <a href="home.php">Home</a>
+
+            <div class="mt-2">
+                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                Shop
+                </button>
+                <div class="collapse ps-3" id="shopMenu">
+                <a href="shop_uniforms.php">Uniforms</a>
+                <a href="shop_supplies.php">School Supplies</a>
+                <a href="shop_merch.php">School-related Merchandise</a>
+                </div>
+            </div>
+
+            <a href="logout.php" class="mt-3 d-block">Log out</a>
+            </div>
+        </div>
+    </div>
+ 
+  <div class="container" style="margin-top: 100px;">
+    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+            <a href="<?= htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'shop.php') ?>" class="text-decoration-none">Shop</a>
+            </li>
+          <li class="breadcrumb-item active" aria-current="page">Product Details</li>
+      </ol>
+    </nav>
     <div class="row align-items-stretch g-3">
       <!-- Carousel -->
-      <div class="col-md-6">
-        <div id="productCarousel" class="carousel slide rounded p-4" data-bs-ride="carousel">
+      <div class="col-md-6 carousel-bg">
+        <div id="productCarousel" class="carousel slide p-4" data-bs-ride="carousel">
           <div class="carousel-inner text-center">
-            <div class="carousel-item active">
+            <div class="carousel-item active ">
               <img src="<?= htmlspecialchars($image_url) ?>" class="d-block mx-auto uniform-image" alt="Product Image">
             </div>
           </div>
@@ -443,13 +475,11 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
       <div class="col-md-6">
         <div class="product-infobg rounded p-4 product-info-box h-100 d-flex flex-column justify-content-between">
           <div class="d-flex justify-content-between align-items-start">
-            <h4 class="fw-bold"><?= htmlspecialchars($product1['product_name']) ?></h4>
+            <h3 class="fw-semibold"><?= htmlspecialchars($product1['product_name']) ?></h3>
 
-
-
-            <button class="fav-btn" onclick="toggleFavorite(event, this, <?= $product1['id'] ?>)">
-              <img src="./admin/images/heart-outline.png" alt="Favorite">
-            </button>
+              <button class="fav-button" onclick="toggleFavorite(event, this, <?= $product1['id'] ?>)">
+                  <i class="bi bi-heart"></i>
+              </button>
 
             <script>
               function toggleFavorite(event, btn, productId) {
@@ -493,54 +523,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
           </div>
 
 
-          <h4 class="fw-bold text-dark"> ₱ <?= number_format($product1['price'], 2) ?></h4>
-
-          <div class="d-flex align-items-center mb-3">
-            <span class="fs-2 fw-bold me-2">
-                <?php 
-                if (is_null($rating) || $rating === '—' || !is_numeric($rating)) {
-                    echo '—';
-                } else {
-                    echo number_format(floatval($rating), 1);
-                }
-                ?>
-            </span>
-            <small class="text-muted">out of 5</small>
-            <div class="ms-3">
-                <?php
-                if (is_null($rating) || $rating === '—' || !is_numeric($rating)) {
-                    // Display empty stars if no rating
-                    for ($i = 0; $i < 5; $i++) {
-                        echo '<i class="bi bi-star text-warning"></i>';
-                    }
-                } else {
-                    $rating = floatval($rating);
-                    // Calculate full and half stars
-                    $fullStars = floor($rating);
-                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
-                    
-                    // Output full stars
-                    for ($i = 0; $i < $fullStars; $i++) {
-                        echo '<i class="bi bi-star-fill text-warning"></i>';
-                    }
-
-                    // Output half star if applicable
-                    if ($hasHalfStar) {
-                        echo '<i class="bi bi-star-half text-warning"></i>';
-                    }
-
-                    // Output empty stars
-                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
-                    for ($i = 0; $i < $emptyStars; $i++) {
-                        echo '<i class="bi bi-star text-warning"></i>';
-                    }
-                }
-                ?>
-            </div>
-            <span class="ms-2 text-muted">
-                (<?= (is_null($rating) || $rating === '—' || !is_numeric($rating)) ? '0' : $review_count ?> ratings)
-            </span>
-          </div>
+          <h2 class="fw-bold text-dark"> ₱ <?= number_format($product1['price'], 2) ?></h2>
 
           <!-- Gender Display -->
           <div class="mt-2">
@@ -548,8 +531,14 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
             <p class="mb-2"><?= implode(', ', $available_genders) ?></p>
           </div>
 
+          <!--Badges Display -->
+          <div class="badges">
+              <span class="badge preschool_badge">Pre-School</span>
+              <span class="badge uniform_badge">Uniform</span>
+          </div>
+
           <?php if ($is_uniform): ?>
-            <div class="mb-3">
+            <div class="mb-4 mt-3">
               <p class="mb-1 fw-semibold">Size:</p>
               <div class="d-flex gap-2 flex-wrap">
                 <?php foreach ($available_sizes as $size): 
@@ -564,8 +553,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                     </button>
                 <?php endforeach; ?>
               </div>
-              <p class="mt-2 mb-0" id="stock-display">Available Stock: -</p>
-              <p class="mt-1 mb-0" id="gender-display">-</p>
+              <p class="mt-3 mb-0" id="stock-display">Available Stock: -</p>
             </div>
           <?php else: ?>
             <div class="mb-3">
@@ -585,10 +573,10 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
           <?php endif; ?>
 
           <script>
-const sizeButtons = document.querySelectorAll('.custom-btn[data-size]');
-const stockDisplay = document.getElementById('stock-display');
-const genderDisplay = document.getElementById('gender-display');
-let selectedSize = null;
+  const sizeButtons = document.querySelectorAll('.custom-btn[data-size]');
+  const stockDisplay = document.getElementById('stock-display');
+  const genderDisplay = document.getElementById('gender-display');
+  let selectedSize = null;
 
 sizeButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -615,7 +603,7 @@ sizeButtons.forEach(btn => {
 });
 </script>
 
-          <div class="mb-2">
+          <div class="mb-4">
             <p class="mb-1 fw-semibold">Quantity:</p>
             <div class="d-flex align-items-center gap-1" id="quantity-control">
               <button class="custom-btn" data-action="decrease">−</button>
@@ -627,30 +615,30 @@ sizeButtons.forEach(btn => {
 
 
           
-          <script>
-const quantityContainer = document.getElementById('quantity-control');
-const quantityInput = quantityContainer.querySelector('.quantity-value');
-const isSupplies = <?= json_encode($is_supplies); ?>;
-const totalStock = <?= $is_supplies ? $total_stock : 0 ?>;
+      <script>
+      const quantityContainer = document.getElementById('quantity-control');
+      const quantityInput = quantityContainer.querySelector('.quantity-value');
+      const isSupplies = <?= json_encode($is_supplies); ?>;
+      const totalStock = <?= $is_supplies ? $total_stock : 0 ?>;
 
-quantityContainer.addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
+      quantityContainer.addEventListener('click', (e) => {
+          const btn = e.target.closest('button');
+          if (!btn) return;
 
-    const action = btn.getAttribute('data-action');
-    let quantity = parseInt(quantityInput.value) || 1;
-    
-    // For uniforms, check selected size stock. For supplies, use total stock
-    const selectedButton = document.querySelector('.custom-btn.selected');
-    const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
+          const action = btn.getAttribute('data-action');
+          let quantity = parseInt(quantityInput.value) || 1;
+          
+          // For uniforms, check selected size stock. For supplies, use total stock
+          const selectedButton = document.querySelector('.custom-btn.selected');
+          const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
 
-    if (action === 'decrease' && quantity > 1) {
-        quantity--;
-    } else if (action === 'increase' && quantity < maxStock) {
-        quantity++;
-    }
+          if (action === 'decrease' && quantity > 1) {
+              quantity--;
+          } else if (action === 'increase' && quantity < maxStock) {
+              quantity++;
+          }
 
-    quantityInput.value = quantity;
+          quantityInput.value = quantity;
 });
 
 // Restrict manual input
@@ -668,7 +656,7 @@ quantityInput.addEventListener('input', () => {
 
 
           <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary w-100" onclick="addToBasket()">Place in Basket</button>
+            <button class="btn btn-outline-dark w-100" onclick="addToBasket()">Place in Basket</button>
 
             <script>
               function addToBasket() {
@@ -724,7 +712,7 @@ quantityInput.addEventListener('input', () => {
             </script>
 
 
-            <button class="btn btn-primary w-100" onclick="placeOrder()">Order Now</button>
+            <button class="btn custom-navy-btn w-100" onclick="placeOrder()">Order Now</button>
 
             <script>
             const isUniform = <?= json_encode($is_uniform); ?>;
@@ -781,17 +769,9 @@ quantityInput.addEventListener('input', () => {
                 });
             }
             </script>
-
-
-
-
-
-
           </div>
         </div>
       </div>
-
-
     </div>
   </div>
 
@@ -799,10 +779,10 @@ quantityInput.addEventListener('input', () => {
 
     <!-- Description & Sizes Table -->
     <div class="container my-4">
-      <div class="p-4 rounded shadow-sm">
+      <div class="p-4 rounded shadow-sm info-box">
         <div class="row">
           <div class="col-md-4">
-            <div class="info-box p-3 w-100 rounded border">
+            <div class="p-3 w-100">
               <div class="d-flex align-items-center mb-2">
                 <i class="bi bi-info-circle me-2"></i>
                 <h6 class="mb-0 fw-bold">Description:</h6>
@@ -812,7 +792,7 @@ quantityInput.addEventListener('input', () => {
             </div>
           </div>
           <div class="col-md-8">
-            <div class="info-box p-3 rounded border">
+            <div class="p-3">
               <div class="d-flex align-items-center mb-3">
                 <i class="bi bi-rulers me-2"></i>
                 <h6 class="mb-0 fw-bold">Sizes:</h6>
@@ -883,9 +863,8 @@ quantityInput.addEventListener('input', () => {
 
   <!-- Reviews Section -->
   <div class="container my-5">
-    <h4>Product Ratings</h4>
-    <div class="p-4 rounded shadow-sm">
-        <div class="d-flex align-items-center mb-3">
+    <div class="p-4 ratings-bg">
+        <div class=" d-flex align-items-center">
             <span class="fs-2 fw-bold me-2">
                 <?php 
                 if ($rating === '—' || !is_numeric($rating)) {
@@ -927,161 +906,151 @@ quantityInput.addEventListener('input', () => {
                 ?>
             </div>
         </div>
-        <div class="text-end mt-3">
-            <?php
-            // Get total number of reviews
-            $review_count_sql = "SELECT COUNT(*) as count FROM product_reviews WHERE product_id = ?";
-            $stmt = $conn->prepare($review_count_sql);
-            $stmt->bind_param("i", $productID);
-            $stmt->execute();
-            $review_count = $stmt->get_result()->fetch_assoc()['count'];
-            ?>
-              
-            <?php while ($review = $reviews_result->fetch_assoc()): ?>
-                <div class="review-card border-bottom py-3">
-                    <div class="d-flex align-items-start mb-2">
-                        <?php
-                        $userPhoto = $review['user_photo'] 
-                            ? 'admin/uploads/' . $review['user_photo'] 
-                            : 'admin/images/profile_pic.png';
-                        ?>
-                        <img src="<?= htmlspecialchars($userPhoto) ?>" 
-                             class="rounded-circle me-3" 
-                             alt="user" 
-                             width="48" 
-                             height="48"
-                             style="object-fit: cover;">
-                        <div>
-                            <strong class="d-block">
-                                <?= $review['is_anonymous'] ? 'Anonymous' : 
-                                    htmlspecialchars($review['student_fname'] . ' ' . $review['student_lname']) ?>
-                            </strong>
-                            <div class="text-warning">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <i class="bi <?= $i <= $review['rating'] ? 'bi-star-fill' : 'bi-star' ?> text-warning"></i>
-                                <?php endfor; ?>
-                            </div>
-                            <small class="text-muted"><?= $review['review_date'] ?></small>
-                        </div>
-                    </div>
-                    <p><?= nl2br(htmlspecialchars($review['review_text'])) ?></p>
-                    
-                    <?php
-                    // Fetch review images
-                    $images_sql = "SELECT image_path FROM review_images WHERE review_id = ?";
-                    $img_stmt = $conn->prepare($images_sql);
-                    $img_stmt->bind_param("i", $review['id']);
-                    $img_stmt->execute();
-                    $images_result = $img_stmt->get_result();
-                    
-                    if ($images_result->num_rows > 0): ?>
-                        <div class="d-flex flex-wrap gap-2">
-                            <?php while ($image = $images_result->fetch_assoc()): ?>
-                                <img src="<?= htmlspecialchars($image['image_path']) ?>" 
-                                     class="img-thumbnail" 
-                                     alt="review" 
-                                     width="100"
-                                     style="height: 100px; object-fit: cover;">
-                            <?php endwhile; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            <?php endwhile; ?>
-
-            <a href="#" class="text-primary">
-                See all reviews (<?= $review_count ?>)
-            </a>
-        </div>
-        <?php if ($total_pages > 1): ?>
-            <nav aria-label="Review pagination" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                        <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                            <a class="page-link" href="?id=<?= $productID ?>&page=<?= $i ?>">
-                                <?= $i ?>
-                            </a>
-                        </li>
-                    <?php endfor; ?>
-                </ul>
-            </nav>
-        <?php endif; ?>
     </div>
+
+      <div class="text-end mt-3">
+          <?php
+          // Get total number of reviews
+          $review_count_sql = "SELECT COUNT(*) as count FROM product_reviews WHERE product_id = ?";
+          $stmt = $conn->prepare($review_count_sql);
+          $stmt->bind_param("i", $productID);
+          $stmt->execute();
+          $review_count = $stmt->get_result()->fetch_assoc()['count'];
+          ?>
+            
+          <?php while ($review = $reviews_result->fetch_assoc()): ?>
+              <div class="review-card border-bottom py-3">
+                  <div class="d-flex align-items-start mb-2">
+                      <?php
+                      $userPhoto = $review['user_photo'] 
+                          ? 'admin/uploads/' . $review['user_photo'] 
+                          : 'admin/images/profile_pic.png';
+                      ?>
+                      <img src="<?= htmlspecialchars($userPhoto) ?>" 
+                            class="rounded-circle me-3" 
+                            alt="user" 
+                            width="48" 
+                            height="48"
+                            style="object-fit: cover;">
+                      <div class="text-start">
+                          <strong class="d-block">
+                              <?= $review['is_anonymous'] ? 'Anonymous' : 
+                                  htmlspecialchars($review['student_fname'] . ' ' . $review['student_lname']) ?>
+                          </strong>
+                          <div class="text-warning">
+                              <?php for ($i = 1; $i <= 5; $i++): ?>
+                                  <i class="bi <?= $i <= $review['rating'] ? 'bi-star-fill' : 'bi-star' ?> text-warning"></i>
+                              <?php endfor; ?>
+                          </div>
+                          <small class="text-muted"><?= $review['review_date'] ?></small>
+                      </div>
+                  </div>
+                  <p><?= nl2br(htmlspecialchars($review['review_text'])) ?></p>
+                  
+                  <?php
+                  // Fetch review images
+                  $images_sql = "SELECT image_path FROM review_images WHERE review_id = ?";
+                  $img_stmt = $conn->prepare($images_sql);
+                  $img_stmt->bind_param("i", $review['id']);
+                  $img_stmt->execute();
+                  $images_result = $img_stmt->get_result();
+                  
+                  if ($images_result->num_rows > 0): ?>
+                      <div class="d-flex flex-wrap gap-2">
+                          <?php while ($image = $images_result->fetch_assoc()): ?>
+                              <img src="<?= htmlspecialchars($image['image_path']) ?>" 
+                                    class="img-thumbnail" 
+                                    alt="review" 
+                                    width="100"
+                                    style="height: 100px; object-fit: cover;">
+                          <?php endwhile; ?>
+                      </div>
+                  <?php endif; ?>
+              </div>
+          <?php endwhile; ?>
+
+          <a href="#" class="text-primary">
+              See all reviews (<?= $review_count ?>)
+          </a>
+      </div>
+      <?php if ($total_pages > 1): ?>
+          <nav aria-label="Review pagination" class="mt-4">
+              <ul class="pagination justify-content-center">
+                  <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                      <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                          <a class="page-link" href="?id=<?= $productID ?>&page=<?= $i ?>">
+                              <?= $i ?>
+                          </a>
+                      </li>
+                  <?php endfor; ?>
+              </ul>
+          </nav>
+      <?php endif; ?>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<footer class="footer">
+    <div class="container p-5">
 
+        <!-- Logo Row -->
+        <div class="row justify-content-start mb-4">
+        <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
+            <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
+            <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
+        </div>
+        </div>
 
+        <!-- Links & Contacts Row -->
+        <div class="row text-start gy-3">
+
+        <!-- Quick Links -->
+        <div class="col-md-3">
+            <h5 class="fw-bold">Quick Links</h5>
+            <ul class="list-unstyled">
+            <li><a href="#" class="footer-link">Home</a></li>
+            <li><a href="#" class="footer-link">Shop</a></li>
+            </ul>
+        </div>
+
+        <!-- Contacts -->
+        <div class="col-md-7">
+            <h5 class="fw-bold">Contacts</h5>
+            <p class="mb-1">
+            <i class="bi bi-geo-alt-fill"></i>
+            18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
+            </p>
+            <p class="mb-1">
+            <i class="bi bi-telephone-fill"></i>
+            +63 2 8929 0856
+            </p>
+            
+            <div class="d-flex gap-3">
+                <p class="mb-1 fw-medium">Socials Media</p>
+                <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
+                <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
+            </div>
+        </div>
+
+        <!-- Back to top -->
+        <div class="col-md-2 d-flex align-items-end justify-content-md-end">
+            <a href="#" class="footer-link">↑ Back to top</a>
+        </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="mt-5 mb-3">
+
+        <!-- Copyright -->
+        <div class="sub-footer text-center small">
+        © 2024 Villager’s Montessori College. All rights served.
+        </div>
+    </div>
+</footer>
 
 
 
 </body>
-
-<!-- Footer -->
-<footer>
-  <div class="footer-container">
-    <div class="footer-logo">
-      <img src="admin/images/Footer/VMS-LOGO-Official-01.png" alt="logo">
-      <div class="logo-text">
-        <h2>VMC Basket</h2>
-        <h4>Villagers Montesorri College E-commerce Website</h4>
-      </div>
-    </div>
-
-    <div class="footer-links mt-5">
-      <div class="about">
-        <p>your one-stop destination for all university merchandise needs! Discover a vast collection of high-quality
-          uniforms, organizational shirts, and accessories tailored to showcase your university pride.</p>
-      </div>
-      <div class="footer-nav">
-        <h4>Links</h4>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="shop.html">Shop</a></li>
-          <li><a href="contact.html">Contact us</a></li>
-        </ul>
-      </div>
-      <div class="services">
-        <h4>Customer Services</h4>
-        <ul>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Size Guide</a></li>
-          <li><a href="#">Exchange & Returns</a></li>
-        </ul>
-      </div>
-      <div class="myAccount">
-        <h4>My Account</h4>
-        <ul>
-          <li><a href="#">Submit Feedback</a></li>
-          <li><a href="#">Favorites</a></li>
-          <li><a href="#">Shopping cart</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="socials mt-4">
-      <div class="footer-acknowledgement">
-        <div class="policy">
-          <ul>
-            <li><a href="#">About |</a></li>
-            <li><a href="#">Privacy Policy |</a></li>
-            <li><a href="#">Terms of Services</a></li>
-          </ul>
-        </div>
-        <div class="copy">
-          <h4>©2024 Villagers Montesorri College. All rights reserved.</h4>
-        </div>
-      </div>
-
-      <div class="footer-social mt-4">
-        <a href="#"><img src="admin/images/Footer/www.png" alt="Website"></a>
-        <a href="facebook.com"><img src="admin/images/Footer/facebook-footer.png" alt="facebook"></a>
-        <a href="#"><img src="admin/images/Footer/instagram.png" alt="instagram"></a>
-        <a href="#"><img src="admin/images/Footer/youtube.png" alt="youtube"></a>
-      </div>
-    </div>
-  </div>
-</footer>
-
 <script>
 
 

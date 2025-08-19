@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="./CSS/style.css">
+    <link rel="stylesheet" href="style.css">
 <style>
 body {
     background-color: #fff;
@@ -159,6 +159,7 @@ input {
 .resend-link:hover {
     text-decoration: underline;
 }
+
 @media (max-width: 991.98px) {
     .right-panel {
         display: none;
@@ -177,20 +178,24 @@ input {
         padding: 20px;
     }
 
+    .left-panel form{
+        padding: 20px;
+    }
+
     .left-panel img {
         max-width: 50%; /* make logo a bit larger for smaller screens */
     }
     .left-panel h2 {
-        font-size: 2rem;
+        font-size: 1.7rem;
     }
 
     .left-panel p {
         font-size: .9rem;
-        max-width: 300px; /* force it to wrap earlier */
+        max-width: 300px; 
         word-wrap: break-word;
         white-space: normal;
-        text-align: center; /* optional: looks nicer on small screens */
-        margin: 0 auto; /* centers it in the panel */
+        text-align: center; 
+        margin: 0 auto;
     }
 
     .circle2 {
@@ -210,11 +215,9 @@ input {
     .successful_icon {
       width: 100%;
     }
-
-   
     .otp-input {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
     }
 }
 </style>
@@ -229,8 +232,8 @@ input {
     <div class="container" id="step1">
         <div class = "left-panel">
             <!-- Left Side: Form -->
-            <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
-            <h2>Reset Password</h2>
+            <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo">
+            <h2 class="mt-5">Reset Password</h2>
             <p>Please enter your email address and we will send the OTP for you to reset your password.</p>
 
             <form method="POST" action="">
@@ -255,8 +258,8 @@ input {
     <!-- Step 2: Enter OTP -->
     <div class="container" id="step2">
         <div class = "left-panel"> 
-            <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
-            <h2>Enter 6-digit OTP code</h2>
+            <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo">
+            <h2 class="mt-5">Enter 6-digit OTP code</h2>
             <p>The OTP code was sent to your email address. Please enter the code.</p>
 
             <form method="POST" action="">
@@ -288,8 +291,8 @@ input {
     <!-- Step 3: Reset Password -->
     <div class="container" id="step3">
         <div class = "left-panel"> 
-            <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
-            <h2>Create New Password</h2>
+            <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo">
+            <h2 class="mt-5">Create New Password</h2>
             <p>You can create your new password.</p>
 
             <form method="POST" action="">
@@ -315,8 +318,8 @@ input {
     <!-- Success -->
     <div class="container" id="success">
          <div class = "left-panel"> 
-            <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
-            <h2 class="fw-bold reset-title">Password Reset Successfully!</h2>
+            <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo">
+            <h2 class="mt-5">Password Reset Successfully!</h2>
             <img src="admin/images/Admin Nav/succesful.png" alt="success icon" class="img-fluid successful_icon">
             <p class="text-muted text-center">You have successfully reset your password. Please use your new password in logging in.</p>
             <a href="login.php"><button class="custom-navy-btn mt-5">Log in now</button></a>

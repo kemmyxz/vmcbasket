@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="./CSS/style.css">
+  <link rel="stylesheet" href="style.css">
 
   <style>
     /* Background gradient */
@@ -68,7 +68,7 @@
       margin-bottom: 40px;
     }
     .logo-pic1{
-      height: 180px;
+      height: 120px;
     }
 
     .logo-pic2{
@@ -151,11 +151,11 @@
     }
 
     .logo-pic1 {
-      height: 120px;
+      height: 80px;
     }
 
     .logo-pic2 {
-      height: 100px;
+      height: 80px;
     }
 
   .custom-navy-btn {
@@ -213,11 +213,11 @@
   }
 
   .logo-pic1 {
-    height: 150px;
+    height: 100px;
   }
 
   .logo-pic2 {
-    height: 130px;
+    height: 100px;
   }
 
   .custom-navy-btn {
@@ -277,11 +277,11 @@
   }
 
   .logo-pic1 {
-    height: 160px;
+    height: 100px;
   }
 
   .logo-pic2 {
-    height: 140px;
+    height: 100px;
   }
 
   .custom-navy-btn {
@@ -321,8 +321,8 @@
       <div class="col-lg-6 text-start" style="font-size: 1.25rem;">
   
     <!-- Logos -->
-    <div class="d-flex align-items-center mb-4 slide-in delay-1">
-      <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo" class="logo-pic1 me-3">
+    <div class="d-flex align-items-center mb-5 slide-in delay-1">
+      <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="logo-pic1 me-3">
       <img src="admin/images/VMC School Logo.png" alt="School Logo" class="logo-pic2">
     </div>
 

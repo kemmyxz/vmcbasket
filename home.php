@@ -26,308 +26,356 @@ $rec_result = $conn->query($recommendations);
 ?>
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMC Basket-Homepage</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>VMC Basket-Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="./CSS/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-        .row > div {
-            display: flex; /* Ensure all cards in a row are the same height */
+        .highlight-yellow {
+            background-color: #fff4bf;
+            padding: 0.3rem 1rem;
+            border-radius: 6px;
+            border: 1px solid black;
+            box-shadow: 3px 3px 0px #000;
+            font-weight: 600;
         }
+        /* Search bar */
+        .search-bar input {
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            padding-left: 15px;
+        }
+        /* Carousel */
+        .carousel-item img {
+            width: 100%;
+            height: auto;
+        }
+        /* Section titles */
+        .section-title {
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        /* Product cards */
         .product-card {
-            background-color: #C8D9E6;
-            padding: 10px;
+            border: 1px solid #eee;
             border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-
-            /* New for equal height & layout */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            width: 100%; 
-            min-height: 410px;
+            transition: 0.3s;
         }
-
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
         }
-
         .product-card img {
+            border-radius: 10px 10px 0 0;
             width: 100%;
-            height: 250px; /* or adjust as needed */
-            object-fit: contain;
-            margin-bottom: 10px;
         }
-
-        .product-card:hover img {
-            transform: scale(1.1); 
-        }
-        
-        .product-title{
-            font-weight: medium;
-            margin-left: 100px;
-            margin-top: 50px;
-            margin-bottom: 20px;
-        }
-
-        /* Product Info */
         .product-info {
-            color: #000000;
-            text-align: left;
-            padding: 10px 5px;
+            padding: 10px;
+        }
+
+        /* FAQ */
+        .faq-section {
+            background: #FFF4C2;
+            padding: 2rem;
+            border: 1px solid black
+        }
+
+        .tagline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            margin: 0px;
+            background: #003153;
+            color: white;
+        }
+
+        /* Fade-in animation */
+        /* Initial hidden state */
+        .fade-section {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* When visible */
+        .fade-section.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 991.98px) {
+        /* Tablet: 3 columns for product cards */
+        .product-card img {
+            height: 180px;
+        }
+        .col-lg-3,
+        .col-md-4 {
+            flex: 0 0 33.3333%;
+            max-width: 33.3333%;
+        }
+
+        .highlight-pink {
+            font-size: 1.5rem;
+        }
+
+        .fav-button {
+            width: 30px;
+            height: 30px;
+            font-size: 0.9rem;
+        }
+        .basket-button {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.3rem;
         }
 
         .product-info h3 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 0.8rem;
         }
-
         .product-info p {
-            font-size: 14px;
-            margin-bottom: 2px;
+            font-size: 0.65rem;
         }
-
+        .badges .badge {
+            font-size: 0.55rem;
+        }
         .price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
+            font-size: 0.85rem;
         }
-
-        .product-line{
-            border: 1px solid #000000;
-        }
-
-        /* Star Rating */
         .rating {
-            color: #000000;
-            font-size: 14px;
+            font-size: 0.65rem;
         }
-
         .rating i {
-            margin-right: 2px;
+            font-size: 0.65rem;
         }
-
-        .filter{
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #00527F;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
-        .filter-color{
-            color: white;
-            background-color:#00527F;
+        @media (max-width: 767.98px) {
+        /* Phone: 2 columns for product cards, smaller card */
+        .product-card img {
+            height: 180px;
         }
-        .filter-title{
-            font-family: "Ubuntu", sans-serif;
-            color: #00527F;
-            font-weight: bold;
+        .col-md-4,
+        .col-lg-3 {
+            flex: 0 0 50%;
+            max-width: 50%;
         }
-        /* Heart Button */
-        .heart-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        border: none;
-        background: none;
-        font-size: 22px;
-        color: black;
-        cursor: pointer;
-        z-index: 10;
+        .product-info h3 {
+            font-size: 0.95rem;
         }
-
-        .heart-btn img {
-        width: 24px; /* Adjust size */
-        height: auto;
-        }
-
+        .product-info p,
+        .price,
         .rating {
-        display: flex;
-        align-items: center;
-        color: #000000;
-        font-size: 14px;
-    }
+            font-size: 0.8rem;
+        }
+        .icon-buttons .basket-button {
+            padding: 0 10px;
+            font-size: 0.9rem;
+        }
+        }
+        @media (max-width: 575.98px) {
+        /* Extra small: 1 column for product cards */
+        .col-md-4,
+        .col-lg-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .product-card img {
+            height: 180px;
+        }
+        .highlight-pink,
+        .highlight-blue,
+        .highlight-yellow {
+            font-size: 1rem;
+        }
+        .tagline {
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .navbar-custom {
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .container-fluid.d-flex.align-items-center {
+            justify-content: start;
+        }
+        .vmc-logo {
+            max-width: 90px;
+        }
+        .search-box {
+            width: 100%;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
 
-    .rating i {
-        margin-right: 2px;
-        font-size: 16px;
-    }
+        .basket-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
 
-    .rating .text-warning {
-        color: #FFC107 !important;
-    }
+        .profile-section img {
+            width: 70px;
+            height: 70px;
+        }
+        footer {
+            font-size: 1rem;
+        }
+        }
 
-    .rating span {
-        font-size: 12px;
-        color: #666;
-    }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="top-text"><h1>ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE</h1></div>
-        <div class="top-container">
-            <ul>
-                <li><a href="basket.php"><img src="admin/images/Home Page/basket-nav.png" alt="Basket"></a></li>  
-                <li><a href="favorites.php"><img src="admin/images/Home Page/heart-nav.png"></a></li>
-                <li><a href="profile.php"> <img src="admin/images/Home Page/profile-user-nav.png" alt="profile"></a></li>
-            </ul>
-        </div>
-    </header>
 
     <!-- Navbar -->
-    <div class="navbar shadow-sm">
-        <div class="logo ms-4">
-            <a href="index.php"><img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="logo"></a>
-            <h2>VMC Basket</h2>
+    <nav class="navbar navbar-custom shadow-sm fixed-top">
+        <div class="container-fluid d-flex align-items-center">
+            <!-- Hamburger -->
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+
+            <!-- Logo -->
+            <a class="navbar-brand" href="home.php">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
+            </a>
+
+            <!-- Search bar (desktop) -->
+            <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Right-aligned buttons for small devices -->
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="gap: 10px;">
+                <!-- Search icon (mobile) -->
+                <button class="btn p-0" type="button" id="mobileSearchToggle">
+                    <i class="fas fa-search fa-lg"></i>
+                </button>
+            </div>
+            <!-- Cart -->
+            <button class="basket-btn">
+                <i class="fas fa-shopping-basket"></i>
+            </button>
+
+            <!-- Collapsible search bar (mobile) -->
+            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="index.php" class="active">Home</a></li>
-                <li><a href="shop.php">Shop</a></li>
-                <li><a href="contact.php">Contact us</a></li>
-            </ul>
-        </nav>
-        <div class="search" style="display: flex;  align-items: center; justify-content: space-between; width: auto;">
-            <div class="search-container me-4">
-                <input type="text" class="form-control" placeholder="">
-                <button><img src="admin/images/search-icon.png" alt="Search"></button>
+    </nav>
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-body p-0">
+            <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="profile-section">
+                <img src="admin/images/profile_pic.png">
+                <h4 class="mt-2">Janella Clare Gomez</h4>
+            </div>
+
+            <div class="px-3">
+                <div class="mb-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                    Profile
+                    </button>
+                    <div class="collapse ps-3" id="profileMenu">
+                    <a href="profile.php">My Account</a>
+                    <a href="purchase_history.php">My Purchase</a>
+                    <a href="favorites.php">My Favorites</a>
+                    </div>
+                </div>
+
+            <a href="home.php">Home</a>
+
+            <div class="mt-2">
+                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                Shop
+                </button>
+                <div class="collapse ps-3" id="shopMenu">
+                <a href="shop_uniforms.php">Uniforms</a>
+                <a href="shop_supplies.php">School Supplies</a>
+                <a href="shop_merch.php">School-related Merchandise</a>
+                </div>
+            </div>
+
+            <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
     </div>
 
-    <!-- Main Sections of VMC Basket Homepage -->
-
-<!-- HERO SECTION / CAROUSEL -->
-<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-        
-    </div>
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="admin/images/Home Page/VMC-Carousel1 copy.png" class="d-block w-100" alt="VMC Uniforms">
+    <!-- HERO SECTION / CAROUSEL -->
+    <div id="heroCarousel" class="carousel slide fade-section" data-bs-ride="carousel" style="margin-top: 85px;">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            
         </div>
-        <div class="carousel-item">
-            <img src="admin/images/vmc-carousel2.png" class="d-block w-100" alt="VMC Uniforms">
-        </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </button>
-</div>
-
-<!-- TAGLINE -->
-<div class="tagline d-flex justify-content-between align-items-center text-white text-center px-5 py-3">
-    <h2>Total Quality Education, Our Thrust</h2>
-    <h2>Shop Now Montessorians!</h2>
-</div>
-
-<!-- CATEGORY ICONS -->
-<div class="custom-icon container text-center my-5">
-    <div class="row justify-content-center">
-        <div class="col-4 col-md-3">
-            <a href="shop.php" style="text-decoration: none; color: black;">
-                <img src="admin/images/Home Page/Uniform.png " class="category-icon" alt="Official Uniforms">
-                <p class="container-text">Official Uniforms</p>
-            </a>
-        </div>
-        <div class="col-4 col-md-3">
-            <a href="shop.php" style="text-decoration: none; color: black;">
-                <img src="admin/images/Home Page/Supplies.png " class="category-icon" alt="School Supplies">
-                <p class="container-text">School Supplies</p>
-            </a>
-        </div>
-        <div class="col-4 col-md-3">
-            <a href="shop.php" style="text-decoration: none; color: black;">
-                <img src="admin/images/Home Page/NewArrivals.png " class="category-icon" alt="New Release">
-                <p class="container-text">New Release</p>
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- ANNOUNCEMENT CORNER -->
-<div class="announcement-container py-5">
-    <div class="container text-center">
-        <h2 class="homepage-title mb-3">Announcement Corner</h2>
-        <p>Any announcements regarding our school uniforms or other school-related apparel will be displayed in this corner!</p>
-        <div id="announcementCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#announcementCarousel" data-bs-slide-to="0" class="active"></button>
-                <button type="button" data-bs-target="#announcementCarousel" data-bs-slide-to="1"></button>
-                <button type="button" data-bs-target="#announcementCarousel" data-bs-slide-to="2"></button>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="admin/images/Home Page/vmc-carousel.png" class="d-block w-100" alt="VMC Uniforms">
             </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="admin/images/Home Page/Announcement Corner.png" class="d-block w-100 announcement-img" alt="Announcement">
-                </div>
-                <div class="carousel-item">
-                    <img src="admin/images/Home Page/Announcement Corner.png" class="d-block w-100 announcement-img" alt="Announcement">
-                </div>
-                <div class="carousel-item">
-                    <img src="admin/images/Home Page/Announcement Corner.png" class="d-block w-100 announcement-img" alt="Announcement">
-                </div>
+            <div class="carousel-item">
+                <img src="admin/images/Home Page/vmc-carousel2.png" class="d-block w-100" alt="VMC Uniforms">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <!-- TAGLINE -->
+    <div class="tagline fade-section">
+        All products are available for pick-up only at Villagers Montessori College
+    </div>
+
+
+    <!-- SHOP BY YEAR-LEVEL -->
+    <div class="container text-start p-5 fade-section">
+        <h2 class="mt-4 mb-5">
+            <span class="highlight-pink">Shop By Year-level</span>
+        </h2>
+        <div class="year-level row g-4 justify-content-center">
+            <!-- First Row -->
+            <div class="col-md-6">
+                <a href="shop.php"><img src="admin/images/Home Page/Pre-School & Elementary.png" class="img-fluid rounded shadow" alt="Pre-School & Elementary"></a>
+            </div>
+            <div class="col-md-6">
+                <a href="shop.php"><img src="admin/images/Home Page/Junior High School.png" class="img-fluid rounded shadow" alt="Junior High"></a>
+            </div>
+            <!-- Second Row -->
+            <div class="col-md-6">
+                <a href="shop.php"><img src="admin/images/Home Page/Senior High School.png" class="img-fluid rounded shadow" alt="Senior High"></a>
+            </div>
+            <div class="col-md-6">
+                <a href="shop.php"><img src="admin/images/Home Page/College.png" class="img-fluid rounded shadow" alt="College"></a>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Fullscreen Image Viewer -->
-<div id="fullscreenViewer" class="fullscreen-viewer">
-    <img id="fullscreenImage" src="" alt="Full-size Announcement">
-</div>
+    <!-- FEATURED PRODUCTS -->
+    <div class="container p-5 fade-section">
+        <h2 class="mb-5 text-center">
+            <span class="highlight-blue">Featured Products</span>
+        </h2>
 
-
-<!-- SHOP BY YEAR-LEVEL -->
-<div class="container text-center my-5" style= "margin-top: 50px;">
-    <h2 class="homepage-title mb-4">Shop by Year-level</h2>
-    <div class="year-level row g-4 justify-content-center">
-        <!-- First Row -->
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/Pre-School & Elementary.png" class="img-fluid rounded shadow" alt="Pre-School & Elementary"></a>
-        </div>
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/Junior High School.png" class="img-fluid rounded shadow" alt="Junior High"></a>
-        </div>
-        <!-- Second Row -->
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/Senior High School.png" class="img-fluid rounded shadow" alt="Senior High"></a>
-        </div>
-        <div class="col-md-6">
-            <a href="shop.php"><img src="admin/images/Home Page/College.png" class="img-fluid rounded shadow" alt="College"></a>
-        </div>
-    </div>
-</div>
-
-<!-- FEATURED PRODUCTS -->
-<!-- Products -->
-<div class="container text-center mb-4" style="margin-top: 100px;">
-    <h2 class="homepage-title mb-4">Featured Products</h2>
-
-        <div class="container mb-5">
+        <div class="container mb-3">
             <div class="row g-4">
                 <?php
                 if ($rec_result && $rec_result->num_rows > 0):
@@ -337,42 +385,68 @@ $rec_result = $conn->query($recommendations);
                 ?>
                 <div class="col-md-4 col-lg-3">
                     <div class="product-card" onclick="location.href='product_details.php?id=<?= $rec_row['id'] ?>'">
-                        <button class="heart-btn" onclick="toggleFavorite(event, this, <?= $rec_row['id'] ?>)">
-                            <img src="./admin/images/heart-outline.png" alt="Favorite">
-                        </button>
+
+                        <!-- Product Image -->
                         <img src="admin/<?= htmlspecialchars($rec_row['image']) ?>" alt="<?= htmlspecialchars($rec_row['product_name']) ?>">
+
+                        <!-- Product Info -->
                         <div class="product-info">
                             <h3><?= htmlspecialchars($rec_row['product_name']) ?></h3>
-                            <?php if (strtolower($rec_row['type']) !== 'supplies'): ?>
-                                <p>Available sizes: <?= htmlspecialchars($rec_row['sizes'] ?? 'N/A') ?></p>
+                            <?php
+                            $genders = trim($rec_row['genders'] ?? '');
+                            $sizes = trim($rec_row['sizes'] ?? '');
+                            if ($genders !== '' || $sizes !== ''): ?>
+                                <p>
+                                    <?= htmlspecialchars($genders) ?>
+                                    <?php if ($sizes !== ''): ?>
+                                        (<?= htmlspecialchars($sizes) ?>)
+                                    <?php endif; ?>
+                                </p>
+                            <?php else: ?>
+                                <p>&nbsp;</p>
                             <?php endif; ?>
-                            <p><?= htmlspecialchars($rec_row['genders'] ?? '') ?></p>
-                            <hr class="product-line">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="price">₱<?= number_format($rec_row['price'], 2) ?></h4>
-                                <div class="rating">
-                                    <?php
-                                    $rating = $rec_row['rating'] ?? 0;
-                                    $fullStars = floor($rating);
-                                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
-                                    
-                                    // Output full stars
-                                    for ($i = 0; $i < $fullStars; $i++): ?>
-                                        <i class="bi bi-star-fill text-warning"></i>
-                                    <?php endfor;
 
-                                    // Output half star if applicable
-                                    if ($hasHalfStar): ?>
-                                        <i class="bi bi-star-half text-warning"></i>
-                                    <?php endif;
+                            <div class="badges">
+                                <span class="badge preschool_badge">Pre-School</span>
+                                <span class="badge uniform_badge">Uniform</span>
+                            </div>
 
-                                    // Output empty stars
-                                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
-                                    for ($i = 0; $i < $emptyStars; $i++): ?>
-                                        <i class="bi bi-star text-warning"></i>
-                                    <?php endfor; ?>
-                                    <span class="ms-1">(<?= number_format($rating, 1) ?>)</span>
-                                </div>
+                            <!-- Price Range -->
+                            <div class="price">
+                                ₱<?= number_format($rec_row['price'], 2) ?>
+                            </div>
+
+                            <!-- Rating -->
+                            <div class="rating">
+                                <?php
+                                $rating = $rec_row['rating'] ?? 0;
+                                $fullStars = floor($rating);
+                                $hasHalfStar = ($rating - $fullStars) >= 0.5;
+
+                                for ($i = 0; $i < $fullStars; $i++): ?>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                <?php endfor;
+
+                                if ($hasHalfStar): ?>
+                                    <i class="bi bi-star-half text-warning"></i>
+                                <?php endif;
+
+                                $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+                                for ($i = 0; $i < $emptyStars; $i++): ?>
+                                    <i class="bi bi-star text-warning"></i>
+                                <?php endfor; ?>
+                                <span><?= number_format($rating, 1) ?></span>
+                            </div>
+
+                            <!-- Icon Buttons (Heart & Cart) -->
+                            <div class="icon-buttons">
+                                <button class="fav-button" onclick="event.stopPropagation(); toggleFavorite(this, <?= $rec_row['id'] ?>)">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                                <button class="basket-button" onclick="event.stopPropagation(); addToCart(<?= $rec_row['id'] ?>)">
+                                    <i class="bi bi-basket me-2"></i>
+                                    Add to Basket
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -385,196 +459,341 @@ $rec_result = $conn->query($recommendations);
                 <?php endif; ?>
             </div>
         </div>
-    
-</div>
-
+    </div>
 
    
-    <div class="text-center mt-4">
-    <a href="shop.php" class="see-more-btn">See More</a>
+    <div class="text-center">
+        <a href="shop_uniforms.php" class="text-decoration-none">
+            <button class="custom-navy-btn">See More</button>
+        <a>
     </div>
 
     
     <!-- FAQ SECTION -->
-<div class="faq-container py-5">
-    <div class="container">
-        <h2 class="homepage-title mb-4 text-center">Frequently Asked Questions</h2>
-        <div class="accordion" id="faqAccordion">
-            <!-- Question 1 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq1">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer1">
-                        What types of products are available on this site?
-                    </button>
-                </h2>
-                <div id="answer1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        VMC Basket offers a wide range of essential products that every student at Villagers Montessori College may need throughout the school year. This includes various school supplies, exclusive VMC notebooks, and official school apparel such as uniforms and PE uniforms available for all year levels.
-                        Our goal is to make it easier for students and parents to find everything they need in one convenient online platform.
+    <div class="py-4 fade-section ">
+        <div class="container p-5">
+            <h2 class= "mb-5 text-end">
+                <span class="highlight-yellow">Frequently Asked Questions</span>
+            </h2>
+            <div class="accordion" id="faqAccordion">
+                <!-- Question 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq1">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer1">
+                            What types of products are available on this site?
+                        </button>
+                    </h2>
+                    <div id="answer1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            The website offers a variety of official uniforms, which you can easily filter based on your year level to find exactly what you need.
+                             You’ll also find a selection of school supplies and other school-related merchandise designed for the VMC community.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Question 2 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq2">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer2">
-                        How do I know which size to order?
-                    </button>
-                </h2>
-                <div id="answer2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        To help you choose the right fit, size information is provided in the description section of each product. We highly recommend reviewing the size chart carefully before placing your order to ensure the perfect fit, especially for uniforms and PE attire.
-                        If you’re unsure, feel free to reach out to us or visit the school bookstore for sample sizing.
+                <!-- Question 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer2">
+                            How do I know which size to order?
+                        </button>
+                    </h2>
+                    <div id="answer2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                           Log in to your VMC Basket account using your registered student number and password. Browse through the available merchandise in the “Shop” section,
+                           select the items you need, and add them to your cart. Once ready, proceed to checkout and choose your preferred payment method and upload your E-receipt.
+                            Follow the instructions carefully to finalize your purchase.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Question 3 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq3">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer3">
-                        What payment methods do you accept?
-                    </button>
-                </h2>
-                <div id="answer3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Currently, VMC Basket only accepts payment through over-the-counter transactions at the school's cashier.
-                        Once you place your order online, you may settle your payment at the school, making it safe and secure for all students and parents.
+                <!-- Question 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer3">
+                            What payment methods do you accept?
+                        </button>
+                    </h2>
+                    <div id="answer3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            VMC Basket accepts both over-the-counter and online payments.<br><br> For over-the-counter payments, you can pay directly at the VMC Accounting Office after placing your order online.<br><br>
+                            For online payments, you may choose GCash at checkout. Send the total amount to the official VMC Basket GCash number, then upload a screenshot or photo of your payment receipt during checkout. This allows the admin to verify your payment and ensures your order is processed smoothly
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Question 4 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq4">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer4">
-                        Is delivery available for my order?
-                    </button>
-                </h2>
-                <div id="answer4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        VMC Basket does not offer door-to-door delivery at this time. All orders must be claimed physically at the school's bookstore. 
-                        This ensures that students and parents can personally check their orders upon claiming and helps maintain smooth and organized distribution within the campus.
+                <!-- Question 4 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq4">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer4">
+                            Is delivery available for my order?
+                        </button>
+                    </h2>
+                    <div id="answer4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            VMC Basket does not offer door-to-door delivery at this time. All orders must be claimed physically at the school's bookstore. 
+                            This ensures that students and parents can personally check their orders upon claiming and helps maintain smooth and organized distribution within the campus.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Question 5 -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="faq5">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer5">
-                        What if I need to return or exchange an item?
-                    </button>
-                </h2>
-                <div id="answer5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        If you need to return or exchange a product, we’re here to assist you. Simply go to the "My Purchase" page within your user account and locate the specific product you wish to return. You will find a return request form available there. Please note that the option to return will only be available if the product has not yet been rated. 
-                        Once your request is submitted, our team will review it and assist you with the return or exchange process.
+                <!-- Question 5 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq5">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer5">
+                            How will I know if my order is ready for pickup?
+                        </button>
+                    </h2>
+                    <div id="answer5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Once your order has been verified and confirmed by the admin team, it will be marked as “To Pick Up” in the “My Purchase” section of your account. You will also receive an order summary with all relevant pickup instructions and details.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 6 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq6">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer6">
+                            Can I cancel my order after placing it?
+                        </button>
+                    </h2>
+                    <div id="answer6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes, you can cancel your order as long as it has not yet been processed or verified by the admin. Simply go to the “My Purchase” section, locate the order, and choose the cancel option. Once an order has been verified, it can no longer be canceled.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 7 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq7">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer7">
+                            Can I use the platform if I’m not a VMC student or staff?
+                        </button>
+                    </h2>
+                    <div id="answer7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            No. The VMC Basket is exclusively for currently enrolled students and official staff of Villagers Montessori College. Only administrators can register users, and each account is tied to a valid VMC student number.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 8 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq8">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer8">
+                            Is my personal information secure on this platform?
+                        </button>
+                    </h2>
+                    <div id="answer8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes. The platform is designed with data security in mind. Only administrators can create accounts, and sensitive details such as your full name and student number cannot be edited after registration. All user data is stored securely and handled with strict confidentiality.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 9 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq9">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer9">
+                           Is there a mobile app available?
+                        </button>
+                    </h2>
+                    <div id="answer9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Not at this time. The VMC Basket is a web-based platform optimized for use on desktop and mobile browsers. You can conveniently access it via any modern browser on your computer or smartphone.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 10 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq10">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer10">
+                            How can I reset my password if I forget it?
+                        </button>
+                    </h2>
+                    <div id="answer10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            If you forget your password, simply click on the “Forgot Password” option on the login page. Enter your email address, and a One-Time Password (OTP) will be sent to your registered email address. Use the OTP to verify your identity and reset your password securely.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 11 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq11">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer11">
+                            Can I change my personal information after registration?
+                        </button>
+                    </h2>
+                    <div id="answer11" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                           Yes, you can update select details such as your phone number, email address, birthdate, and year level by visiting the Account Settings page. However, your full name and student number are locked for identity verification purposes and cannot be edited.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 12 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq12">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer12">
+                            Can I leave feedback about a product I purchased?
+                        </button>
+                    </h2>
+                    <div id="answer12" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                        Yes! After you've received your order, you can go to the My Purchase page to leave a star rating, write a review, and upload a photo of the item.                        </div>
+                    </div>
+                </div>
+                <!-- Question 13 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq13">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer13">
+                            Can I request customized uniform sizes?
+                        </button>
+                    </h2>
+                    <div id="answer13" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            No. We currently do not accept custom uniform size requests. Only the standard sizes listed on the site are available for purchase.                    </div>
+                
+                        </div>
+                </div>
+                <!-- Question 14 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq14">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer14">
+                            Can I return a product after receiving it?
+                        </button>
+                    </h2>
+                    <div id="answer14" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Yes, you may request a return if the product meets our return policy conditions. To do this, go to the “My Purchase” section, locate the order, and select the Return option. Please provide the reason for the return and upload photos of the product you want to return, then click Send Request. Our team will review your request and let you know if your return has been approved.
+                        </div>
+                    </div>
+                </div>
+                <!-- Question 15 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faq15">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer15">
+                            What should I do if I have questions or concerns not addressed here?
+                        </button>
+                    </h2>
+                    <div id="answer15" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                           If you can’t find the answer you’re looking for, simply use the chat feature on our website to talk directly with an admin for real-time assistance.
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container p-5">
+
+            <!-- Logo Row -->
+            <div class="row justify-content-start mb-4">
+            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
+                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
+            </div>
+            </div>
+
+            <!-- Links & Contacts Row -->
+            <div class="row text-start gy-3">
+
+            <!-- Quick Links -->
+            <div class="col-md-3">
+                <h5 class="fw-bold">Quick Links</h5>
+                <ul class="list-unstyled">
+                <li><a href="#" class="footer-link">Home</a></li>
+                <li><a href="#" class="footer-link">Shop</a></li>
+                </ul>
+            </div>
+
+            <!-- Contacts -->
+            <div class="col-md-7">
+                <h5 class="fw-bold">Contacts</h5>
+                <p class="mb-1">
+                <i class="bi bi-geo-alt-fill"></i>
+                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
+                </p>
+                <p class="mb-1">
+                <i class="bi bi-telephone-fill"></i>
+                +63 2 8929 0856
+                </p>
+                
+                <div class="d-flex gap-3">
+                    <p class="mb-1 fw-medium">Socials Media</p>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- Back to top -->
+            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
+                <a href="#" class="footer-link">↑ Back to top</a>
+            </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="mt-5 mb-3">
+
+            <!-- Copyright -->
+            <div class="sub-footer text-center small">
+            © 2024 Villager’s Montessori College. All rights served.
+            </div>
+        </div>
+    </footer>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-</body>
 
-<script>
-    function toggleFavorite(event, btn) {
-    event.stopPropagation(); // Prevents redirection
-    let heartImg = btn.querySelector("img");
-    
-    if (heartImg.src.includes("heart-outline.png")) {
-        heartImg.src = "./Images/heart.png"; // Change to filled heart
-    } else {
-        heartImg.src = "./Images/heart-outline.png"; // Change back to outlined heart
-    }
-}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Select all images inside the announcement carousel
-        const announcementImages = document.querySelectorAll(".announcement-img");
+    <!-- Animation Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const sections = document.querySelectorAll(".fade-section");
+        const footer = document.querySelector("footer");
 
-        // Select fullscreen viewer elements
-        const fullscreenViewer = document.getElementById("fullscreenViewer");
-        const fullscreenImage = document.getElementById("fullscreenImage");
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+            // Stop animation if it's the footer
+            if (entry.target === footer) {
+                observer.unobserve(entry.target);
+                return;
+            }
 
-        // Show fullscreen image on click
-        announcementImages.forEach(img => {
-            img.addEventListener("click", function () {
-                fullscreenImage.src = this.src; // Set the fullscreen image
-                fullscreenViewer.style.display = "flex"; // Show fullscreen viewer
+            // Add visible class when in viewport
+            if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                observer.unobserve(entry.target); // run once per section
+            }
             });
+        }, { threshold: 0.2 });
+
+        sections.forEach(section => observer.observe(section));
+        observer.observe(footer); 
         });
+    </script>
 
-        // Hide fullscreen viewer when clicking outside the image
-        fullscreenViewer.addEventListener("click", function () {
-            fullscreenViewer.style.display = "none";
+    <!-- Collapse Search for small device Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('mobileSearchToggle');
+            const searchBar = document.getElementById('mobileSearchBar');
+            if (toggleBtn && searchBar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchBar.classList.toggle('d-none');
+                    if (!searchBar.classList.contains('d-none')) {
+                        searchBar.querySelector('input').focus();
+                    }
+                });
+                // Optional: Hide search bar when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                        searchBar.classList.add('d-none');
+                    }
+                });
+            }
         });
-    });
-</script>
+    </script>
 
-<!-- Footer -->
-<footer>
-    <div class="footer-container">
-        <div class="footer-logo">
-            <img src="admin/images/Footer/VMS-LOGO-Official-01.png" alt="logo">
-            <div class="logo-text">
-                <h2>VMC Basket</h2>
-                <h4>Villagers Montesorri College E-commerce Website</h4>
-            </div>
-        </div>
 
-        <div class="footer-links mt-5">
-            <div class="about">
-                <p>your one-stop destination for all university merchandise needs! Discover a vast collection of high-quality uniforms, organizational shirts, and accessories tailored to showcase your university pride.</p>
-            </div>
-            <div class="footer-nav">
-                <h4>Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="shop.html">Shop</a></li>
-                    <li><a href="contact.html">Contact us</a></li>
-                </ul>
-            </div>
-            <div class="services">
-                <h4>Customer Services</h4>
-                <ul>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Size Guide</a></li>
-                    <li><a href="#">Exchange & Returns</a></li>
-                </ul>
-            </div>
-            <div class="myAccount">
-                <h4>My Account</h4>
-                <ul>
-                    <li><a href="#">Submit Feedback</a></li>
-                    <li><a href="#">Favorites</a></li>
-                    <li><a href="#">Shopping cart</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="socials mt-4">
-            <div class="footer-acknowledgement">
-                <div class="policy">
-                    <ul>
-                        <li><a href="#">About |</a></li>
-                        <li><a href="#">Privacy Policy |</a></li>
-                        <li><a href="#">Terms of Services</a></li>
-                    </ul>
-                </div>
-                <div class="copy">
-                    <h4>©2024 Villagers Montesorri College. All rights reserved.</h4>
-                </div>
-            </div>
-            
-            <div class="footer-social mt-4">
-                <a href="#"><img src="admin/images/Footer/www.png" alt="Website"></a> 
-                <a href="facebook.com"><img src="admin/images/Footer/facebook-footer.png" alt="facebook"></a>
-                <a href="#"><img src="admin/images/Footer/instagram.png" alt="instagram"></a>
-                <a href="#"><img src="admin/images/Footer/youtube.png" alt="youtube"></a> 
-            </div>
-        </div>
-    </div> 
-</footer>
+</body>
 </html>

@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $update_last_activity_stmt->close();
 
                     // Redirect to dashboard
-                    header("Location: index.php");
+                    header("Location: home.php");
                     exit();
                 } else {
                     $error = "Incorrect Password!";
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<link rel="stylesheet" href="./CSS/style.css">
+<link rel="stylesheet" href="style.css">
 
 <style>
 body {
@@ -311,8 +311,8 @@ a:hover {
     </div>
 
     <div class="right-panel">
-        <img src="admin/images/VMC Basket Logo.png" alt="VMC Basket Logo">
-        <h2>Log In</h2>
+        <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo">
+        <h2 class="mt-5">Log In</h2>
         <p>Please use your student number to log in.</p>
 
         <form id="loginForm" method="POST" action="">
