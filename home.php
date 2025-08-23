@@ -38,6 +38,7 @@ $rec_result = $conn->query($recommendations);
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
         .highlight-yellow {
@@ -258,16 +259,16 @@ $rec_result = $conn->query($recommendations);
             </div>
 
             <!-- Right-aligned buttons for small devices -->
-            <div class="d-flex d-sm-none ms-auto align-items-center" style="gap: 10px;">
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
                 <!-- Search icon (mobile) -->
                 <button class="btn p-0" type="button" id="mobileSearchToggle">
                     <i class="fas fa-search fa-lg"></i>
                 </button>
             </div>
             <!-- Cart -->
-            <button class="basket-btn">
+            <a href="basket.php" class=" basket-btn text-decoration-none">
                 <i class="fas fa-shopping-basket"></i>
-            </button>
+            </a>
 
             <!-- Collapsible search bar (mobile) -->
             <div class="w-100 mt-2 d-none" id="mobileSearchBar">
@@ -740,9 +741,6 @@ $rec_result = $conn->query($recommendations);
         </div>
     </footer>
 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Animation Script -->
     <script>

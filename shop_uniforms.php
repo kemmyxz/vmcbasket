@@ -39,12 +39,12 @@ $search = $_GET['search'] ?? '';
     <link rel="stylesheet" href="style.css">
     <style>
         .stock-info {
-        color: #666;
-        font-size: 14px;
-        margin: 5px 0;
-        padding: 2px 5px;
-        background-color: #f8f9fa;
-        border-radius: 3px;
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+            padding: 2px 5px;
+            background-color: #f8f9fa;
+            border-radius: 3px;
         }
 
         .stock-info.out-of-stock {
@@ -54,13 +54,13 @@ $search = $_GET['search'] ?? '';
 
         /* Sidebar filter styling */
         aside h6 {
-        font-size: 0.95rem;
-        font-weight: 600;
-        margin-bottom: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
         aside ul li {
-        margin-bottom: 6px;
-        font-size: 0.9rem;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
         }
 
         .basket-button{
@@ -70,58 +70,80 @@ $search = $_GET['search'] ?? '';
 
         @media (max-width: 991.98px) {
         /* Tablet: 3 columns for product cards */
-        .product-card img {
-            height: 180px;
-        }
-        .col-lg-3,
-        .col-md-4 {
-            flex: 0 0 33.3333%;
-            max-width: 33.3333%;
-        }
+            .product-card img {
+                height: 180px;
+            }
+            .col-lg-3,
+            .col-md-4 {
+                flex: 0 0 33.3333%;
+                max-width: 33.3333%;
+            }
 
-        .highlight-pink {
-            font-size: 1.5rem;
-        }
+            .highlight-pink {
+                font-size: 1.5rem;
+            }
 
-        .fav-button {
-            width: 30px;
-            height: 30px;
-            font-size: 0.9rem;
-        }
-        .basket-button {
-            font-size: 0.65rem;
-            padding: 0.15rem 0.15rem;
-        }
+            .fav-button {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            .basket-button {
+                font-size: 0.65rem;
+                padding: 0.15rem 0.15rem;
+            }
+            .product-info h3 {
+                font-size: 0.8rem;
+            }
+            .product-info p {
+                font-size: 0.65rem;
+            }
+            .badges .badge {
+                font-size: 0.55rem;
+            }
+            .price {
+                font-size: 0.85rem;
+            }
+            .rating {
+                font-size: 0.65rem;
+            }
+            .rating i {
+                font-size: 0.65rem;
+            }
 
-        .basket-btn i{
-            display: none;
-        }
+            .filter-title{
+                font-size: 1rem;
+            }
+            .filter-text{
+                font-size: 0.85rem;
+            }
+            .navbar-custom {
+                padding: 0.5rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .container-fluid.d-flex.align-items-center {
+                justify-content: start;
+            }
+            .vmc-logo {
+                max-width: 90px;
+            }
+            .search-box {
+                width: 100%;
+                font-size: 0.85rem;
+                margin-top: 0.5rem;
+            }
 
-        .product-info h3 {
-            font-size: 0.8rem;
-        }
-        .product-info p {
-            font-size: 0.65rem;
-        }
-        .badges .badge {
-            font-size: 0.55rem;
-        }
-        .price {
-            font-size: 0.85rem;
-        }
-        .rating {
-            font-size: 0.65rem;
-        }
-        .rating i {
-            font-size: 0.65rem;
-        }
+            .basket-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.2rem;
+                margin-right: 5px;
+            }
 
-        .filter-title{
-            font-size: 1rem;
-        }
-        .filter-text{
-            font-size: 0.85rem;
-        }
+            footer {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 575.98px) {
@@ -172,7 +194,7 @@ $search = $_GET['search'] ?? '';
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+     <!-- Navbar -->
     <nav class="navbar navbar-custom shadow-sm fixed-top">
         <div class="container-fluid d-flex align-items-center">
             <!-- Hamburger -->
@@ -192,7 +214,7 @@ $search = $_GET['search'] ?? '';
             </div>
 
             <!-- Right-aligned buttons for small devices -->
-            <div class="d-flex d-sm-none ms-auto align-items-center" style="gap: 10px;">
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
                 <!-- Search icon (mobile) -->
                 <button class="btn p-0" type="button" id="mobileSearchToggle">
                     <i class="fas fa-search fa-lg"></i>
@@ -200,9 +222,9 @@ $search = $_GET['search'] ?? '';
             </div>
 
             <!-- Cart -->
-            <button class="basket-btn">
+            <a href="basket.php" class=" basket-btn text-decoration-none">
                 <i class="fas fa-shopping-basket"></i>
-            </button>
+            </a>
 
             <!-- Collapsible search bar (mobile) -->
             <div class="w-100 mt-2 d-none" id="mobileSearchBar">
@@ -210,6 +232,7 @@ $search = $_GET['search'] ?? '';
             </div>
         </div>
     </nav>
+
 
     <!-- Offcanvas Sidebar -->
     <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
@@ -514,6 +537,27 @@ $search = $_GET['search'] ?? '';
         </div>
     </div>
 </footer>
-  
+   <!-- Collapse Search for small device Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('mobileSearchToggle');
+            const searchBar = document.getElementById('mobileSearchBar');
+            if (toggleBtn && searchBar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchBar.classList.toggle('d-none');
+                    if (!searchBar.classList.contains('d-none')) {
+                        searchBar.querySelector('input').focus();
+                    }
+                });
+                // Optional: Hide search bar when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                        searchBar.classList.add('d-none');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

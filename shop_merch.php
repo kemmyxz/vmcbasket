@@ -93,10 +93,6 @@ $search = $_GET['search'] ?? '';
             padding: 0.15rem 0.15rem;
         }
 
-        .basket-btn i{
-            display: none;
-        }
-
         .product-info h3 {
             font-size: 0.8rem;
         }
@@ -196,7 +192,7 @@ $search = $_GET['search'] ?? '';
             </div>
 
             <!-- Right-aligned buttons for small devices -->
-            <div class="d-flex d-sm-none ms-auto align-items-center" style="gap: 10px;">
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
                 <!-- Search icon (mobile) -->
                 <button class="btn p-0" type="button" id="mobileSearchToggle">
                     <i class="fas fa-search fa-lg"></i>
@@ -204,9 +200,9 @@ $search = $_GET['search'] ?? '';
             </div>
 
             <!-- Cart -->
-            <button class="basket-btn">
+            <a href="basket.php" class=" basket-btn text-decoration-none">
                 <i class="fas fa-shopping-basket"></i>
-            </button>
+            </a>
 
             <!-- Collapsible search bar (mobile) -->
             <div class="w-100 mt-2 d-none" id="mobileSearchBar">
@@ -519,5 +515,28 @@ $search = $_GET['search'] ?? '';
     </div>
 </footer>
   
+   <!-- Collapse Search for small device Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('mobileSearchToggle');
+            const searchBar = document.getElementById('mobileSearchBar');
+            if (toggleBtn && searchBar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchBar.classList.toggle('d-none');
+                    if (!searchBar.classList.contains('d-none')) {
+                        searchBar.querySelector('input').focus();
+                    }
+                });
+                // Optional: Hide search bar when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                        searchBar.classList.add('d-none');
+                    }
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>

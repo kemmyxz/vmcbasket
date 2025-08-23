@@ -79,13 +79,13 @@ try {
     $conn->commit();
 
 } catch (Exception $e) {
-    $conn->rollback();
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
+  $conn->rollback();
+  echo json_encode(['error' => $e->getMessage()]);
+  exit;
 }
 
 if (empty($orders)) {
-    echo "<h2 class='text-center mt-5'>No orders found. <a href='shop.php' class='btn btn-primary ms-2'>Go to Shop</a></h2>";
+    echo "<h2 class='text-center mt-5'>No orders found. <a href='shop_uniforms.php' class='btn btn-primary ms-2'>Go to Shop</a></h2>";
     exit;
 }
 ?>
@@ -96,9 +96,14 @@ if (empty($orders)) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VMC Basket-My Favorites</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="CSS/style.css">
+  <title>VMC Basket- Order Placed</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 
   <style>
     .header-order {
@@ -117,11 +122,35 @@ if (empty($orders)) {
       font-weight: bold;
     }
 
+    .brand {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .thankyou-section {
+      background: linear-gradient(102deg, rgba(255, 166, 171, 0.50) -4.28%, rgba(86, 121, 255, 0.50) 46.09%, rgba(255, 237, 152, 0.50) 121.59%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      height: 180px;
+    }
+
+    .thankyou-title {
+      font-size: 3rem;
+      color: #333;
+    }
+
+    .thankyou-section p {
+      font-size: 1.25rem;
+      color: #555;
+    }
+
     .order-title {
       margin: 0;
       padding: 0;
-      color: #00527F;
-      font-family: "Ubuntu", sans-serif;
+      color: #26387D;
+      font-family: "Montserrat", sans-serif;
       font-weight: bold;
     }
 
@@ -134,10 +163,15 @@ if (empty($orders)) {
     }
 
     .brand img {
-      height: 40px;
+      height: 50px;
       margin-right: 10px;
     }
 
+    .receipt-card{
+      width: 100%;
+      max-width: 850px; 
+      border: 1px solid black;
+    }
     .banner-wrapper {
       display: flex;
       justify-content: center;
@@ -163,57 +197,73 @@ if (empty($orders)) {
     .table td,
     .table th {
       vertical-align: middle;
-      border-top: 1px solid #000000;
-      border-bottom: 1px solid #000000;
+      border-bottom: 1px solid #D9D9D9;
       font-weight: normal;
     }
-
-    .summary-section {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      font-size: 0.95rem;
+    .total-text {
+      font-size: 1.25rem;
+      font-weight: bold;
     }
 
-    .summary-section strong {
-      font-weight: 600;
+    @media (max-width: 767.98px) {
+  .thankyou-title {
+      font-size: 2.5rem;
+      color: #333;
     }
 
-    .btn-view {
-      display: block;
-      margin: 30px auto 0;
-      background-color: #567C8D;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: 500;
+    .thankyou-section p {
+      font-size: 1rem;
+      color: #555;
+    }
+    .table td,
+    .table th {
+      font-size: 0.75rem;
+    }
+       
+    }
+    @media (max-width: 575.98px) {
+    .thankyou-title {
+      font-size: 1.5rem;
+      color: #333;
     }
 
-    .btn-view:hover {
-      background-color: #3d6576;
-      color: white;
+    .thankyou-section p {
+      font-size: 0.9rem;
+      color: #555;
     }
+    .table td,
+    .table th {
+      font-size: 0.75rem;
+    }
+
+    .total-text {
+      font-size: 0.75rem;
+      font-weight: medium;
+    }
+        
+    }
+
   </style>
 </head>
 
 <body>
 
   <div class="header-order">
-    ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE
+     All products are available for pick-up only at Villagers Montessori College
   </div>
 
   <div class="brand d-flex justify-content-center border-bottom shadow-sm">
-    <img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="Logo" />
-    <h2 class="mb-0 logo-name">VMC Basket</h2>
+    <img src="admin/images/vmc_basket_logo.png" alt="Logo">
   </div>
 
-  <div class="d-flex justify-content-center mt-1">
-    <div class="card shadow-lg" style="width: 100%; max-width: 850px; border: none;">
-      <div class="card-body">
-        <div class="banner-wrapper">
-          <div class="banner"></div>
-        </div>
+  <div class="thankyou-section d-flex flex-column justify-content-center align-items-center py-3">
+    <h2 class="fw-bold thankyou-title text-center">Thank You!</h2>
+    <p class="text-center">Your order has been placed.</p>
+  </div>
+
+  <div class="d-flex justify-content-center p-4">
+    <div class="card shadow-lg ">
+      <div class="card-body text-center">
 
         <div class="order-container mt-2">
             <?php foreach ($orders as $receiptNo => $orderDataArray): ?>
@@ -221,57 +271,66 @@ if (empty($orders)) {
                     <a href="#" class="text-decoration-none order-title"><?= $receiptNo ?></a>
                 </h4>
                 <div class="table-responsive">
-                    <table class="table mt-3 mb-2">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Description</th>
-                                <th>Unit Price</th>
-                                <th>Qty.</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($orderDataArray as $orderData): ?>
-                                <tr>
-                                    <td><img src="admin/<?= htmlspecialchars($orderData['product']['image']) ?>" alt="Product" width="60"></td>
-                                    <td>
-                                        <div class="fw-bold"><?= htmlspecialchars($orderData['product']['product_name']) ?></div>
-                                        <div class="text-muted" style="font-size: 0.85rem;">Size: <?= htmlspecialchars($orderData['order']['size']) ?></div>
-                                    </td>
-                                    <td>₱ <?= number_format($orderData['product']['price'], 2) ?></td>
-                                    <td><?= $orderData['order']['quantity'] ?></td>
-                                    <td>₱ <?= number_format($orderData['total'], 2) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="summary-section mt-2">
-                    <div>
-                        <h6 class="order-title">Order Date</h6>
-                        <?php 
-                        // Get the first order's date since all orders in the same receipt have same date
+                  <table class="table mt-3 mb-2">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Description</th>
+                        <th>Unit Price</th>
+                        <th>Qty.</th>
+                        <th>Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php foreach ($orderDataArray as $orderData): ?>
+                        <tr>
+                          <td><img src="admin/<?= htmlspecialchars($orderData['product']['image']) ?>" alt="Product" width="60"></td>
+                          <td>
+                            <div class="fw-bold"><?= htmlspecialchars($orderData['product']['product_name']) ?></div>
+                            <div class="text-muted" style="font-size: 0.85rem;">Size: <?= htmlspecialchars($orderData['order']['size']) ?></div>
+                          </td>
+                          <td>₱ <?= number_format($orderData['product']['price'], 2) ?></td>
+                          <td><?= $orderData['order']['quantity'] ?></td>
+                          <td>₱ <?= number_format($orderData['total'], 2) ?></td>
+                        </tr>
+                      <?php endforeach; ?>
+                      <?php 
+                        // Get the first order's date and payment method since all orders in the same receipt have same values
                         $firstOrder = reset($orderDataArray);
-                        ?>
-                        <div><?= date('M d, Y', strtotime($firstOrder['order']['order_date'])) ?></div>
-                        <h6 class="mt-3 order-title">Payment</h6>
-                        <div><?= htmlspecialchars($firstOrder['order']['payment_method']) ?></div>
-                    </div>
-                    <div class="d-flex flex-column align-items-start">
-                        <h6 class="order-title">Order Summary</h6>
-                        <div class="d-flex align-items-center">
-                            <h4 class="fw-bold me-2">Total:</h4>
-                            <h4 class="fw-bold">₱ <?= number_format(array_sum(array_column($orderDataArray, 'total')), 2) ?></h4>
-                        </div>
-                    </div>
+                      ?>
+                      <tr>
+                        <td><small class="fw-bold text-start">Order Date</small></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                          <small><?= date('M d, Y', strtotime($firstOrder['order']['order_date'])) ?></small>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><small class="fw-bold text-start">Payment</small></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                          <small><?= htmlspecialchars($firstOrder['order']['payment_method']) ?></small>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><h5 class="fw-bold text-start total-text">Total:</h5></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                          <p class="total-text">₱ <?= number_format(array_sum(array_column($orderDataArray, 'total')), 2) ?></p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
+              <?php endforeach; ?>
 
-                <hr class="order-line my-4">
-            <?php endforeach; ?>
-
-            <a href="purchase_history.php"><button class="btn btn-view mt-5">View My Purchase</button></a>
+            <a href="purchase_history.php"><button class="custom-navy-btn mt-3">View My Purchase</button></a>
         </div>
       </div>
     </div>

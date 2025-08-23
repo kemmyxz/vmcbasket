@@ -82,394 +82,400 @@ $rec_result = $conn->query($recommendations);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMC Basket-Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>VMC Basket - My Favorites</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 
     <style>
-        .fav-title{
-            font-family: "Ubuntu", sans-serif;
-            font-weight: bold;
-            color: #00527F;
-        }
+/* Responsive styles */
 
-           
-        .carousel-container {
-            background-color: #E8EDEF;
-            padding: 40px 20px;
-        }
-
-        .carousel-control-prev, .carousel-control-next {
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 0, 0, 0.5); /* Semi-transparent */
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-        }
-
-        .carousel-control-prev {
-            left: 0px; /* Adjust this to move the button inside */
-        }
-
-        .carousel-control-next {
-            right: 0px; /* Adjust this to move the button inside */
-        }
-
-        .carousel-control-prev-icon, 
-        .carousel-control-next-icon {
-            width: 15px;
-            height: 15px;
-        }
-
-        /* Product Card */
-        .row > div {
-            display: flex; /* Ensure all cards in a row are the same height */
-        }
-        .product-card {
-            background-color: #C8D9E6;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            position: relative;
-
-            /* New for equal height & layout */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            width: 100%; 
-            min-height: 410px;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.2);
-        }
-
+    .fav-icon{
+        max-width: 300px;
+        height: auto;
+    }
+    @media (max-width: 991.98px) {
+        
+        /* Tablet: 3 columns for product cards */
         .product-card img {
-            width: 100%;
-            height: 250px; /* or adjust as needed */
-            object-fit: contain;
-            margin-bottom: 10px;
+            height: 180px;
+        }
+        .col-lg-3,
+        .col-md-4 {
+            flex: 0 0 33.3333%;
+            max-width: 33.3333%;
         }
 
-        .product-card:hover img {
-            transform: scale(1.1); 
+        .highlight-pink {
+            font-size: 1.5rem;
         }
 
-
-        .product-title{
-            font-weight: medium;
-            margin-left: 100px;
-            margin-top: 50px;
-            margin-bottom: 20px;
+        .fav-button {
+            width: 30px;
+            height: 30px;
+            font-size: 0.9rem;
         }
-
-        /* Heart Button */
-
-        /* Product Info */
-        .product-info {
-            color: #000000;
-            text-align: left;
-            padding: 10px 5px;
+        .basket-button {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.3rem;
         }
 
         .product-info h3 {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-size: 0.8rem;
         }
-
         .product-info p {
-            font-size: 14px;
-            margin-bottom: 2px;
+            font-size: 0.65rem;
         }
-
+        .badges .badge {
+            font-size: 0.55rem;
+        }
         .price {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
+            font-size: 0.85rem;
         }
-
-        .product-line{
-            border: 1px solid #000000;
+        .rating {
+            font-size: 0.65rem;
         }
-        /* Star Rating */
-        .product-rating {
-            color: #000000;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
+        .rating i {
+            font-size: 0.65rem;
         }
-
-        .text-warning {
-            color: #FFD700 !important;
         }
-
-        .bi-star-fill.text-warning {
-            color: #FFD700;
-        }
-
-        .bi-star-half.text-warning {
-            color: #FFD700;
-        }
-
-        .bi-star.text-warning {
-            color: #ccc;
-        }
-
-        .product-rating span {
-            font-size: 12px;
-            color: #666;
-            margin-left: 5px;
-        }
-
-        .filter{
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #00527F;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-        .filter-color{
-            color: white;
-            background-color:#00527F;
-        }
-        .filter-title{
-            font-family: "Ubuntu", sans-serif;
-            color: #00527F;
-            font-weight: bold;
-        }
-        .form-select {
-            appearance: none; /* Hides default arrow */
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="white"><path d="M1.5 5.5l6.5 6.5 6.5-6.5H1.5z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 16px;
-        }   
-            /* Heart Button */
-        .heart-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            border: none;
-            background: none;
-            font-size: 22px;
-            color: black;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        .heart-btn img {
-            width: 24px; /* Adjust size */
+        @media (max-width: 767.98px) {
+        /* Phone: 2 columns for product cards, smaller card */
+        .fav-icon{
+            max-width: 200px;
             height: auto;
         }
+        .product-card img {
+            height: 180px;
+        }
+        .col-md-4,
+        .col-lg-3 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        .product-info h3 {
+            font-size: 0.95rem;
+        }
+        .product-info p,
+        .price,
+        .rating {
+            font-size: 0.8rem;
+        }
+        .icon-buttons .basket-button {
+            padding: 0 10px;
+            font-size: 0.9rem;
+        }
+    }
+    @media (max-width: 575.98px) {
+        /* Extra small: 1 column for product cards */
+        .col-md-4,
+        .col-lg-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .product-card img {
+            height: 180px;
+        }
+        .highlight-pink {
+            font-size: 1rem;
+        }
+        .navbar-custom {
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .container-fluid.d-flex.align-items-center {
+            justify-content: start;
+        }
+        .vmc-logo {
+            max-width: 90px;
+        }
+        .search-box {
+            width: 100%;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
 
+        .basket-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+
+        .profile-section img {
+            width: 70px;
+            height: 70px;
+        }
+        footer {
+            font-size: 1rem;
+        }
+    }
+        
     </style>   
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="top-text"><h1>ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE</h1></div>
-        <div class="top-container">
-            <ul>
-                <li><a href="basket.php"><img src="admin/images/Home Page/basket-nav.png" alt="Basket"></a></li>
-                <li><a href="favorites.php"><img src="admin/images/Home Page/heart-nav.png"></a></li>
-                <li><a href="profile.php"><img src="admin/images/Home Page/profile-user-nav.png" alt="profile"></a></li>
-            </ul>
-        </div>
-    </header>
+     <!-- Navbar -->
+    <nav class="navbar navbar-custom shadow-sm fixed-top">
+        <div class="container-fluid d-flex align-items-center">
+            <!-- Hamburger -->
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
 
-    <!-- Navbar -->
-    <div class="navbar shadow-sm">
-        <div class="logo ms-4">
-            <a href="index.php"><img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="logo"></a>
-            <h2>VMC Basket</h2>
+            <!-- Logo -->
+            <a class="navbar-brand" href="home.php">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
+            </a>
+
+            <!-- Search bar (desktop) -->
+            <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Right-aligned buttons for small devices -->
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
+                <!-- Search icon (mobile) -->
+                <button class="btn p-0" type="button" id="mobileSearchToggle">
+                    <i class="fas fa-search fa-lg"></i>
+                </button>
+            </div>
+
+            <!-- Cart -->
+            <a href="basket.php" class=" basket-btn text-decoration-none">
+                <i class="fas fa-shopping-basket"></i>
+            </a>
+     
+
+            <!-- Collapsible search bar (mobile) -->
+            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="index.php">Home</a></li>
-                <li><a href="shop.php" class="active">Shop</a></li>
-                <li><a href="contact.php">Contact us</a></li>
-            </ul>
-        </nav>
-        <div class="search" style="display: flex; align-items: center; justify-content: space-between; width: auto;">
-            <div class="search-container me-4">
-                <input type="text" class="form-control" placeholder="Search...">
-                <button><img src="admin/images/search-icon.png" alt="Search"></button>
+    </nav>
+
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-body p-0">
+            <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="profile-section">
+                <img src="admin/images/profile_pic.png">
+                <h4 class="mt-2">Janella Clare Gomez</h4>
+            </div>
+
+            <div class="px-3">
+                <div class="mb-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                    Profile
+                    </button>
+                    <div class="collapse ps-3" id="profileMenu">
+                    <a href="profile.php">My Account</a>
+                    <a href="purchase_history.php">My Purchase</a>
+                    <a href="favorites.php">My Favorites</a>
+                    </div>
+                </div>
+
+            <a href="home.php">Home</a>
+
+            <div class="mt-2">
+                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                Shop
+                </button>
+                <div class="collapse ps-3" id="shopMenu">
+                <a href="shop_uniforms.php">Uniforms</a>
+                <a href="shop_supplies.php">School Supplies</a>
+                <a href="shop_merch.php">School-related Merchandise</a>
+                </div>
+            </div>
+
+            <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
     </div>
 
     <!-- Favorites Page -->
-    <h2 class="text-start fav-title ms-4 mt-3 mb-4">My Likes</h2>
-
-    <div class="container mb-5">
-        <div class="row g-4">
-            <?php if ($favoriteResult->num_rows > 0): ?>
-                <?php while ($row = $favoriteResult->fetch_assoc()): ?>
-                    <div class="col-md-4 col-lg-3">
-                        <div class="product-card" onclick="location.href='product_details.php?id=<?= $row['id'] ?>'">
-                            <button class="heart-btn" onclick="toggleFavorite(event, this, <?= $row['id'] ?>)">
-                                <img src="./admin/images/heart.png" alt="Favorite">
-                            </button>
-                            <img src="./admin/<?= $row['image'] ?>" alt="<?= htmlspecialchars($row['product_name']) ?>">
-                            <div class="product-info">
-                                <h3><?= htmlspecialchars($row['product_name']) ?></h3>
-                                <?php if (strtolower($row['type']) !== 'supplies'): ?>
-                                    <p>Available sizes: <?= htmlspecialchars($row['sizes']) ?></p>
-                                <?php endif; ?>
-                                <p>For: <?= htmlspecialchars($row['genders']) ?></p>
-                                <hr class="product-line">
-                                <div class="d-flex justify-content-between">
-                                    <h4 class="price">₱<?= number_format($row['price'], 2) ?></h4>
-                                    <div class="product-rating">
-                                        <?php
-                                        $rating = $row['rating'] ?? 0;
-                                        $fullStars = floor($rating);
-                                        $halfStar = round($rating - $fullStars, 1) >= 0.5;
-                                        
-                                        // Display full stars
-                                        for ($i = 0; $i < $fullStars; $i++) {
-                                            echo '<i class="bi bi-star-fill text-warning"></i>';
-                                        }
-                                        
-                                        // Display half star if applicable
-                                        if ($halfStar) {
-                                            echo '<i class="bi bi-star-half text-warning"></i>';
-                                            $i++;
-                                        }
-                                        
-                                        // Display empty stars
-                                        for (; $i < 5; $i++) {
-                                            echo '<i class="bi bi-star text-warning"></i>';
-                                        }
-                                        
-                                        echo '<span class="ms-1">(' . number_format($rating, 1) . ')</span>';
-                                        ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <section class="text-center py-5">
-                    <div class="container">
-                        <img src="./admin/images/favorites.png" alt="Empty Favorites" style="max-width: 300px;">
-                        <h4 class="fav-title mt-1">Your Favorites is empty.</h4>
-                        <p class="text-muted">Start shopping and find your new uniform.</p>
-                        <a href="shop.php" class="btn btn-secondary px-4 py-2 shadow-sm mt-2">Go to Shop</a>
-                    </div>
-                </section>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <!-- Product Listing / Recommendations Section -->
-    <div class="carousel-container">
-        <h2 class="mb-4 fav-title">Buy your VMC Essentials</h2>
-
-        <div class="container mb-5">
+    <div class="container" style="margin-top: 110px;">
+            <h2 class="mt-4 mb-5">
+                <span class="highlight-pink">My Favorites</span>
+            </h2>
             <div class="row g-4">
-                <?php
-                if ($rec_result && $rec_result->num_rows > 0):
-                    while ($rec_row = $rec_result->fetch_assoc()):
-                ?>
-                <div class="col-md-4 col-lg-3">
-                    <div class="product-card" onclick="location.href='product_details.php?id=<?= $rec_row['id'] ?>'">
-                        <button class="heart-btn" onclick="toggleFavorite(event, this, <?= $rec_row['id'] ?>)">
-                            <img src="./admin/images/heart-outline.png" alt="Favorite">
-                        </button>
-                        <img src="admin/<?= htmlspecialchars($rec_row['image']) ?>" alt="<?= htmlspecialchars($rec_row['product_name']) ?>">
-                        <div class="product-info">
-                            <h3><?= htmlspecialchars($rec_row['product_name']) ?></h3>
-                            <?php if (strtolower($rec_row['type']) !== 'supplies'): ?>
-                                <p>Available sizes: <?= htmlspecialchars($rec_row['sizes'] ?? 'N/A') ?></p>
-                            <?php endif; ?>
-                            <p> <?= htmlspecialchars($rec_row['genders'] ?? '') ?></p>
-                            <hr class="product-line">
-                            <div class="d-flex justify-content-between">
-                                <h4 class="price">₱<?= number_format($rec_row['price'], 2) ?></h4>
-                                <div class="product-rating">
+                <?php if ($favoriteResult->num_rows > 0): ?>
+                    <?php while ($row = $favoriteResult->fetch_assoc()): ?>
+                        <div class="col-md-4 col-lg-3">
+                        <div class="product-card" onclick="location.href='product_details.php?id=<?= $rec_row['id'] ?>'">
+
+                            <!-- Product Image -->
+                            <img src="admin/<?= htmlspecialchars($rec_row['image']) ?>" alt="<?= htmlspecialchars($rec_row['product_name']) ?>">
+
+                            <!-- Product Info -->
+                            <div class="product-info">
+                                <h3><?= htmlspecialchars($rec_row['product_name']) ?></h3>
+                                <?php
+                                $genders = trim($rec_row['genders'] ?? '');
+                                $sizes = trim($rec_row['sizes'] ?? '');
+                                if ($genders !== '' || $sizes !== ''): ?>
+                                    <p>
+                                        <?= htmlspecialchars($genders) ?>
+                                        <?php if ($sizes !== ''): ?>
+                                            (<?= htmlspecialchars($sizes) ?>)
+                                        <?php endif; ?>
+                                    </p>
+                                <?php else: ?>
+                                    <p>&nbsp;</p>
+                                <?php endif; ?>
+
+                                <div class="badges">
+                                    <span class="badge preschool_badge">Pre-School</span>
+                                    <span class="badge uniform_badge">Uniform</span>
+                                </div>
+
+                                <!-- Price Range -->
+                                <div class="price">
+                                    ₱<?= number_format($rec_row['price'], 2) ?>
+                                </div>
+
+                                <!-- Rating -->
+                                <div class="rating">
                                     <?php
                                     $rating = $rec_row['rating'] ?? 0;
                                     $fullStars = floor($rating);
-                                    $halfStar = round($rating - $fullStars, 1) >= 0.5;
-                                    
-                                    // Display full stars
-                                    for ($i = 0; $i < $fullStars; $i++) {
-                                        echo '<i class="bi bi-star-fill text-warning"></i>';
-                                    }
-                                    
-                                    // Display half star if applicable
-                                    if ($halfStar) {
-                                        echo '<i class="bi bi-star-half text-warning"></i>';
-                                        $i++;
-                                    }
-                                    
-                                    // Display empty stars
-                                    for (; $i < 5; $i++) {
-                                        echo '<i class="bi bi-star text-warning"></i>';
-                                    }
-                                    
-                                    echo '<span class="ms-1">(' . number_format($rating, 1) . ')</span>';
-                                    ?>
+                                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
+
+                                    for ($i = 0; $i < $fullStars; $i++): ?>
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    <?php endfor;
+
+                                    if ($hasHalfStar): ?>
+                                        <i class="bi bi-star-half text-warning"></i>
+                                    <?php endif;
+
+                                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+                                    for ($i = 0; $i < $emptyStars; $i++): ?>
+                                        <i class="bi bi-star text-warning"></i>
+                                    <?php endfor; ?>
+                                    <span><?= number_format($rating, 1) ?></span>
+                                </div>
+
+                                <!-- Icon Buttons (Heart & Cart) -->
+                                <div class="icon-buttons">
+                                    <button class="fav-button" onclick="event.stopPropagation(); toggleFavorite(this, <?= $rec_row['id'] ?>)">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                    <button class="basket-button" onclick="event.stopPropagation(); addToCart(<?= $rec_row['id'] ?>)">
+                                        <i class="bi bi-basket me-2"></i>
+                                        Add to Basket
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <?php endwhile; else: ?>
-                    <p>No recommended products available.</p>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <section class="text-center py-3 mb-5">
+                        <div class="container">
+                            <img src="./admin/images/favorites.png" alt="Empty Favorites" class="img-fluid mb-4 fav-icon">
+                            <h4 class="title-text fw-bold mt-1">Your Favorites is empty.</h4>
+                            <p class="text-muted mb-5">Start shopping and find your new academic essentials.</p>
+                            <a href="shop_uniforms.php" class="custom-navy-btn text-decoration-none">Go to Shop</a>
+                        </div>
+                    </section>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container p-5">
+
+            <!-- Logo Row -->
+            <div class="row justify-content-start mb-4">
+            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
+                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
+            </div>
+            </div>
+
+            <!-- Links & Contacts Row -->
+            <div class="row text-start gy-3">
+
+            <!-- Quick Links -->
+            <div class="col-md-3">
+                <h5 class="fw-bold">Quick Links</h5>
+                <ul class="list-unstyled">
+                <li><a href="#" class="footer-link">Home</a></li>
+                <li><a href="#" class="footer-link">Shop</a></li>
+                </ul>
+            </div>
+
+            <!-- Contacts -->
+            <div class="col-md-7">
+                <h5 class="fw-bold">Contacts</h5>
+                <p class="mb-1">
+                <i class="bi bi-geo-alt-fill"></i>
+                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
+                </p>
+                <p class="mb-1">
+                <i class="bi bi-telephone-fill"></i>
+                +63 2 8929 0856
+                </p>
+                
+                <div class="d-flex gap-3">
+                    <p class="mb-1 fw-medium">Socials Media</p>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- Back to top -->
+            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
+                <a href="#" class="footer-link">↑ Back to top</a>
+            </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="mt-5 mb-3">
+
+            <!-- Copyright -->
+            <div class="sub-footer text-center small">
+            © 2024 Villager’s Montessori College. All rights served.
+            </div>
+        </div>
+    </footer>
+
+
+
+   <!-- Collapse Search for small device Script -->
     <script>
-    // Toggle favorite status
-    function toggleFavorite(event, btn, productId) {
-        event.stopPropagation(); // Prevents redirection
-      
-        
-        let heartImg = btn.querySelector("img");
-        let isFavorited = heartImg.src.includes("heart.png") ? 1 : 0;
-        let newStatus = isFavorited ? 0 : 1; // Toggle the current status
-
-        // Change heart icon immediately
-        heartImg.src = newStatus ? "./admin/images/heart.png" : "./admin/images/heart-outline.png";
-
-        // Send AJAX request to update favorite status
-        const data = `product_id=${productId}&favorite=${newStatus}`;
-        fetch('update_favorites.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: data
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                alert('Failed to update favorite: ' + data.error);
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('mobileSearchToggle');
+            const searchBar = document.getElementById('mobileSearchBar');
+            if (toggleBtn && searchBar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchBar.classList.toggle('d-none');
+                    if (!searchBar.classList.contains('d-none')) {
+                        searchBar.querySelector('input').focus();
+                    }
+                });
+                // Optional: Hide search bar when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                        searchBar.classList.add('d-none');
+                    }
+                });
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Something went wrong.');
         });
-    }
     </script>
 </body>
 </html>

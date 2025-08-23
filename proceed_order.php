@@ -54,43 +54,22 @@ $products = getProducts();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VMC Basket-My Favorites</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>VMC Basket- Order Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css"
-    rel="stylesheet">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:wght@400;500;700&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <link rel="stylesheet" href="./css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 
   <style>
     .header-order {
-      background-color: #0b2c4d;
+      background-color: #003153;
       color: white;
       padding: 0.5rem 1rem;
       font-size: 0.9rem;
-      font-weight: bold;
       text-align: center;
-    }
-
-    .logo-name {
-      color: #003153;
-      font-size: 30px;
-      font-family: "Ubuntu", sans-serif;
-      font-weight: bold;
-    }
-
-    .order-title {
-      margin: 0;
-      padding: 0;
-      color: #00527F;
-      font-family: "Ubuntu", sans-serif;
-      font-weight: bold;
     }
 
     .brand {
@@ -102,16 +81,20 @@ $products = getProducts();
     }
 
     .brand img {
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .table-headerbg {
-      background-color: #E8EDEF;
+      height: 50px;
     }
 
     .section {
-      background-color: #E8EDEF;
+      background: linear-gradient(180deg, #F7FBFE 1.92%, #E4EFF9 100%);
+      border: 1px solid black;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+    }
+
+    .table-section {
+      background: #F7FAFE;
+      border: 1px solid black;
       padding: 1rem;
       margin-bottom: 1rem;
       border-radius: 8px;
@@ -137,7 +120,9 @@ $products = getProducts();
 
     .summary-table th,
     .summary-table td {
+      background: #F7FAFE;
       vertical-align: middle;
+      border-bottom: 1px solid black;
     }
 
     .total {
@@ -149,7 +134,7 @@ $products = getProducts();
       border: 1px solid #000000;
       opacity: 0.3;
       margin-top: 5px;
-      margin-botton: 5px;
+      margin-bottom: 5px;
     }
 
     .btn-order {
@@ -171,25 +156,20 @@ $products = getProducts();
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
     .btn-circle {
       border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      padding: 0;
+      border: 1px solid black;
+      width: 50px;
+      height: 50px;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #004b75;
-      color: #fff;
-      border: none;
-    }
-
-    .btn-circle:hover {
-      background-color: #003a5c;
+      background-color: black;
       color: white;
+      transition: 0.3s ease;
     }
 
     .online-note {
@@ -200,6 +180,107 @@ $products = getProducts();
       display: none;
       border-radius: 4px;
       margin-bottom: 30px;
+      width: 100%;
+    }
+
+    .payment-icon{
+      height: 50px; 
+      width: 50px; 
+      border-radius: 50%;
+    }
+    .radio-bordered {
+      border: 1px solid black !important;
+      box-shadow: 0 0 0 2px #e4eff9;
+      border-radius: 50%;
+      width: 1.2em;
+      height: 1.2em;
+    }
+    .radio-bordered:checked {
+      border-color: #0d6efd !important;
+      box-shadow: 0 0 0 2px #b6d4fe;
+    }
+    .qr-img {
+      max-width: 500px;
+      max-height: 500px;
+      object-fit: cover;
+      
+    }
+    
+    .upload-box {
+        border-style: dashed;
+        border-color: #ccc;
+        border-width: 2px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .upload-box:hover {
+        background-color: #f0f8ff;
+    }
+
+   @media (max-width: 991.98px) {
+      
+    .highlight-blue {
+        font-size: 1.5rem;
+    }
+
+        
+    }
+    @media (max-width: 767.98px) {
+      .highlight-blue {
+          font-size: 1.2rem;
+      }
+      .summary-table th,
+      .summary-table td {
+        font-size: 0.75rem;
+    }
+
+    .section, .table-section{
+      font-size: 0.8rem;
+    }
+    .payment-method{
+      font-size: 0.8rem;
+    }
+    .payment-icon{
+      width:40px;
+      height:40px;
+    }
+       
+    }
+    @media (max-width: 575.98px) {
+      .highlight-blue {
+          font-size: 1.2rem;
+      }
+      .summary-table th,
+      .summary-table td {
+        font-size: 0.65rem;
+    }
+
+    .section, .table-section{
+      font-size: 0.65rem;
+    }
+    .payment-method{
+      display: none;
+      margin-right: 10px;
+    }
+
+    .payment-icon{
+      width:35px;
+      height:35px;
+    }
+
+    .qr-img {
+      max-width: 300px;
+      max-height: 300px;
+    }
+
+    .btn-outline-secondary{
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+    }
+        
     }
   </style>
 
@@ -208,15 +289,14 @@ $products = getProducts();
 <body>
 
   <div class="header-order">
-    ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE
+     All products are available for pick-up only at Villagers Montessori College
   </div>
 
   <div class="brand d-flex justify-content-center border-bottom shadow-sm">
-    <img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="Logo" />
-    <h2 class="mb-0 logo-name">VMC Basket</h2>
+    <img src="admin/images/vmc_basket_logo.png" alt="Logo">
   </div>
 
-  <div class="container mt-4">
+  <div class="container p-5">
 
     <!-- Return Button -->
     <div class="order-header">
@@ -227,18 +307,18 @@ $products = getProducts();
             d="M15 8a.5.5 0 0 1-.5.5H2.707l4.147 4.146a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z" />
         </svg>
       </button>
-      <h3 class="mb-0 order-title"><strong>Order Details</strong></h3>
+      <h2>
+          <span class="highlight-blue">Order Details</span>
+      </h2>
     </div>
    
     <!-- Order Details -->
-    <div class="section card">
+    <div class="table-section card">
       <div class="table-responsive">
         <table class="table summary-table">
           <thead class="table-headerbg">
             <tr>
-              <th>
-                <h4 class="order-title">Product Details</h4>
-              </th>
+              <th>Product Details</th>
               <th class="text-center">Unit Price</th>
               <th class="text-center">Quantity</th>
               <th class="text-end">Item Subtotal</th>
@@ -288,39 +368,73 @@ $products = getProducts();
 
         </table>
       </div>
-      <hr class="order-line">
       <div class="text-end pe-2 text-muted">
         Order Total (<span id="total-items"><?php echo $totalItems; ?></span> items):
-        <span class="order-title ms-2" id="order-total">₱ <?php echo number_format($total, 2); ?></span>
+        <span class="text-title fw-bold ms-2" id="order-total">₱ <?php echo number_format($total, 2); ?></span>
       </div>
     </div>
 
     <!-- Payment Method -->
     <div class="card p-4 section">
-    <h4 class="order-title mb-3">Payment Method</h4>
+    <h4 class="title-text fw-bold mb-3">Payment Method</h4>
     <div class="d-flex flex-column justify-content-start align-items-start mb-2">
-        <div class="form-check custom-radio mb-2 d-flex align-items-center">
-            <input class="form-check-input me-2" type="radio" name="paymentMethod" id="online" 
-                value="Send Online Receipt"
-                <?php echo isset($orderData['payment_method']) && $orderData['payment_method'] === 'Send Online Receipt' ? 'checked' : ''; ?>
-                onclick="toggleNote(true); updatePaymentMethod(this.value)">
-            <label class="form-check-label d-flex align-items-center" for="online">
-                <img src="./admin/images/Gcash-icon.png" alt="Receipt Icon" style="height: 50px; width: 50px; border-radius: 50%;">
-                <span class="ms-2">Send Online Receipt</span>
-            </label>
-        </div>
+    <div class="form-check custom-radio mb-2 d-flex align-items-center">
+        <input class="form-check-input me-2 radio-bordered" type="radio" name="paymentMethod" id="online" 
+        value="Send Online Receipt"
+        <?php echo isset($orderData['payment_method']) && $orderData['payment_method'] === 'Send Online Receipt' ? 'checked' : ''; ?>
+        onclick="toggleNote(true); updatePaymentMethod(this.value)">
+        <label class="form-check-label d-flex align-items-center" for="online">
+            <img src="./admin/images/Gcash-icon.png" alt="Receipt Icon" class="payment-icon">
+            <span class="ms-2">Send Online Receipt</span>
+        </label>
+    </div>
 
-        <div id="onlineNote" class="online-note" style="display:none;">
-            Pay via GCash and upload the receipt in <b>'My Purchase'</b> for validation. Orders are processed within 24 hours after payment confirmation. Payment must be made within <b>24 hours</b>, or the order will be canceled.
-        </div>
+    <!-- ONLINE NOTE WITH UPLOAD SECTION -->
+    <div id="onlineNote" class= "online-note">
+            <div class="d-flex flex-wrap justify-content-center text-center align-items-center gap-2">
+              <!-- Left Side: INSTRUCTIONS -->
+              <div class="p-3 flex-fill d-flex flex-column align-items-center">
+                <img src="./admin/images/GCash-Instruction.png" alt="GCash Instruction" 
+                   class="img-fluid qr-img mb-2 gcash-img-same-size">
+              </div>
 
+              <!-- Right Side: GCASH QR CODE -->
+              <div class="review-form flex-fill p-3 d-flex flex-column align-items-center">
+                <h5 class="fw-bold mb-3 content-title">VMC Official GCash Account:</h5>
+                <img src="./admin/images/GCashAcc.jpg" alt="GCash QR Code" 
+                   class="img-fluid qr-img mb-2 gcash-img-same-size">
+              </div>
+            </div>
+            <hr>
+
+            <!-- Upload Section -->
+            <div class="upload-section p-3">
+                <h5 class="content-title fw-bold">Upload Here</h5>
+                <p class="text-muted mb-3">Select and upload (1) image</p>
+
+                <label for="gcashReceiptInput" class="upload-box border rounded p-4 text-center position-relative d-block" id="dropArea">
+                    <input type="file" id="gcashReceiptInput" class="d-none" accept=".jpg,.jpeg,.png">
+
+                    <!-- Upload Prompt -->
+                    <div id="uploadPrompt">
+                        <i class="bi bi-upload fs-1 mb-2"></i>
+                        <p class="mb-1 fw-medium">Choose a file or drag & drop it here.</p>
+                        <small class="text-muted">JPG, JPEG, PNG formats</small><br>
+                        <span class="btn btn-outline-secondary mt-2">Browse File</span>
+                    </div>
+
+                    <!-- Preview container -->
+                    <div id="previewContainer" class="mt-3"></div>
+                </label>
+            </div>
+        </div>
         <div class="form-check custom-radio d-flex align-items-center mt-1">
-            <input class="form-check-input me-2" type="radio" name="paymentMethod" id="cash" 
+            <input class="form-check-input me-2 radio-bordered" type="radio" name="paymentMethod" id="cash" 
                 value="Cash (Pay at the Counter)"
                 <?php echo !isset($orderData['payment_method']) || $orderData['payment_method'] === 'Cash (Pay at the Counter)' ? 'checked' : ''; ?>
                 onclick="toggleNote(false); updatePaymentMethod(this.value)">
             <label class="form-check-label d-flex align-items-center" for="cash">
-                <img src="./admin/images/Cash.png" alt="Cash Icon" style="height: 50px; width: 50px; border-radius: 50%;">
+                <img src="./admin/images/Cash.png" alt="Cash Icon" class="payment-icon">
                 <span class="ms-2">Cash (Pay at the Counter)</span>
             </label>
         </div>
@@ -329,19 +443,19 @@ $products = getProducts();
     <hr class="order-line">
     <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
         <div>
-            <img src="./admin/images/Cash.png" alt="Payment Icon" style="height: 50px; width: 50px; border-radius: 50%;" id="paymentMethodIcon"> 
-            <span id="paymentMethodText">Cash (Pay at the Counter)</span>
+            <img src="./admin/images/Cash.png" alt="Payment Icon" class="payment-icon" id="paymentMethodIcon"> 
+            <span id="paymentMethodText" class="payment-method">Cash (Pay at the Counter)</span>
         </div> 
         <div class="d-flex justify-content-between align-items-center">
-            <div class="text-muted me-5">Total Payment:</div>
-            <h3 class="order-title">₱<?php echo number_format($total, 2); ?></h3>
+            <div class="text-muted me-5 ms-2">Total Payment:</div>
+            <h3 class="fw-bold">₱<?php echo number_format($total, 2); ?></h3>
         </div>
     </div>
 
       <hr class="order-line">
       <div class="d-flex justify-content-end mt-2">
         <button class="btn btn-outline-danger me-2 btn-cancel btn-lg" onclick="window.history.back();">Cancel</button>
-        <a href="order_complete.php"><button class="btn btn-order btn-lg" type="submit">Proceed to Order</button></a>
+        <a href="order_complete.php"><button class="custom-navy-btn btn-lg" type="submit">Proceed to Order</button></a>
     </div>
   </div>
 
@@ -391,6 +505,4 @@ $products = getProducts();
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
 </body>
-
 </html>
-``` 

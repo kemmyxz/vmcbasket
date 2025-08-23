@@ -192,15 +192,11 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
     <link rel="stylesheet" href="style.css">
 
   <style>
-    .product-details-title {
-      font-family: 'Ubuntu', sans-serif;
-      font-weight: bold;
-      color: #00527F;
-
-    }
 
     .carousel-bg {
-      background-color: linear-gradient(180deg, #FFF 0%, rgba(200, 224, 243, 0.50) 100%);
+      background: linear-gradient(180deg, #FFF 0%, rgba(200, 224, 243, 0.50) 100%);
+      border-radius: 10px;
+      border: 1px solid black;
     }
 
     .product-infobg {
@@ -215,7 +211,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
     /* Carousel image resizing */
     .uniform-image {
-      max-height: 400px;
+      max-height: 500px;
       width: auto;
       height: auto;
       object-fit: contain;
@@ -365,6 +361,41 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
       border-radius: 0.5rem;
       object-fit: cover;
     }
+    @media (max-width: 991.98px) {
+         .uniform-image {
+            max-height: 350px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+          }
+            .navbar-custom {
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .container-fluid.d-flex.align-items-center {
+            justify-content: start;
+          }
+          .vmc-logo {
+            max-width: 90px;
+          }
+          .search-box {
+            width: 100%;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+          }
+
+          .basket-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            margin-right: 5px;
+          }
+
+          footer {
+            font-size: 1rem;
+          }
+        }
   </style>
 </head>
 
@@ -389,7 +420,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
             </div>
 
             <!-- Right-aligned buttons for small devices -->
-            <div class="d-flex d-sm-none ms-auto align-items-center" style="gap: 10px;">
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
                 <!-- Search icon (mobile) -->
                 <button class="btn p-0" type="button" id="mobileSearchToggle">
                     <i class="fas fa-search fa-lg"></i>
@@ -397,10 +428,9 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
             </div>
 
             <!-- Cart -->
-            <button class="basket-btn">
-                <i class="fas fa-shopping-basket"></i>
-            </button>
-
+            <a href="basket.php" class=" basket-btn text-decoration-none">
+              <i class="fas fa-shopping-basket"></i>
+            </a>
             <!-- Collapsible search bar (mobile) -->
             <div class="w-100 mt-2 d-none" id="mobileSearchBar">
                 <input type="text" class="form-control search-box" placeholder="Search products here...">
@@ -449,7 +479,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
         </div>
     </div>
  
-  <div class="container" style="margin-top: 100px;">
+  <div class="container p-4" style="margin-top: 100px;">
     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
       <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -611,6 +641,7 @@ sizeButtons.forEach(btn => {
                 style="width: 60px; text-align: center; -moz-appearance: textfield; background-color: #e6f0f9; border: 1px solid #a5c8e2; border-radius: 6px; font-weight: 500; color: #000;" />
               <button class="custom-btn" data-action="increase">+</button>
             </div>
+            <p class="mb-3 text-danger"><i>*Maximum of 5 pieces per item</i></p>
           </div>
 
 
@@ -656,7 +687,7 @@ quantityInput.addEventListener('input', () => {
 
 
           <div class="d-flex gap-2">
-            <button class="btn btn-outline-dark w-100" onclick="addToBasket()">Place in Basket</button>
+            <button class="btn btn-outline-dark w-100" onclick="addToBasket()">Add to Basket</button>
 
             <script>
               function addToBasket() {
@@ -1048,11 +1079,29 @@ quantityInput.addEventListener('input', () => {
     </div>
 </footer>
 
-
-
-</body>
+ <!-- Collapse Search for small device Script -->
+  <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          const toggleBtn = document.getElementById('mobileSearchToggle');
+          const searchBar = document.getElementById('mobileSearchBar');
+          if (toggleBtn && searchBar) {
+              toggleBtn.addEventListener('click', function (e) {
+                  e.stopPropagation();
+                  searchBar.classList.toggle('d-none');
+                  if (!searchBar.classList.contains('d-none')) {
+                      searchBar.querySelector('input').focus();
+                  }
+              });
+              // Optional: Hide search bar when clicking outside
+              document.addEventListener('click', function (e) {
+                  if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                      searchBar.classList.add('d-none');
+                  }
+              });
+          }
+      });
+  </script>
 <script>
-
 
   // Size button logic
 
@@ -1069,4 +1118,5 @@ quantityInput.addEventListener('input', () => {
 </script>
 
 
+</body>
 </html>

@@ -49,141 +49,222 @@ unset($_SESSION['error']); // Clear error after displaying
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href='https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sawarabi+Mincho&display=swap'>
     <title>Admin login</title>
-    <style>
-    .login-body{
-        background-size: cover;
-        background-image: url(../admin/images/userlogin/LoginBG.png);
-        background-repeat: no-repeat;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    
-    }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
 
+<style>
+body {
+    background-color: #fff;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+/* Gradient circles on left side */
+.gradient-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    z-index: -1;
+}
 
-    .container {
-        display: flex;
-        width: 70%;
-        height: 80vh;
-        background: rgb(234, 227, 227);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin-top: 5%;
-    }
+.circle1, .circle2 {
+    position: absolute;
+    border-radius: 862px;
+    filter: blur(100px);
+}
 
+.circle1 {
+    width: 700px;
+    height: 700px;
+    flex-shrink: 0;
+    background: linear-gradient(136deg, #FFA6AB 17.46%, #5679FF 93.71%);
+    top: -200px;
+    left: -150px;
+}
+
+.circle2 {
+    width: 700px;
+    height: 700px;
+    transform: rotate(-168.542deg);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FFED98 22.87%, #5679FF 82.65%);
+    top: 500px;
+    right: -650px;
+}
+
+.container-login {
+    display: flex;
+    width: 90%;
+    height: 90vh;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    border: 1px solid black;
+    overflow: hidden;
+    padding: 0px;
+}
+.left-panel {
+    flex: 1;
+    background: url('images/log-in-bg.png') center center / cover no-repeat;
+    background-color: #26387D;
+    padding: 40px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.left-panel h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    margin: 0; /* remove browser default margin */
+}
+
+.left-panel p {
+    font-size: 1.4rem;
+    margin: 15px 0 0 0; /* keep only top space */
+}
+
+.right-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    justify-content: flex-start; /* Push content to top */
+    padding: 30px 40px;
+}
+
+.right-panel img {
+    height: auto; 
+    max-width: 30%;
+    align-self: center;
+}
+.right-panel h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #003153;
+    text-align: center;
+}
+.right-panel form {
+    padding: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.right-panel p {
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Space between inputs */
+.right-panel .input-group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Move link above button with spacing */
+.right-panel a {
+  margin: 10px 0 30px 0; 
+  text-decoration: none;
+  color: #3D87F5;
+  font-size: 0.9rem;
+}
+
+/* Full width button */
+.right-panel .custom-navy-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+/* Phones and tablets */
+@media (max-width: 991.98px) {
     .left-panel {
-        background: url(../admin/images/userlogin/Log\ In\ Picture.png) center/cover;
-        width: 50%;
-        color: white;
-        text-align: center;
-        padding-left: 2%;
-        padding-top: 2%;
+        display: none;
     }
 
-    .left-panel .login-logo{
-        width: 71%;
-        display: flex;
-        align-items: center;
-        margin-top: 2%;
-        margin: 0;
-        justify-content: space-between;
-    }
-    .login-logo img{
-        height: 120px;
-        width: auto;   
-    }
-    .login-logo h3{
-        font-family: 'ubuntu sans', sans-serif;
-        font-size: 35px;
-        font-weight: bold;
-        width: 100%;
-        display: flex;
-    }
-    .left-panel h1{
-        font-family: 'ubuntu sans', sans-serif;
-        font-size: 55px;
-        font-weight: bold;
-        text-align: left;
-        margin-top: 15%;
-        margin-left: 5%;
-    }
-    .left-panel p{
-        font-family: 'poppins', sans-serif;
-        font-size: 20px;
-        text-align: left;
-        margin-top: 5%;
-        margin-left: 5%;
-    }
-    .right-panel {
-        justify-content: center;
-        align-items: center;
-        width:55%;
-        background-color: #f2f2f2;
-    }
-    .login-content h2{
-        font-family: 'ubuntu sans', sans-serif;
-        font-size: 64px;
-        font-weight: bold;
-        margin: 0%;
-    }
-    .login-content p{
-        font-family: 'poppins', sans-serif;
-        font-size: 20px;
-        margin-top: 5%; 
-        padding: 0;
-    }
-
-    .login-content{
-        width: auto;
-        height: 50vh;
-        text-align: center;
-        margin: 15% 5%;
-    }
-    .input-group {
-        margin: 10px 0;
-    }
-
-    input {
-        width: 80%;
-        height: 3vh;
-        padding: 10px;
-        margin-top: 5%;
-        border: 2px solid #003153;
-        border-radius: 4px;
-    }
-
-    button {
-        width: 30%;
-        height: 5vh;
-        padding: 10px;
-        background: #003153;
-        color: white;
+    .container-login {
+        width: 90%;
+        height: auto;
+        border-radius: 0;
         border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        margin-top: 5%;
     }
 
-    button:hover {
-        background: #0963bd;
+    .right-panel {
+        flex: 1;
+        padding: 20px;
     }
 
+    .right-panel img {
+        max-width: 50%; /* make logo a bit larger for smaller screens */
+    }
+    .right-panel h2 {
+        font-size: 2rem;
+    }
 
-    </style>
+    .circle2 {
+        width: 300px;
+        height: 300px;
+        bottom: 100px;
+        right: -120px;
+        filter: blur(50px);
+    }
+    .circle1 {
+        width: 350px;
+        height: 300px;
+        top: -100px;
+        left: -70px;
+        filter: blur(80px);
+    }
+}
+
+</style>
 </head>
-<body class="login-body">
-    <div class="container">
-        <div class="left-panel">
-            <div class="login-logo">
-                <img src="images/userlogin/Log In Logo.png" alt="Logo">
-                <h3>VMC Basket</h3>
-             </div>
-            <h1>Hello, Admin!</h1>
-            <p>Log in now to Showcase all VMC academic essentials.</p>
-        </div>
-        <div class="right-panel">
-            <div class="login-content">
-                <h2>Log In</h2>
+
+<body>
+
+<div class="gradient-bg">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+</div>
+    <div class="container-login">
+    <div class="left-panel">
+        <h1 class="text-start">Hello, Admin!</h1>
+        <p>Log in now to Showcase all VMC academic essentials.</p>
+    </div>
+
+       <div class="right-panel">
+        <img src="images/vmc_basket_logo.png" alt="VMC Basket Logo">
+                <h2 class="mt-5">Log In</h2>
                 <p>Please use your Administrator Account to log in.</p>
                 <form id="loginForm" method="POST" action="login.php">
                     <div class="input-group">
@@ -192,12 +273,10 @@ unset($_SESSION['error']); // Clear error after displaying
                     <div class="input-group">
                         <input type="password" id="password" name="password" placeholder="Password" required>
                     </div>
-                    <button type="submit" name="login">Log In</button>
+                    <button type="submit" class="custom-navy-btn" name="login">Log In</button>
                 </form>
-            </div>
         </div>
     </div>
-
     <!-- JavaScript Alert for Error -->
     <script>
         var errorMessage = "<?php echo $error; ?>";
