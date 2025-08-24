@@ -82,81 +82,86 @@ while ($row = $result->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket-My Purchase</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         /* General Card Styling */
         .card {
-        background-color: #E8EDEF;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-        border: none;
+            background-color: #E8EDEF;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid black;
         }
 
         .card hr{
-            border: 1px solid #00527F;
+            border: 1px solid black;
         }
 
         /* Status Section */
         .card .d-flex.align-items-center img:first-child {
-        margin-right: 8px;
+            margin-right: 8px;
         }
 
         .card strong {
-        font-weight: 600;
-        font-size: 15px;
+            font-weight: 600;
+            font-size: 15px;
         }
 
         /* Product Image and Info */
         .card img {
-        border-radius: 8px;
+            border-radius: 8px;
         }
 
         .card .d-flex.align-items-center.mb-2 img {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
         }
 
         /* Text Info */
         .card p {
-        font-size: 14px;
-        font-weight: 500;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .card small {
-        font-size: 13px;
-        color: #666;
+            font-size: 13px;
+            color: #666;
         }
 
         /* Buttons */
         .card button {
-        font-size: 13px;
-        padding: 8px 24px;
-        font-weight: 500;
+            font-size: 13px;
+            padding: 8px 24px;
+            font-weight: 500;
         }
 
         /* Totals */
         .card .text-end {
-        font-size: 14px;
-        font-weight: 600;
-        color: #222;
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
         }
 
         /* Border Styling for Special Statuses */
         .border-danger {
-        border-left: 5px solid #dc3545 !important;
+            border-left: 5px solid #dc3545 !important;
         }
 
         .border-info {
-        border-left: 5px solid #0dcaf0 !important;
+            border-left: 5px solid #0dcaf0 !important;
         }
 
+        .tab-card{
+            border: 1px solid black;
+        }
         .tab-button {
             border: none;
             background-color: #E8EDEF;
@@ -166,7 +171,7 @@ while ($row = $result->fetch_assoc()) {
             text-align: center;
         }
         .tab-button.active {
-            border: 2px solid #3D87F5;
+            border: 1px solid #3D87F5;
             color: #00527F;
             background-color: #A9CEEA;
         }
@@ -178,8 +183,8 @@ while ($row = $result->fetch_assoc()) {
 
         /* Modal Styling */
         .rate-review-modal {
-        border-radius: 12px;
-        overflow: hidden;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         /* Left side panel */
@@ -204,16 +209,6 @@ while ($row = $result->fetch_assoc()) {
             align-items: center;
             justify-content: center;
         }
-
-        .title-part{
-           font-family: 'Ubuntu', sans-serif;
-           color: #00527F;
-        }
-
-        .content-title{
-            color: #00527F;
-            font-weight: 500;
-        }
         #photoPreview .btn {
             font-weight: bold;
             background-color: rgba(255, 255, 255, 0.85);
@@ -224,47 +219,6 @@ while ($row = $result->fetch_assoc()) {
 
         #photoArea img {
             border-radius: 6px;
-        }
-
-        .gcash-modal-content {
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .gcash-logo {
-            height: 40px;
-            width: 40px;
-            border-radius: 50%;
-        }
-
-        .qr-img {
-            max-width: 300px;
-            border-radius: 8px;
-        }
-
-        .instruction-box {
-            width: 60%;
-            background-color: #D5E9F3;
-        }
-
-        .instruction-list li {
-            margin-bottom: 0.75rem;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-        
-        .upload-box {
-            border-style: dashed;
-            border-color: #ccc;
-            border-width: 2px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .upload-box:hover {
-            background-color: #f0f8ff;
         }
 
         .modal-footer {
@@ -284,100 +238,334 @@ while ($row = $result->fetch_assoc()) {
             background-color: #f8f9fa;
         }
 
-        .pagination .page-link {
-        color: #00527F;
-        background-color: #fff;
-        border-color: #D5E9F3;
+        .custom-outline-black {
+            border: 1px solid black;
+            background-color: transparent;
+            color: black;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: 0.2s;
         }
-
-        .pagination .page-item.active .page-link {
-            background-color: #00527F;
-            border-color: #00527F;
+        .custom-outline-black:hover {
+            background-color: black;
             color: #fff;
         }
 
-        .pagination .page-item.disabled .page-link {
-            color: #6c757d;
-            background-color: #fff;
-            border-color: #dee2e6;
+        /* Navy button for "Buy Again" */
+        .custom-navy-btn {
+            background-color: #0d1b52; /* dark navy */
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-weight: 500;
+            margin-left: 8px;
+            transition: 0.2s;
         }
+        .custom-navy-btn:hover {
+            background-color: #142674;
+        }
+
+        /* Blue button for "Request for Refund" */
+        .custom-blue-btn {
+            background-color: #007bff; /* bootstrap blue */
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-weight: 500;
+            margin-left: 8px;
+            transition: 0.2s;
+        }
+        .custom-blue-btn:hover {
+            background-color: #0069d9;
+            color: #fff;
+        }
+          /* Tablet styles */
+    @media (max-width: 991.98px) {
+        .tab-card{
+            font-size: 0.75rem;
+        }
+         /* Cards */
+        .card {
+            padding: 10px;
+        }
+        .card .d-flex.align-items-center.mb-2 img {
+            width: 50px;
+            height: 50px;
+        }
+        .card strong {
+            font-size: 14px;
+        }
+        .card p, .card small {
+            font-size: 13px;
+        }
+
+        /* Buttons */
+        .card button {
+            font-size: 12px;
+            padding: 6px 18px;
+        }
+
+        /* Product review modal */
+        .product-info {
+            width: 45%; /* shrink left panel */
+        }
+        .review-form-content {
+            padding: 1rem;
+            font-size: 0.95rem;
+        }
+        .star-rating i {
+            font-size: 1.25rem;
+        }
+        .product-info{
+            font-size: 0.95rem;
+        }
+        .review-form{
+            font-size: 0.95rem;
+        }
+    }
+    @media (max-width: 575.98px) {
+        .custom-navy-btn, .custom-blue-btn, .custom-outline-black .btn-danger{
+            font-size: 0.85rem;
+        }
+        .text-title{
+            font-size: 0.9rem;
+        }
+        .product-reviews-container{
+            font-size: 0.85rem;
+        }
+        .product-image{
+            width: 150px;
+            height: auto;
+        }
+        
+        .highlight-blue {
+            font-size: 1rem;
+        }
+
+        /* Cards become vertical */
+        .card {
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .card .d-flex.align-items-center.mb-2 {
+            flex-direction: column;
+            text-align: center;
+        }
+        .card .d-flex.align-items-center.mb-2 img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 8px;
+        }
+        .card strong {
+            font-size: 13px;
+        }
+        .card p, .card small {
+            font-size: 12px;
+        }
+
+        /* Buttons stack */
+        .card button {
+            display: block;
+            width: 100%;
+            margin: 6px 0;
+            font-size: 13px;
+            padding: 10px;
+        }
+        .tab-card {
+            flex-direction: column;
+        }
+        .tab-button {
+            width: 50%;
+            margin-bottom: 5px;
+        }
+        /* Product review modal stacked layout */
+        .product-info {
+            width: 100%;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        .review-form-content {
+            width: 100%;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+        .star-rating i {
+            font-size: 1.2rem;
+        }
+        .photo-upload-btn {
+            width: 100px;
+            height: 80px;
+        }
+        
+        .navbar-custom {
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .container-fluid.d-flex.align-items-center {
+            justify-content: start;
+        }
+        .vmc-logo {
+            max-width: 90px;
+        }
+        .search-box {
+            width: 100%;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .basket-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+
+        .profile-section img {
+            width: 70px;
+            height: 70px;
+        }
+        footer {
+            font-size: 1rem;
+        }
+        .pagination .page-link {
+            padding: 4px 8px;
+            font-size: 0.85rem;
+        }
+        .form-check-label{
+            font-size: 0.85rem;
+        }
+    }
+
+
     </style>
     
 </head>
 <body>
-    <!-- Header -->
-     <header>
-        <div class="top-text"><h1>ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE</h1></div>
-        <div class="top-container">
-            <ul>
-                <li><a href="basket.php"><img src="admin/images/Home Page/basket-nav.png" alt="Basket"></a></li>  
-                <li><a href="favorites.php"><img src="admin/images/Home Page/heart-nav.png"></a></li>
-                <li><a href="profile.php"> <img src="admin/images/Home Page/profile-user-nav.png" alt="profile"></a></li>
-            </ul>
-        </div>
-    </header>
-
     <!-- Navbar -->
-    <div class="navbar shadow-sm mb-4">
-        <div class="logo ms-4">
-            <a href="index.php"><img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="logo"></a>
-            <h2>VMC Basket</h2>
+    <nav class="navbar navbar-custom shadow-sm fixed-top">
+        <div class="container-fluid d-flex align-items-center">
+            <!-- Hamburger -->
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+
+            <!-- Logo -->
+            <a class="navbar-brand" href="home.php">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
+            </a>
+
+            <!-- Search bar (desktop) -->
+            <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Right-aligned buttons for small devices -->
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
+                <!-- Search icon (mobile) -->
+                <button class="btn p-0" type="button" id="mobileSearchToggle">
+                    <i class="fas fa-search fa-lg"></i>
+                </button>
+            </div>
+            <!-- Cart -->
+            <a href="basket.php" class=" basket-btn text-decoration-none">
+                <i class="fas fa-shopping-basket"></i>
+            </a>
+
+            <!-- Collapsible search bar (mobile) -->
+            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="index.php" >Home</a></li>
-                <li><a href="shop.php">Shop</a></li>
-                <li><a href="contact.php">Contact us</a></li>
-            </ul>
-        </nav>
-        <div class="search" style="display: flex;  align-items: center; justify-content: space-between; width: auto;">
-            <div class="search-container me-4">
-                <input type="text" class="form-control" placeholder="">
-                <button><img src="admin/images/search-icon.png" alt="Search"></button>
+    </nav>
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-body p-0">
+            <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="profile-section">
+                <img src="admin/images/profile_pic.png">
+                <h4 class="mt-2">Janella Clare Gomez</h4>
+            </div>
+
+            <div class="px-3">
+                <div class="mb-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                    Profile
+                    </button>
+                    <div class="collapse ps-3" id="profileMenu">
+                    <a href="profile.php">My Account</a>
+                    <a href="purchase_history.php">My Purchase</a>
+                    <a href="favorites.php">My Favorites</a>
+                    </div>
+                </div>
+
+            <a href="home.php">Home</a>
+
+            <div class="mt-2">
+                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                Shop
+                </button>
+                <div class="collapse ps-3" id="shopMenu">
+                <a href="shop_uniforms.php">Uniforms</a>
+                <a href="shop_supplies.php">School Supplies</a>
+                <a href="shop_merch.php">School-related Merchandise</a>
+                </div>
+            </div>
+
+            <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
     </div>
 
     <!-- My Profile Side-bar-->
-    <div class="d-flex">
-         <div class="sidebar ms-5 ">
-            <!-- USER PROFILE PIC AND NAME-->
-            <h5 style="font-size: 16px;">
-            <!-- Display the Profile Image -->
-                <img src= "admin/uploads/<?= $profilePic ?>" class="rounded-circle mb-3" width="120" id="profileImage" name="profileImage" alt="profile">
-
-                <br>    
-                <?php echo htmlspecialchars($fullName); ?>
-               
-                
-            </h5>
-
-
-             <!-- SIDE-BAR-->
-            <div class="mt-4 mb-4">
-                <button class="btn w-100 text-start btn-active d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#accountMenu" aria-expanded="true">
-                    <img src="admin/images/profile_pic.png" alt="profile" width="20" class="me-2">
-                    My profile
-                </button>
-                <div id="accountMenu" class="collapse show mb-3 mt-1">
-                    <a href="forgot_pass.php" class="d-block text-decoration-none ps-3 text-muted mb-3"><img src="admin/images/locked.png" alt="profile" width="20" class="me-2">Change Password</a>
-                </div>
-                <a href="#" class="d-block text-decoration-none mb-3 mt-3"><img src="admin/images/bill.png" alt="profile" width="20" class="me-2">My Purchase</a>
-                <a href="logout.php" class="d-block text-decoration-none"><img src="admin/images/logout.png" alt="profile" width="20" class="me-2">Log out</a>
+    <div class="d-flex" style="margin-top: 80px;">
+     <!-- Purchase History -->
+     <div class="purchase-history container mb-5 p-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <h2 class="mt-4 mb-5">
+                <span class="highlight-blue">My Purchase History</span>
+            </h2>
+             <!-- Desktop: show p and pagination on the right -->
+            <div class="d-flex flex-column justify-content-center align-items-end align-items-sm-end ms-auto text-center">
+                <p class="mb-2">8 out of 100 items shows</p>
+                <!-- Pagination -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination custom-pagination justify-content-center">
+                        <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                            <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?= $page >= $total_pages ? 'disabled' : '' ?>">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
 
-     <!-- Purchase History -->
-     <div class="purchase-history container mt-3 mb-5">
-
     <!-- Tabs -->
-    <div class="d-flex mb-3">
-        <button class="tab-button active w-100">All</button>
-        <button class="tab-button w-100">To Pay</button>
-        <button class="tab-button w-100">To Pick Up</button>
-        <button class="tab-button w-100">Completed</button>
-        <button class="tab-button w-100">Cancelled</button>
-        <button class="tab-button w-100">Return Refund</button>
+     <div class="d-flex tab-card mb-3"> 
+        <button class="tab-button active w-100">All</button> 
+        <button class="tab-button w-100">To Pay</button> 
+        <button class="tab-button w-100">To Pick Up</button> 
+        <button class="tab-button w-100">Completed</button> 
+        <button class="tab-button w-100">Cancelled</button> 
+        <button class="tab-button w-100">Return Refund</button> 
     </div>
 
     <!-- Search -->
@@ -396,7 +584,7 @@ while ($row = $result->fetch_assoc()) {
             <!-- Order Header -->
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <img src="./admin/images/wallet.png" alt="Box" width="25" class="me-2">
+                    <img src="./admin/images/ready-to-pickup.png" alt="Box" width="25" class="me-2">
                     <div>
                         <strong>Order #<?= $order['receipt_no'] ?></strong><br>
                         <small class="text-muted">Ordered on <?= date('M d, Y', strtotime($order['order_date'])) ?></small>
@@ -424,84 +612,76 @@ while ($row = $result->fetch_assoc()) {
             <hr>
             <!-- Order Footer -->
             <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <?php if($order['status'] == 'Pending'): ?>
-                        <?php if($order['payment_method'] == 'Send Online Receipt'): ?>
-                            <?php if(!$order['has_receipt']): ?>
-                                <button class="btn btn-outline-primary btn-sm me-2" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#gcashUploadModal"
-                                        data-receipt="<?= $order['receipt_no'] ?>"
-                                        data-products='<?= json_encode($order['items']) ?>'>
-                                    Upload E-Receipt
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#cancelOrderModal" 
-                                        data-receipt="<?= $order['receipt_no'] ?>"
-                                        data-products='<?= json_encode($order['items']) ?>'>
-                                    Cancel Order
-                                </button>
-                            <?php else: ?>
-                                <span class="text-muted">
-                                    <i class="bi bi-clock"></i> Waiting to confirm payment...
-                                </span>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                    <?php elseif($order['status'] == 'ToPickUp'): ?>
-                        <button class="btn btn-success btn-sm pickup-btn"
-                                data-receipt="<?= $order['receipt_no'] ?>">
-                            <i class="bi bi-check2-circle"></i> Confirm Pick-up
+        <div>
+            <?php if($order['status'] == 'Pending'): ?>
+                <?php if($order['payment_method'] == 'Send Online Receipt'): ?>
+                    <?php if(!$order['has_receipt']): ?>
+                        <button class="btn btn-outline-danger btn-sm" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#cancelOrderModal" 
+                                data-receipt="<?= $order['receipt_no'] ?>"
+                                data-products='<?= json_encode($order['items']) ?>'>
+                            Cancel Order
                         </button>
                     <?php endif; ?>
-                    
-                    <?php if($order['status'] == 'Complete'): ?>
-                        <?php if(!$item['has_review']): ?>
-                            <button class="btn btn-outline-primary btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#rateReviewModal"
-                                    data-receipt="<?= $order['receipt_no'] ?>"
-                                    data-products='<?= json_encode($order['items']) ?>'>
-                                Rate & Review
-                            </button>
-                        <?php else: ?>
-                            <button class="btn btn-outline-secondary btn-sm" disabled>
-                                Already Reviewed
-                            </button>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
-                <div class="text-end">
-                    <small class="text-muted">Total Amount</small><br>
-                    <strong class="fs-5">₱<?= number_format($order['total'], 2) ?></strong>
-                </div>
-            </div>
+                <?php endif; ?>
+            <?php elseif($order['status'] == 'ToPickUp'): ?>
+                <button class="btn btn-success btn-sm pickup-btn"
+                        data-receipt="<?= $order['receipt_no'] ?>">
+                    <i class="bi bi-check2-circle"></i> Confirm Pick-up
+                </button>
+            <?php endif; ?>
+            
+<?php if($order['status'] == 'Complete'): ?>
+    <?php if(!$item['has_review']): ?>
+        <button class="btn custom-outline-black"
+                data-bs-toggle="modal"
+                data-bs-target="#rateReviewModal"
+                data-receipt="<?= $order['receipt_no'] ?>"
+                data-products='<?= json_encode($order['items']) ?>'>
+            Rate
+        </button>
+
+        <button class="btn custom-navy-btn">
+            Buy Again
+        </button>
+
+        <button class="btn custom-blue-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#returnRequestModal"
+                data-receipt="<?= $order['receipt_no'] ?>"
+                data-products='<?= json_encode($order['items']) ?>'>
+            Request for Refund
+        </button>
+    <?php else: ?>
+        <button class="btn custom-outline-black" disabled>
+            Already Reviewed
+        </button>
+         <button class="btn custom-navy-btn">
+            Buy Again
+        </button>
+
+        <button class="btn custom-blue-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#returnRequestModal"
+                data-receipt="<?= $order['receipt_no'] ?>"
+                data-products='<?= json_encode($order['items']) ?>'>
+            Request for Refund
+        </button>
+    <?php endif; ?>
+<?php endif; ?>
+
         </div>
-    <?php endforeach; ?>
-
-    <!-- Pagination -->
-    <div aria-label="Page navigation example" class="mt-4">
-        <ul class="pagination d-flex justify-content-end">
-            <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-                <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-                </li>
-            <?php endfor; ?>
-            <li class="page-item <?= $page >= $total_pages ? 'disabled' : '' ?>">
-                <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
+        <div class="text-end">
+            <small class="text-muted">Total Amount</small><br>
+            <strong class="fs-5">₱<?= number_format($order['total'], 2) ?></strong>
+        </div>
     </div>
+</div>
+<?php endforeach; ?>
+</div>
+</div>
 
-</div>
-</div>
 
 <!------------------------ MODALS ----------------------------------------------------------->
 <!-- SEND E-RECEIPT MODAL-->
@@ -579,8 +759,8 @@ while ($row = $result->fetch_assoc()) {
 <div class="modal fade" id="returnRequestModal" tabindex="-1" aria-labelledby="returnRequestLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content return-request-modal">
-    <div class="modal-header">
-        <h4 class="modal-title title-part" id="returnRequestLabel">
+    <div class="modal-header shadow-sm">
+        <h4 class="modal-title title-text fw-bold" id="returnRequestLabel">
             <img src="./admin/images/request-for-return.png" alt="Return Icon"  class="me-2" style="width: 40px; height: 40px;">
             Request for Return/Refund
         </h4>
@@ -589,7 +769,7 @@ while ($row = $result->fetch_assoc()) {
       <div class="modal-body d-flex p-0">
         
         <!-- Left Side: Product Info -->
-        <div class="product-info p-4 text-center">
+        <div class="product-info p-4 text-start">
           <img src="./Images/41's Aniv Shirt (Front).png" alt="VMC Shirt" class="img-fluid mb-3" />
           <h5 class="mb-1">VMC 41st Anniversary Shirt</h5>
           <p class="text-muted mb-0">Size: L</p>
@@ -598,7 +778,7 @@ while ($row = $result->fetch_assoc()) {
         <!-- Right Side: Rating Form -->
         <div class="review-form flex-grow-1 p-4">
 
-        <h5 class="content-title">Reason for Return</h5>
+        <h5 class="title-text fw-semibold">Reason for Return</h5>
           <div class="form-check mb-2">
             <input class="form-check-input" type="checkbox" id="returnReason1">
             <label class="form-check-label" for="returnReason1">Defective or Damage Product</label>
@@ -620,7 +800,7 @@ while ($row = $result->fetch_assoc()) {
 
           <!-- Photo Upload -->
           <div class="mb-3 photo-upload-section">
-            <label class="form-label content-title fs-5 mt-3">Add photos</label><br/>
+            <label class="form-label title-text fw-semibold fs-5 mt-3">Add photos</label><br/>
 
             <!-- Flex container for previews + button -->
             <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
@@ -635,9 +815,9 @@ while ($row = $result->fetch_assoc()) {
             <input type="file" class="photo-upload-input d-none" multiple accept="image/png, image/jpeg">
             </div>
 
-          <div class="d-flex justify-content-between mt-4">
-            <button class="btn btn-outline-danger me-2" data-bs-dismiss="modal">Cancel</button>
-            <button class="btn btn-primary">Send Request</button>
+          <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-danger me-2" data-bs-dismiss="modal">Cancel</button>
+            <button class="custom-navy-btn">Send Request</button>
           </div>
         </div>
       </div>
@@ -649,8 +829,8 @@ while ($row = $result->fetch_assoc()) {
 <div class="modal fade" id="rateReviewModal" tabindex="-1" aria-labelledby="rateReviewLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content rate-review-modal">
-      <div class="modal-header">
-        <h4 class="modal-title title-part" id="rateReviewLabel">
+      <div class="modal-header shadow-sm">
+        <h4 class="modal-title text-title fw-bold" id="rateReviewLabel">
           <img src="./admin/images/rate-and-review.png" alt="Review Icon" class="me-2" style="width: 40px; height: 40px;">
           Rate & Review Products
         </h4>
@@ -665,8 +845,8 @@ while ($row = $result->fetch_assoc()) {
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary px-4" id="submitAllReviews">Submit All Reviews</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="custom-navy-btn" id="submitAllReviews">Submit Reviews</button>
       </div>
     </div>
   </div>
@@ -674,27 +854,29 @@ while ($row = $result->fetch_assoc()) {
 
 <!-- Template for individual product review (hidden) -->
 <template id="productReviewTemplate">
-  <div class="product-review-item border-bottom mb-3">
+  <div class="product-review-item border-bomb-3">
     <form class="review-form" data-product-id="" data-order-id="">
       <div class="d-flex p-0">
         <!-- Left Side: Product Info -->
-        <div class="product-info p-4 text-center" style="width: 40%; background-color: #D5E9F3;">
+        <div class="product-info p-4 text-center">
           <img src="" alt="Product Image" class="img-fluid mb-3 product-image" />
           <h5 class="mb-1 product-name"></h5>
           <p class="text-muted mb-0 product-size"></p>
-          <div class="form-check mt-4 d-flex align-items-center justify-content-center">
-            <input class="form-check-input me-2" type="checkbox" name="is_anonymous">
-            <label class="form-check-label text-muted ms-1">
-              Review Anonymously
+          <div class="d-flex justify-content-center">
+        <div class="form-check mt-4 d-flex align-items-center">
+            <input class="form-check-input me-2" type="checkbox" name="is_anonymous" id="is_anonymous">
+            <label class="form-check-label text-muted" for="is_anonymous">
+            Review Anonymously
             </label>
-          </div>
         </div>
+        </div>
+    </div>
 
         <!-- Right Side: Rating Form -->
         <div class="review-form-content flex-grow-1 p-4">
           <!-- Star Rating -->
           <div class="mb-3">
-            <label class="form-label content-title">Rate Product</label><br/>
+            <label class="form-label text-title fw-semibold">Rate Product</label><br/>
             <div class="star-rating">
               <i class="bi bi-star" data-rating="1"></i>
               <i class="bi bi-star" data-rating="2"></i>
@@ -707,7 +889,7 @@ while ($row = $result->fetch_assoc()) {
 
           <!-- Photo Upload -->
           <div class="mb-3 photo-upload-section">
-            <label class="form-label content-title">Add photos</label><br/>
+            <label class="form-label text-title fw-semibold">Add photos</label><br/>
             <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
               <div class="d-flex flex-wrap photo-preview"></div>
               <button type="button" class="btn btn-light border photo-upload-btn">
@@ -721,7 +903,7 @@ while ($row = $result->fetch_assoc()) {
 
           <!-- Review Text -->
           <div class="mb-3">
-            <label class="form-label content-title">Write your review</label>
+            <label class="form-label text-title fw-semibold">Write your review</label>
             <textarea class="form-control" name="review_text" rows="3"></textarea>
           </div>
         </div>
@@ -730,12 +912,12 @@ while ($row = $result->fetch_assoc()) {
   </div>
 </template>
 
-<!-- CANCELLED MODAL -->
+<!-- CANCEL MODAL -->
 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content cancel-order-modal">
-      <div class="modal-header">
-          <h4 class="modal-title title-part" id="cancelOrderLabel">
+      <div class="modal-header shadow-sm">
+          <h4 class="modal-title text-title fw-bold" id="cancelOrderLabel">
               <img src="./admin/images/cancel-order.png" alt="Cancel Icon" class="me-2" style="width: 40px; height: 40px;">
               Cancel Order
           </h4>
@@ -748,7 +930,7 @@ while ($row = $result->fetch_assoc()) {
         <!-- Right: Cancel Form -->
         <div class="review-form flex-grow-1 p-4">
             <p>Are you sure you want to cancel your order? If yes, please state the reason.</p>
-            <h5 class="content-title mt-2 mb-1">Reason for Cancel</h5>
+            <h5 class="mt-2 mb-1 text-title fw-semibold">Reason for Cancel</h5>
 
             <div class="form-check mb-2">
               <input class="form-check-input" type="checkbox" id="cancelReason1">
@@ -781,70 +963,67 @@ while ($row = $result->fetch_assoc()) {
 
 
 <!------------------------ FOOTER ----------------------------------------------------------->
+<!-- Footer -->
+    <footer class="footer">
+        <div class="container p-5">
 
-<footer>
-    <div class="footer-container">
-        <div class="footer-logo">
-            <img src="admin/images/Footer/VMS-LOGO-Official-01.png" alt="logo">
-            <div class="logo-text">
-                <h2>VMC Basket</h2>
-                <h4>Villagers Montesorri College E-commerce Website</h4>
+            <!-- Logo Row -->
+            <div class="row justify-content-start mb-4">
+            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
+                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
             </div>
-        </div>
+            </div>
 
-        <div class="footer-links mt-5">
-            <div class="about">
-                <p>your one-stop destination for all university merchandise needs! Discover a vast collection of high-quality uniforms, organizational shirts, and accessories tailored to showcase your university pride.</p>
-            </div>
-            <div class="footer-nav">
-                <h4>Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="shop.html">Shop</a></li>
-                    <li><a href="contact.html">Contact us</a></li>
+            <!-- Links & Contacts Row -->
+            <div class="row text-start gy-3">
+
+            <!-- Quick Links -->
+            <div class="col-md-3">
+                <h5 class="fw-bold">Quick Links</h5>
+                <ul class="list-unstyled">
+                <li><a href="#" class="footer-link">Home</a></li>
+                <li><a href="#" class="footer-link">Shop</a></li>
                 </ul>
             </div>
-            <div class="services">
-                <h4>Customer Services</h4>
-                <ul>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Size Guide</a></li>
-                    <li><a href="#">Exchange & Returns</a></li>
-                </ul>
-            </div>
-            <div class="myAccount">
-                <h4>My Account</h4>
-                <ul>
-                    <li><a href="#">Submit Feedback</a></li>
-                    <li><a href="#">Favorites</a></li>
-                    <li><a href="#">Shopping cart</a></li>
-                </ul>
-            </div>
-        </div>
 
-        <div class="socials mt-4">
-            <div class="footer-acknowledgement">
-                <div class="policy">
-                    <ul>
-                        <li><a href="#">About |</a></li>
-                        <li><a href="#">Privacy Policy |</a></li>
-                        <li><a href="#">Terms of Services</a></li>
-                    </ul>
-                </div>
-                <div class="copy">
-                    <h4>©2024 Villagers Montesorri College. All rights reserved.</h4>
+            <!-- Contacts -->
+            <div class="col-md-7">
+                <h5 class="fw-bold">Contacts</h5>
+                <p class="mb-1">
+                <i class="bi bi-geo-alt-fill"></i>
+                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
+                </p>
+                <p class="mb-1">
+                <i class="bi bi-telephone-fill"></i>
+                +63 2 8929 0856
+                </p>
+                
+                <div class="d-flex gap-3">
+                    <p class="mb-1 fw-medium">Socials Media</p>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
                 </div>
             </div>
-            
-            <div class="footer-social mt-4">
-                <a href="#"><img src="admin/images/Footer/www.png" alt="Website"></a> 
-                <a href="facebook.com"><img src="admin/images/Footer/facebook-footer.png" alt="facebook"></a>
-                <a href="#"><img src="admin/images/Footer/instagram.png" alt="instagram"></a>
-                <a href="#"><img src="admin/images/Footer/youtube.png" alt="youtube"></a> 
+
+            <!-- Back to top -->
+            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
+                <a href="#" class="footer-link">↑ Back to top</a>
+            </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="mt-5 mb-3">
+
+            <!-- Copyright -->
+            <div class="sub-footer text-center small">
+            © 2024 Villager’s Montessori College. All rights served.
             </div>
         </div>
-    </div> 
-</footer>
+    </footer>
+
 
 
 
@@ -1504,7 +1683,5 @@ function updateRatingDisplay(element, rating) {
     element.innerHTML = html;
 }
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

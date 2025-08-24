@@ -67,48 +67,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket-Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 
     <style>
+    .highlight-orange {
+        background-color: #ffd498;
+        padding: 0.3rem 1rem;
+        border-radius: 6px;
+        border: 1px solid black;
+        box-shadow: 3px 3px 0px #000;
+        font-weight: 600;
+    }       
+
     .profile-container {
         max-width: 950px;
-        max-height: 850px;
+        height: auto;
         background-color: #F5EFEB;
         padding: 10px;
-        margin-left:60px;
         border-radius: 10px;
         border: solid 1px #FF9E5E;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .sidebar {
-        width: 350px;
-        background: white;
-        padding: 20px;
-        height: 900px;
-    }
-
-    .btn-active {
-        font-weight: bold;
-        color: #00527F !important;
-        background-color: #C8D9E6;
-        padding: 10px
-    }
-    .sidebar a {
-        color: #00527F;
-        text-decoration: none;
-    }
-    .sidebar a:hover {
-        font-weight: bold;
-        border-radius: 3px;
-        color: #00527F !important;
-        background-color: #C8D9E6;
-        padding: 10px
     }
     .profile-container h3 {
         font-family: "Ubuntu", sans-serif;
@@ -125,105 +111,196 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         border-right: solid 1px #CED4DA;
         border-bottom: solid 1px #CED4DA;
         border-left:0px;
-        background-color: #E9ECEF;
+        background-color: white;
         color: #0066FF;
     }
     .changebtn:hover, .changebtn:focus, .changebtn.active {
         background-color: #0066FF;
         color: white;
     }
+
+    .profile-img{
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    /* Tablet styles */
+    @media (max-width: 991.98px) {
+        .profile-container {
+            padding: 8px;
+        }
+        .profile-img {
+            width: 120px;
+            height: 120px;
+        }
+        .profile-container h3 {
+            font-size: 24px;
+        }
+    }
+    @media (max-width: 575.98px) {
+
+        .highlight-orange {
+            font-size: 1rem;
+        }
+        .profile-container {
+            padding: 5px;
+        }
+        .profile-img {
+            width: 80px;
+            height: 80px;
+        }
+        .profile-container h3 {
+            font-size: 18px;
+        }
+        .profile-container p{
+            font-size: 0.85rem;
+        }
+        .navbar-custom {
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .container-fluid.d-flex.align-items-center {
+            justify-content: start;
+        }
+        .vmc-logo {
+            max-width: 90px;
+        }
+        .search-box {
+            width: 100%;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .basket-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+
+        .profile-section img {
+            width: 70px;
+            height: 70px;
+        }
+        footer {
+            font-size: 1rem;
+        }
+    }
+
  </style>
 
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="top-text"><h1>ALL PRODUCTS ARE AVAILABLE FOR PICK-UP ONLY AT VILLAGERS MONTESSORI COLLEGE</h1></div>
-        <div class="top-container">
-            <ul>
-                <li><a href="basket.php"><img src="admin/images/Home Page/basket-nav.png" alt="Basket"></a></li>  
-                <li><a href="favorites.php"><img src="admin/images/Home Page/heart-nav.png"></a></li>
-                <li><a href="profile.php"> <img src="admin/images/Home Page/profile-user-nav.png" alt="profile"></a></li>
-            </ul>
-        </div>
-    </header>
 
     <!-- Navbar -->
-    <div class="navbar shadow-sm mb-4">
-        <div class="logo ms-4">
-            <a href="index.php"><img src="admin/images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="logo"></a>
-            <h2>VMC Basket</h2>
+    <nav class="navbar navbar-custom shadow-sm fixed-top">
+        <div class="container-fluid d-flex align-items-center">
+            <!-- Hamburger -->
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+
+            <!-- Logo -->
+            <a class="navbar-brand" href="home.php">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
+            </a>
+
+            <!-- Search bar (desktop) -->
+            <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Right-aligned buttons for small devices -->
+            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
+                <!-- Search icon (mobile) -->
+                <button class="btn p-0" type="button" id="mobileSearchToggle">
+                    <i class="fas fa-search fa-lg"></i>
+                </button>
+            </div>
+            <!-- Cart -->
+            <a href="basket.php" class=" basket-btn text-decoration-none">
+                <i class="fas fa-shopping-basket"></i>
+            </a>
+
+            <!-- Collapsible search bar (mobile) -->
+            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+            </div>
         </div>
-        <nav>
-            <ul>
-                <li><a href="index.php" >Home</a></li>
-                <li><a href="shop.php">Shop</a></li>
-                <li><a href="contact.php">Contact us</a></li>
-            </ul>
-        </nav>
-        <div class="search" style="display: flex;  align-items: center; justify-content: space-between; width: auto;">
-            <div class="search-container me-4">
-                <input type="text" class="form-control" placeholder="">
-                <button><img src="admin/images/search-icon.png" alt="Search"></button>
+    </nav>
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-body p-0">
+            <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="profile-section">
+                <img src="admin/images/profile_pic.png">
+                <h4 class="mt-2">Janella Clare Gomez</h4>
+            </div>
+
+            <div class="px-3">
+                <div class="mb-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                    Profile
+                    </button>
+                    <div class="collapse ps-3" id="profileMenu">
+                    <a href="profile.php">My Account</a>
+                    <a href="purchase_history.php">My Purchase</a>
+                    <a href="favorites.php">My Favorites</a>
+                    </div>
+                </div>
+
+            <a href="home.php">Home</a>
+
+            <div class="mt-2">
+                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                Shop
+                </button>
+                <div class="collapse ps-3" id="shopMenu">
+                <a href="shop_uniforms.php">Uniforms</a>
+                <a href="shop_supplies.php">School Supplies</a>
+                <a href="shop_merch.php">School-related Merchandise</a>
+                </div>
+            </div>
+
+            <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
     </div>
 
     <!-- My Profile Side-bar-->
-    <div class="d-flex">
-        <div class="sidebar ms-5 ">
-            <!-- USER PROFILE PIC AND NAME-->
-            <h5 style="font-size: 16px;">
-            <!-- Display the Profile Image -->
-                <img src= "admin/uploads/<?= $profilePic ?>" class="rounded-circle mb-3" width="120" id="profileImage" name="profileImage" alt="profile">
-
-                <br>    
-                <?php echo htmlspecialchars($fullName); ?>
-               
-                
-            </h5>
-
-
-             <!-- SIDE-BAR-->
-            <div class="mt-4 mb-4">
-                <button class="btn w-100 text-start btn-active d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#accountMenu" aria-expanded="true">
-                    <img src="admin/images/profile_pic.png" alt="profile" width="20" class="me-2">
-                    My profile
-                </button>
-                <div id="accountMenu" class="collapse show mb-3 mt-1">
-                    <a href="forgot_pass.php" class="d-block text-decoration-none ps-3 text-muted mb-3"><img src="admin/images/locked.png" alt="profile" width="20" class="me-2">Change Password</a>
-                </div>
-                <a href="purchase_history.php" class="d-block text-decoration-none mb-3 mt-3"><img src="admin/images/bill.png" alt="profile" width="20" class="me-2">My Purchase</a>
-                <a href="logout.php" class="d-block text-decoration-none"><img src="admin/images/logout.png" alt="profile" width="20" class="me-2">Log out</a>
-            </div>
-        </div>
-        
-       <!-- Profile Information -->
-       <div class="profile-container flex-grow-1 p-4">
-    <h3>My Profile</h3>
-    <p class="mb-3">Manage and protect your account</p>
-    <hr>
-    
+    <div class="d-flex justify-content-center" style="margin-top: 100px; margin-bottom: 30px;">
+        <div class="profile-container flex-grow-1 p-4">
+            <h2 class="mt-4 mb-3">
+                <span class="highlight-orange">My Profile</span>
+            </h2>
+            <p class="mb-3">Manage and protect your account</p>
+            <hr>
 
     <!-- Editable Form -->
     <form class="mt-4" method="POST" enctype="multipart/form-data">
             <div class="text-center">
                 <!-- Dynamic Profile Picture -->
-               
-                <img src="admin/uploads/<?=$profilePic ?>" class="rounded-circle mb-3" width="120" id="profileImage">
+                <!-- Display the Profile Image -->
+                <img src= "admin/uploads/<?= $profilePic ?>" class="rounded-circle mb-3 profile-img" id="profileImage" name="profileImage" alt="profile">
                 <br>
                 <input type="file" id="imageUpload" accept="image/*" name="profile_pic" style="display: none;" onchange="previewImage(event)">
-                <button type="button" class="btn btn-primary mt-2 w-25 mb-3" onclick="document.getElementById('imageUpload').click();">Select Image</button>
+                <button type="button" class="custom-navy-btn mt-2" onclick="document.getElementById('imageUpload').click();">Select Image</button>
                 <hr>
             </div>
         <div class="row mb-3">
             <div class="col-md-6 mb-2">
-                <label class="form-label">Student Number</label>
-                <input type="text" name="student_no" class="form-control" value="<?php echo $user['student_no']; ?>" readonly>
+            <label class="form-label">Student Number</label>
+            <input type="text" name="student_no" class="form-control" value="<?php echo $user['student_no']; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
             </div>
             <div class="col-md-6 mb-2">
-                <label class="form-label">Full Name</label>
-                <input type="text" name="full_name" class="form-control" value="<?php echo $fullName; ?>" readonly>
+            <label class="form-label">Full Name</label>
+            <input type="text" name="full_name" class="form-control" value="<?php echo $fullName; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
             </div>
         </div>
 
@@ -231,7 +308,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-6">
                 <label class="form-label">Email</label>
                 <div class="input-group">
-                <input type="email" name="email" class="form-control" value="<?php echo $user['email']; ?>" required>
+                <input type="email" name="email" id="email" class="form-control" value="<?php echo $user['email']; ?>" required>
                     <button class="btn changebtn" type="button" onclick="enableEdit('email', this)">Change</button>
                 </div>
             </div>
@@ -263,7 +340,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <hr>
         <div class="text-center mt-5">
-            <button type="submit" class="btn btn-sm btn-primary w-25" id="saveBtn" disabled>Save</button>
+            <button type="submit" class="custom-navy-btn" id="saveBtn" disabled>Save</button>
         </div>
     </form>
 </div>
@@ -271,70 +348,66 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
      </div>
 </div>
 
-<!-- Footer -->
-<footer>
-    <div class="footer-container">
-        <div class="footer-logo">
-            <img src="admin/images/Footer/VMS-LOGO-Official-01.png" alt="logo">
-            <div class="logo-text">
-                <h2>VMC Basket</h2>
-                <h4>Villagers Montesorri College E-commerce Website</h4>
-            </div>
-        </div>
+   <!-- Footer -->
+    <footer class="footer">
+        <div class="container p-5">
 
-        <div class="footer-links mt-5">
-            <div class="about">
-                <p>your one-stop destination for all university merchandise needs! Discover a vast collection of high-quality uniforms, organizational shirts, and accessories tailored to showcase your university pride.</p>
+            <!-- Logo Row -->
+            <div class="row justify-content-start mb-4">
+            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
+                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
+                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
             </div>
-            <div class="footer-nav">
-                <h4>Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="shop.html">Shop</a></li>
-                    <li><a href="contact.html">Contact us</a></li>
-                </ul>
             </div>
-            <div class="services">
-                <h4>Customer Services</h4>
-                <ul>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Size Guide</a></li>
-                    <li><a href="#">Exchange & Returns</a></li>
-                </ul>
-            </div>
-            <div class="myAccount">
-                <h4>My Account</h4>
-                <ul>
-                    <li><a href="#">Submit Feedback</a></li>
-                    <li><a href="#">Favorites</a></li>
-                    <li><a href="#">Shopping cart</a></li>
-                </ul>
-            </div>
-        </div>
 
-        <div class="socials mt-4">
-            <div class="footer-acknowledgement">
-                <div class="policy">
-                    <ul>
-                        <li><a href="#">About |</a></li>
-                        <li><a href="#">Privacy Policy |</a></li>
-                        <li><a href="#">Terms of Services</a></li>
-                    </ul>
-                </div>
-                <div class="copy">
-                    <h4>©2024 Villagers Montesorri College. All rights reserved.</h4>
+            <!-- Links & Contacts Row -->
+            <div class="row text-start gy-3">
+
+            <!-- Quick Links -->
+            <div class="col-md-3">
+                <h5 class="fw-bold">Quick Links</h5>
+                <ul class="list-unstyled">
+                <li><a href="#" class="footer-link">Home</a></li>
+                <li><a href="#" class="footer-link">Shop</a></li>
+                </ul>
+            </div>
+
+            <!-- Contacts -->
+            <div class="col-md-7">
+                <h5 class="fw-bold">Contacts</h5>
+                <p class="mb-1">
+                <i class="bi bi-geo-alt-fill"></i>
+                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
+                </p>
+                <p class="mb-1">
+                <i class="bi bi-telephone-fill"></i>
+                +63 2 8929 0856
+                </p>
+                
+                <div class="d-flex gap-3">
+                    <p class="mb-1 fw-medium">Socials Media</p>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
                 </div>
             </div>
-            
-            <div class="footer-social mt-4">
-                <a href="#"><img src="admin/images/Footer/www.png" alt="Website"></a> 
-                <a href="facebook.com"><img src="admin/images/Footer/facebook-footer.png" alt="facebook"></a>
-                <a href="#"><img src="admin/images/Footer/instagram.png" alt="instagram"></a>
-                <a href="#"><img src="admin/images/Footer/youtube.png" alt="youtube"></a> 
+
+            <!-- Back to top -->
+            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
+                <a href="#" class="footer-link">↑ Back to top</a>
+            </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="mt-5 mb-3">
+
+            <!-- Copyright -->
+            <div class="sub-footer text-center small">
+            © 2024 Villager’s Montessori College. All rights served.
             </div>
         </div>
-    </div> 
-</footer>
+    </footer>
 
 <!-- Javascript -->
 <script>
@@ -489,8 +562,5 @@ function previewImage(event) {
 
 
 </script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

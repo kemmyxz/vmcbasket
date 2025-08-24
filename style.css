@@ -43,6 +43,15 @@ header {
   font-weight: 600;
 }
 
+.highlight-orange {
+  background-color: #ffd498;
+  padding: 0.3rem 1rem;
+  border-radius: 6px;
+  border: 1px solid black;
+  box-shadow: 3px 3px 0px #000;
+  font-weight: 600;
+}
+
 .custom-navy-btn {
   background-color: #26387d;
   color: #fff;
@@ -501,66 +510,6 @@ footer {
   color: #444;
 }
 
-/* FOR PROFILE */
-.profile-container {
-  max-width: 950px;
-  max-height: 850px;
-  background-color: #f5efeb;
-  padding: 10px;
-  margin-left: 60px;
-  border-radius: 10px;
-  border: solid 1px #ff9e5e;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-.sidebar {
-  width: 350px;
-  background: white;
-  padding: 20px;
-  height: 900px;
-}
-
-.btn-active {
-  font-weight: bold;
-  color: #00527f !important;
-  background-color: #c8d9e6;
-  padding: 10px;
-}
-.sidebar a {
-  color: #00527f;
-  text-decoration: none;
-}
-.sidebar a:hover {
-  font-weight: bold;
-  border-radius: 3px;
-  color: #00527f !important;
-  background-color: #c8d9e6;
-  padding: 10px;
-}
-.profile-container h3 {
-  font-family: "Ubuntu", sans-serif;
-  font-size: 30px;
-  color: #00527f;
-  font-weight: bold;
-}
-.profile-container hr {
-  border: solid 1px #ff9e5e;
-  opacity: 0.6;
-}
-.changebtn {
-  border-top: solid 1px #ced4da;
-  border-right: solid 1px #ced4da;
-  border-bottom: solid 1px #ced4da;
-  border-left: 0px;
-  background-color: #e9ecef;
-  color: #0066ff;
-}
-.changebtn:hover,
-.changebtn:focus,
-.changebtn.active {
-  background-color: #0066ff;
-  color: white;
-}
-
 /* Category Icons */
 .category-icon {
   width: 200px;
@@ -669,38 +618,6 @@ footer {
   font-size: 16px;
 }
 
-/* Fullscreen viewer overlay */
-.fullscreen-viewer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8); /* Dark overlay */
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  cursor: pointer;
-}
-
-/* Fullscreen image */
-.fullscreen-viewer img {
-  max-width: 90%;
-  max-height: 90%;
-  border-radius: 0px;
-  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3);
-}
-
-/*Favorite Page*/
-.transition {
-  transition: transform 0.5s ease;
-}
-
-#carouselInner {
-  display: flex;
-  transition: transform 0.5s ease;
-}
 @media (max-width: 991.98px) {
   .navbar-custom {
     padding: 0.5rem 1rem;
