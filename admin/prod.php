@@ -127,7 +127,7 @@ $total_pages = ceil($total_records / $limit);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket - Admin/Products</title>
-    <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
+    <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,16 +135,8 @@ $total_pages = ceil($total_records / $limit);
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        #qrcode {
-            min-width: 128px;
-            min-height: 128px;
-            margin: 0 auto;
-        }
-        #qrcode img {
-            margin: 0 auto;
-        }
         .variant-options {
             max-height: 200px;
             overflow-y: auto;
@@ -164,631 +156,584 @@ $total_pages = ceil($total_records / $limit);
         <div class="row">
         <!-- Sidebar Toggle Button -->
         <!-- Top Navbar (visible only on small devices) -->
-        <nav class="navbar navbar-light bg-light d-md-none shadow-sm">
-            <div class="container-fluid d-flex justify-content-between align-items-center">
-                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-        </nav>
+            <nav class="navbar navbar-light bg-light d-lg-none">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
+            </nav>
 
         <!-- Sidebar -->
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
-        <div class="text-center py-3 d-none d-md-block">
-            <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+
+                <div class="text-center py-3 d-none d-md-block">
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
+
+                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                    <li class="nav-item">
+                        <a href="index.php" class="nav-link">
+                            <i class="bi bi-house-door me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="orders.php" class="nav-link">
+                            <i class="bi bi-bag-check me-2"></i> Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="prod.php" class="nav-link active">
+                            <i class="bi bi-box-seam me-2"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="cus.php" class="nav-link">
+                            <i class="bi bi-people me-2"></i> Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="inquiries.php" class="nav-link">
+                            <i class="bi bi-chat-dots me-2"></i> Messages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="ratings.php" class="nav-link">
+                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounting.php" class="nav-link">
+                            <i class="bi bi-receipt me-2"></i> Receipt Form
+                        </a>
+                    </li>
+                    <li class="nav-item justify-content-end mt-lg-5">
+                        <a href="logout.php" class="nav-link text-danger fw-semibold">
+                            <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        <!-- Title Page and Search -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+            <div class="d-flex justify-content-end mb-5">
+                <div class="search-container">
+                    <input type="text" class="form-control" placeholder="Search...">
+                    <button><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+            <div class="mt-2 d-flex flex-row align-items-center">
+                <h2 class="mb-0">Product</h2>
+            </div>
+
+        <!--Total Products, Add Products Button, and Modal-->
+        <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+            <div>
+            <strong>Total Products: 100</strong>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+            <!-- Bulk Delete Button (hidden by default) -->
+            <div id="bulkDeleteContainer" style="display:none;">
+                <button id="bulkDeleteBtn" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete Selected
+                </button>
+            </div>
+            <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
+            <button type="button" class="admin-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                Add <i class="bi bi-plus-circle ms-1"></i>
+            </button>
+            </div>
         </div>
 
-        <ul class="nav flex-column px-2 mb-3">
-            <button class="btn btn-light btn-sm d-lg-none d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-label="Close">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            <li class="nav-item">
-                <a href="index.php" class="nav-link">
-                    <i class="bi bi-house-door me-2"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="orders.php" class="nav-link">
-                    <i class="bi bi-bag-check me-2"></i> Orders
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="prod.php" class="nav-link active">
-                    <i class="bi bi-box-seam me-2"></i> Products
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="cus.php" class="nav-link">
-                    <i class="bi bi-people me-2"></i> Students
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="inquiries.php" class="nav-link">
-                    <i class="bi bi-chat-dots me-2"></i> Messages
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="ratings.php" class="nav-link">
-                    <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="accounting.php" class="nav-link">
-                    <i class="bi bi-receipt me-2"></i> Receipt Form
-                </a>
-            </li>
-            <li class="nav-item justify-content-end mt-lg-5">
-                <a href="logout.php" class="nav-link text-danger fw-semibold">
-                    <i class="bi bi-box-arrow-right me-2"></i> Log Out
-                </a>
-            </li>
-        </ul>
-    </nav>
+        <!-- ADD NEW PRODUCTS FORM -->
+        <div class="modal fade" id="addProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5  class="d-flex align-items-center">
+                    <img src="./images/add-product.png" alt="add user icon" style="margin-right: 5px; height:50px;">Add New Product
+                    </h5>                                    
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-            <!-- Content Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content">
-                <div class="d-flex justify-content-end mb-5">
-                    <div class="search-container">
-                        <input type="text" class="form-control" placeholder="">
-                        <button><img src="./images/search-icon.png" alt="Search"></button>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <!-- Product Details Section -->
+                    <h5 class="title-text mb-3">Product Details</h5>
+                    <form action="" method="POST" enctype="multipart/form-data">
+
+                    <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="type" id="productType" required>
+                        <option value="">Choose Type</option >
+                        <option value="1">Uniform</option>
+                        <option value="2">Supplies</option>
+                        </select>
                     </div>
-                </div>
-                <div class="mt-2 d-flex flex-row align-items-center">
-                    <img src="./images/Admin Nav/products-nav.png" alt="VMC Products" class="img-fluid" style="max-width: 40px; margin-right: 10px;">
-                    <h2 class="mb-0">Products</h2>
-                </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" name="product_name" placeholder="Enter product name" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Delivery Receipt Number</label>
+                        <input type="text" class="form-control" name="dr_number" placeholder="Ex. DR1234567" required>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-control" name="price" placeholder="Enter price" required>
+                    </div>
 
-                <div class="d-flex justify-content-end mb-3"> 
-                    <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    <img src="./images/add.png" alt="Add" style="max-width: 20px; margin-right: 5px;">
-                     New Products
-                    </button>
-
-                    <!-- ADD NEW PRODUCTS FORM -->
-                    <div class="modal fade" id="addProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <!-- Modal Header -->
-                                <div class="modal-header">
-                                    <h5 class="modal-title" class="d-flex align-items-center">
-                                        <img src="./images/add-product.png" alt="add user icon" style="margin-right: 5px; height:50px;">Add New Product
-                                    </h5>                                    
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <!-- Uniform Tags Badges Section -->
+                    <div class="col-12 mb-3 mt-2" id="uniformTagsSection" style="display:none;">
+                        <label class="form-label">Year-level Tags</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <?php
+                            $uniformTags = [
+                                ['id' => 'tagPreschool', 'value' => 'Pre-school', 'badge' => 'preschool_badge', 'label' => 'Pre-school', 'badgeId' => 'badgePreschool'],
+                                ['id' => 'tagKindergarten', 'value' => 'Kindergarten', 'badge' => 'kinder_badge', 'label' => 'Kindergarten', 'badgeId' => 'badgeKindergarten'],
+                                ['id' => 'tagElementary', 'value' => 'Elementary', 'badge' => 'elementary_badge', 'label' => 'Elementary', 'badgeId' => 'badgeElem'],
+                                ['id' => 'tagJuniorHigh', 'value' => 'Junior High School', 'badge' => 'jhs_badge', 'label' => 'Junior High School', 'badgeId' => 'badgeJHS'],
+                                ['id' => 'tagSeniorHigh', 'value' => 'Senior High School', 'badge' => 'shs_badge', 'label' => 'Senior High School', 'badgeId' => 'badgeSHS'],
+                                ['id' => 'tagTourism', 'value' => 'BS Tourism Management', 'badge' => 'bstm_badge', 'label' => 'BS Tourism Management', 'badgeId' => 'badgeTM'],
+                                ['id' => 'tagBSIS', 'value' => 'BS Information System', 'badge' => 'bsis_badge', 'label' => 'BS Information System', 'badgeId' => 'badgeBSIS'],
+                                ['id' => 'tagBHRM', 'value' => 'BS Hotel and Restaurant Management', 'badge' => 'bhrm_badge', 'label' => 'BS Hotel and Restaurant Management', 'badgeId' => 'badgeBHRM'],
+                                ['id' => 'tagSecondary', 'value' => 'BS Secondary Education', 'badge' => 'secondary_badge', 'label' => 'BS Secondary Education', 'badgeId' => 'badgeSecondary'],
+                                ['id' => 'tagEduc', 'value' => 'BS Elementary Education', 'badge' => 'educ_badge', 'label' => 'BS Elementary Education', 'badgeId' => 'badgeEduc'],
+                                ['id' => 'tagCrim', 'value' => 'Criminology', 'badge' => 'crim_badge', 'label' => 'Criminology', 'badgeId' => 'badgeCriminology'],
+                            ];
+                            foreach ($uniformTags as $tag) {
+                                ?>
+                                <div class="form-check">
+                                    <input class="form-check-input styled-checkbox uniform-tag-checkbox" type="checkbox" id="<?= $tag['id'] ?>" name="tags[]" value="<?= $tag['value'] ?>">
+                                    <label class="form-check-label" for="<?= $tag['id'] ?>">
+                                        <span class="badge <?= $tag['badge'] ?> me-2" id="<?= $tag['badgeId'] ?>"><?= $tag['label'] ?></span>
+                                    </label>
                                 </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
 
-                                <!-- Modal Body -->
-                                <div class="modal-body">
-                                    <!-- Product Details Section -->
-                                    <h5 class="title-text mb-3">Product Details</h5>
-                                   <form action="" method="POST" enctype="multipart/form-data">
-
-                                   <div class="row g-3">
-                                   <div class="col-md-6">
-                                            <label class="form-label">Type</label>
-                                            <select class="form-select" name="type" id="productType" required>
-                                                <option value="">Choose Type</option >
-                                                <option value="1">Uniform</option>
-                                                <option value="2">Supplies</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Product Name</label>
-                                            <input type="text" class="form-control" name="product_name" required>
-                                        </div>
-                                        
-                                        <div class="col-12">
-                                            <label class="form-label">Delivery Receipt Number</label>
-                                            <input type="text" class="form-control" name="dr_number" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Price</label>
-                                            <input type="number" class="form-control" name="price" required>
-                                        </div>
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Sizes</label>
-                                            <div class="row" id="sizesContainer">
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sizes[]" value="XS" id="sizeXS">
-                                                        <label class="form-check-label" for="sizeXS">XS</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sizes[]" value="Small" id="sizeS">
-                                                        <label class="form-check-label" for="sizeS">Small</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sizes[]" value="Medium" id="sizeM">
-                                                        <label class="form-check-label" for="sizeM">Medium</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sizes[]" value="Large" id="sizeL">
-                                                        <label class="form-check-label" for="sizeL">Large</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sizes[]" value="XL" id="sizeXL">
-                                                        <label class="form-check-label" for="sizeXL">XL</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sizes[]" value="2XL" id="size2XL">
-                                                        <label class="form-check-label" for="size2XL">2XL</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Gender</label>
-                                            <div class="row" id="gendersContainer">
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="genders[]" value="Male" id="genderMale">
-                                                        <label class="form-check-label" for="genderMale">Male</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="genders[]" value="Female" id="genderFemale">
-                                                        <label class="form-check-label" for="genderFemale">Female</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="genders[]" value="Unisex" id="genderUnisex">
-                                                        <label class="form-check-label" for="genderUnisex">Unisex</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <label class="form-label">Stocks for each variant</label>
-                                            <div class="row" id="stocksContainer">
-                                                <!-- Stock inputs will be dynamically added here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Image Upload Section -->
-                                    <hr>
-                                    <h5 class="title-text mt-3 mb-3">Add Images</h5>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label class="form-label">Picture</label>
-                                            <input type="file" class="form-control" name="product_image" required>
-                                            
-                                        </div>
-                                        
-                                    </div>
+                    <!-- Supplies Tags Badges Section (Only one can be selected) -->
+                    <div class="col-12 mb-3 mt-2" id="suppliesTagsSection" style="display:none;">
+                        <label class="form-label">School Supplies Tags</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <?php
+                            $suppliesTags = [
+                                ['id' => 'tagWriting', 'value' => 'Writing Tools', 'badge' => 'writing_badge', 'label' => 'Writing Tools', 'badgeId' => 'badgeWriting'],
+                                ['id' => 'tagPaper', 'value' => 'Paper Products', 'badge' => 'paper_badge', 'label' => 'Paper Products', 'badgeId' => 'badgePaper'],
+                                ['id' => 'tagArt', 'value' => 'Art Supplies', 'badge' => 'art_badge', 'label' => 'Art Supplies', 'badgeId' => 'badgeArt'],
+                            ];
+                            foreach ($suppliesTags as $tag) {
+                                ?>
+                                <div class="form-check">
+                                    <input class="form-check-input styled-checkbox supplies-tag-checkbox" type="checkbox" id="<?= $tag['id'] ?>" name="tags[]" value="<?= $tag['value'] ?>">
+                                    <label class="form-check-label" for="<?= $tag['id'] ?>">
+                                        <span class="badge <?= $tag['badge'] ?> me-2" id="<?= $tag['badgeId'] ?>"><?= $tag['label'] ?></span>
+                                    </label>
                                 </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
 
-                                <!-- Modal Footer -->
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    <!-- Sizes Selection -->
+                    <div class="col-12 mb-3 mt-2">
+                        <label class="form-label">Sizes</label>
+                        <div class="row" id="sizesContainer">
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="XS" id="sizeXS">
+                            <label class="form-check-label" for="sizeXS">XS</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Small" id="sizeS">
+                            <label class="form-check-label" for="sizeS">Small</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Medium" id="sizeM">
+                            <label class="form-check-label" for="sizeM">Medium</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Large" id="sizeL">
+                            <label class="form-check-label" for="sizeL">Large</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="XL" id="sizeXL">
+                            <label class="form-check-label" for="sizeXL">XL</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="2XL" id="size2XL">
+                            <label class="form-check-label" for="size2XL">2XL</label>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Gender Selection -->
+                    <div class="col-12 mb-3 mt-2">
+                        <label class="form-label">Gender</label>
+                        <div class="row" id="gendersContainer">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Male" id="genderMale">
+                                <label class="form-check-label" for="genderMale">Male</label>
                                 </div>
-                                   </form>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Female" id="genderFemale">
+                                <label class="form-check-label" for="genderFemale">Female</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Unisex" id="genderUnisex">
+                                <label class="form-check-label" for="genderUnisex">Unisex</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                
-               <!-- PRODUCTS TABLE -->
-<div class="table-container table-responsive-lg">
-    <table class="table table-bordered">
-        <thead class="image-table-header">
-            <tr>
-                <th>#</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Type</th>
-                <th>Date Modified</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody class="image-table-body">
-            <?php if ($result->num_rows > 0): ?>
-                <?php $count = $offset + 1; while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= $count++; ?></td>
-                        <td class="text-start">
-                            <img src="<?= $row['image'] ?: 'default.png'; ?>" class="product-image" alt="Product Image" name="product_image" style="width: auto; height: 200px; justify-content: center;"><br>
-                            <strong><?= $row['product_name']; ?></strong><br>
-                            <small>D.R. No: <?= $row['dr_number']; ?></small>
-                        </td>
-                        <td class="text-start">₱<?= number_format($row['price'], 2); ?></td>
-                        <td class="text-start">
-                            <?= $row['size_variants'] ?: ' '; ?><br>
-                            <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
-                        </td>
-                        <td class="text-start"><?= $row['type']; ?></td>
-                        <td class="text-start"><?= $row['date_modified']; ?></td>
-                        <td>
-                        <button type="button" class="bi bi-file-text btn btn-outline-dark rounded-100" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#productDetailsModal"
-                            data-id="<?= $row['id']; ?>"
-                            data-variant_id="<?= $row['variant_id']; ?>"
-                            data-product_name="<?= $row['product_name']; ?>"
-                            data-drnumber="<?= $row['dr_number']; ?>"
-                            data-price="<?= $row['price']; ?>"
-                            data-total_stock="<?= $row['total_stock']; ?>"
-                            data-variants="<?= htmlspecialchars($row['size_variants']); ?>"
-                            data-type="<?= $row['type']; ?>"
-                            data-image="<?= $row['image']; ?>">
-                            Details
-                        </button>
 
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr><td colspan="7">No products found.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-</div>
-                
-                <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?= ($page == 1) ? 'disabled' : ''; ?>">
-                            <a class="page-link" href="?page=<?= max(1, $page - 1); ?>">Previous</a>
-                        </li>
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                            <li class="page-item <?= ($page == $i) ? 'active' : ''; ?>">
-                                <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
-                            </li>
-                        <?php endfor; ?>
-                        <li class="page-item <?= ($page == $total_pages) ? 'disabled' : ''; ?>">
-                            <a class="page-link" href="?page=<?= min($total_pages, $page + 1); ?>">Next</a>
-                        </li>
-                    </ul>
-                </nav>
-            </main>
+                    <!-- Stocks -->
+                    <div class="col-12 mt-2">
+                        <label class="form-label" id="stocksLabel">Stocks for each Sizes and Gender</label>
+                        <div class="row" id="stocksContainer">
+                        <!-- Stock inputs will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="col-md-12 mt-2">
+                        <label class="form-label">Maximum Quantity to be Sold</label>
+                        <input type="number" class="form-control" name="max_quantity" placeholder="Ex. 5 pcs" required>
+                    </div>
+                <!-- Image Upload Section -->
+                <hr>
+                <h5 class="title-text mt-3 mb-3">Add Images</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Picture</label>
+                        <input type="file" class="form-control" name="product_image" required>
+                        
+                    </div>
+                </div>
+            </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn custom-navy-btn">Add Product</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
+
+        <!-- PRODUCTS TABLE -->
+        <div class="table-responsive">
+            <table class="table table-container">
+            <thead class="thead">
+            <tr>
+            <th>
+                <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
+            </th>
+            <th>#</th>
+            <th>Image</th>
+            <th>Product Details</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th class="align-middle text-start">
+                <div class="dropdown">
+                <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="tagsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                    Tags
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
+                    <li><a class="dropdown-item" href="#">All</a></li>
+                    <li><a class="dropdown-item" href="#">Uniform</a></li>
+                    <li><a class="dropdown-item" href="#">Supplies</a></li>
+                    <!-- Add more tag options as needed -->
+                </ul>
+                </div>
+            </th>
+            <th class="align-middle text-start">Restock History </th>
+            <th class="align-middle text-start">
+                <div class="dropdown">
+                <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="stocksStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                    Status
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
+                    <li><a class="dropdown-item" href="#">All</a></li>
+                    <li><a class="dropdown-item" href="#">In Stock</a></li>
+                    <li><a class="dropdown-item" href="#">Out of Stock</a></li>
+                    <!-- Add more tag options as needed -->
+                </ul>
+                </div>
+            </th>
+            <th class="align-middle text-start">Action</th>
+            </tr>
+            </thead>
+            <!--table-body-->
+            <tbody class="image-table-body text-center">
+            <?php if ($result->num_rows > 0): ?>
+            <?php $count = $offset + 1; while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                <td>
+                <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
+                </td>
+                <td><?= $count++; ?></td>
+                <td>
+                <img src="<?= $row['image'] ?: 'default.png'; ?>" class="product-img" alt="Product Image" name="product_image">
+                </td>
+                <td>
+                <strong><?= $row['product_name']; ?></strong><br>
+                <small>D.R. No: <?= $row['dr_number']; ?></small>
+                </td>
+                <td>₱<?= number_format($row['price'], 2); ?></td>
+                <td>
+                <?php if (!empty($row['size_variants'])): ?>
+                    <?= $row['size_variants']; ?><br>
+                    <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
+                <?php else: ?>
+                    <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
+                <?php endif; ?>
+                </td>
+                <td>tags</td>
+                <td><?= $row['type_name']; ?><br><?= $row['date_modified']; ?></td>
+                <td>
+                <!-- Status: In Stock/Out of Stock -->
+                <?php if ($row['total_stock'] > 0): ?>
+                <span class="badge green-badge">In Stock</span>
+                <?php else: ?>
+                <span class="badge bg-danger">Out of Stock</span>
+                <?php endif; ?>
+                </td>
+                <td>
+                <div class="dropdown">
+                    <button class="btn btn-light p-0 m-0" type="button" id="actionDropdown<?= $row['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical fs-5"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="actionDropdown<?= $row['id']; ?>">
+                    <li>
+                    <!--View Button -->
+                        <button 
+                        type="button" 
+                        class="dropdown-item"
+                        data-bs-toggle="modal"
+                        data-bs-target="#productDetailsModal"
+                        data-id="<?= $row['id']; ?>"
+                        data-variant_id="<?= $row['variant_id']; ?>"
+                        data-product_name="<?= htmlspecialchars($row['product_name']); ?>"
+                        data-drnumber="<?= htmlspecialchars($row['dr_number']); ?>"
+                        data-price="<?= $row['price']; ?>"
+                        data-total_stock="<?= $row['total_stock']; ?>"
+                        data-variants="<?= htmlspecialchars($row['size_variants']); ?>"
+                        data-type="<?= $row['type']; ?>"
+                        data-image="<?= htmlspecialchars($row['image']); ?>"
+                        >
+                        <i class="bi bi-eye me-2"></i> View
+                        </button>
+                    </li>
+                    <li>
+                    <!--Restock Button -->
+                        <button 
+                        type="button" 
+                        class="dropdown-item"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#addStocksModal"
+                        >
+                        <i class="bi bi-plus-lg me-2"></i> Restock
+                        </button>
+                    </li>
+                    <li>
+                        <!--Delete Button -->
+                        <button 
+                        type="button" 
+                        class="dropdown-item text-danger"
+                        id="deleteProductBtn<?= $row['id']; ?>"
+                        >
+                        <i class="bi bi-trash me-2"></i> Delete
+                        </button>
+                    </li>
+                    </ul>
+                </div>
+                </td>
+                </tr>
+            <?php endwhile; ?>
+            <?php else: ?>
+            <tr>
+                <td colspan="10">No products found.</td>
+            </tr>
+            <?php endif; ?>
+            </tbody>
+            </table>
+        </div>
+        <!-- Pagination -->
+            <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
+                <ul class="pagination justify-content-center custom-pagination">
+                    <li class="page-item <?= ($page == 1) ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?= max(1, $page - 1); ?>"><span aria-hidden="true">&lt;</span></a>
+                    </li>
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= ($page == $i) ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <li class="page-item <?= ($page == $total_pages) ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?= min($total_pages, $page + 1); ?>"><span aria-hidden="true">&gt;</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
+    </div>
+</div>
 
 <!-- PRODUCT DETAILS MODAL-->
 <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" class="d-flex align-items-center">
-                    <img src="./images/detail.png" alt="add user icon" style="margin-right: 5px; height:50px;">Product Details
-                </h5> 
+                <h5 class="modal-title d-flex align-items-center">
+                    <img src="./images/detail.png" alt="detail icon" style="margin-right: 5px; height:50px;">Product Details
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-3">
-                <form>
-                    <div class="p-3">
-                        <h6 class="title-text mb-3">Product Details</h6>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Product Name</label>
-                                <input type="text" class="form-control" id="productName" readonly>
+                <div class="p-3">
+                    <h6 class="title-text mb-3">Product Details</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label mb-0">Product Name</label>
+                            <div class="form-control-plaintext fw-semibold" id="productNameView"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-0">Type</label>
+                            <div class="form-control-plaintext" id="productTypesView"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-0">Delivery Receipt Number</label>
+                            <div class="form-control-plaintext" id="drNumberView"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-0">Price</label>
+                            <div class="form-control-plaintext" id="productPriceView"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label mb-0">Stock Information</label>
+                            <div class="border rounded p-2" style="min-height: 60px;" id="productVariants"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-0">Tags</label>
+                            <div class="form-control-plaintext" id="productTagsView">
+                                <span class="text-muted">No tags available (placeholder)</span>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Type</label>
-                                <input type="text" class="form-control" id="productTypes" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Delivery Receipt Number</label>
-                                <input type="text" class="form-control" id="drNumber" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Price</label>
-                                <input type="text" class="form-control" id="productPrice" readonly>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Stock Information</label>
-                                <div class="form-control" style="height: auto; min-height: 100px;" id="productVariants"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-0">Maximum Quantity to be Sold</label>
+                            <div class="form-control-plaintext" id="productMaxQtyView">
+                                <span class="text-muted">Not set (placeholder)</span>
                             </div>
                         </div>
                     </div>
-                    <hr>
-
-                    <!-- Images Section -->
-                    <div class="p-3">
-                        <h6 class="title-text mb-3">Product Image</h6>
-                        <div class="text-center" id="productImages"></div>
-                    </div>
-                    <hr>
-
-                    <!-- QR Code Section -->
-                    <div class="p-3 bg-light">
-                        <h6 class="title-text mb-3">QR Code</h6>
-                        <div class="text-center">
-                            <div id="qrcode" class="d-inline-block bg-white p-3 rounded"></div>
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-outline-primary" id="downloadQRBtn">
-                                    <i class="bi bi-download"></i> Download QR Code
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="modal-footer d-flex justify-content-between buttons">
-                <button type="button" class="btn btn-outline-danger" id="deleteProductBtn">
-                    <i class="bi bi-trash"></i> Delete
-                </button>
-                
-                <div class="d-flex gap-2" style="width: 300px;">
-                    <button type="button" class="btn btn-primary w-100">
-                        <i class="bi bi-plus-lg"></i> Add Stocks
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">OK</button>
                 </div>
+                <hr>
+                <!-- Images Section -->
+                <div class="p-3">
+                    <h6 class="title-text mb-3">Product Image</h6>
+                    <div class="text-center" id="productImages"></div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="button" class="btn custom-navy-btn" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
 </div>
 
+<!--RESTOCK MODAL -->
+<div class="modal fade" id="addStocksModal" tabindex="-1" aria-labelledby="addStocksModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold d-flex align-items-center" id="addStocksModalLabel">
+          <img src="https://cdn-icons-png.flaticon.com/512/1170/1170576.png" 
+               alt="Stock Icon" class="me-2" width="30"> 
+          Add Stocks
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+        <form>
+            <!-- Notice -->
+            <div class="alert alert-info text-center small rounded-pill py-2 mt-2">
+                To maintain accurate stock records, kindly provide the exact quantity of stock 
+                linked to the Delivery Receipt Number you enter.
+            </div>
+            <!-- Delivery Receipt Number -->
+            <div class="mb-3">
+                <label class="form-label">Delivery Receipt Number</label>
+                <input type="text" class="form-control" placeholder="Please enter the Delivery Receipt Number here">
+            </div>
+
+            <!-- Stock -->
+            <div class="mb-3">
+                <label class="form-label">Stock</label>
+                <input type="number" class="form-control" placeholder="Please enter the stock quantity here">
+            </div>
+
+            <!-- Stock Update by -->
+            <div class="mb-3">
+                <label class="form-label">Stock Update by:</label>
+                <input type="text" class="form-control" placeholder="Please enter your name here">
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="custom-navy-btn">
+        <i class="bi bi-plus-circle me-1"></i> Add Stocks
+        </button>
+    </div>
+</div>
+
+
 <script>
-
-    
-// Set product details into the modal when it is opened
-const productDetailsModal = document.getElementById('productDetailsModal');
-const deleteButton = document.getElementById('deleteProductBtn');
-
-productDetailsModal.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    
-    // Get data from button attributes
-    const productId = button.getAttribute('data-id');
-    const productName = button.getAttribute('data-product_name');
-    const productType = button.getAttribute('data-type');
-    const drNumber = button.getAttribute('data-drnumber');
-    const productPrice = button.getAttribute('data-price');
-    const totalStock = button.getAttribute('data-total_stock');
-    const variants = button.getAttribute('data-variants');
-    const productImage = button.getAttribute('data-image');
-    const variantId = button.getAttribute('data-variant_id');
-
-    // Set values in the modal form
-    document.getElementById('productName').value = productName;
-    document.getElementById('productTypes').value = productType === '1' ? 'Uniform' : 'Supplies';
-    document.getElementById('drNumber').value = drNumber;
-    document.getElementById('productPrice').value = '₱' + parseFloat(productPrice).toFixed(2);
-    
-    // Update delete button with product ID
-    document.getElementById('deleteProductBtn').setAttribute('data-id', productId);
-
-    // First, fetch the variant IDs
-    fetch('get_variants.php?product_id=' + productId)
-        .then(response => response.json())
-        .then(variantData => {
-            // Display variants information with radio buttons
-            const variantsContainer = document.getElementById('productVariants');
-            variantsContainer.innerHTML = '';
-            
-            if (variants) {
-                // Parse the variants string into an array of variants
-                const variantArray = variants.split('<br>');
-                
-                // Create variant selection form with the familiar structure
-                variantsContainer.innerHTML = `
-                    <div class="mb-3">
-                        <label class="form-label">Select Variant for QR Code:</label>
-                        <div class="variant-options">
-                            ${variantArray.map((variant, index) => {
-                                // Extract size and gender from variant text
-                                const match = variant.match(/^(.+) \((.+)\):/);
-                                let variantHtml = '';
-                                
-                                if (match) {
-                                    const size = match[1].trim();
-                                    const gender = match[2].trim();
-                                    
-                                    // Find the matching variant ID from our fetched data
-                                    const matchingVariant = variantData.find(v => 
-                                        v.size === size && v.gender === gender
-                                    );
-                                    
-                                    // Use the correct variant ID if found, otherwise fall back to the default
-                                    const actualVariantId = matchingVariant ? matchingVariant.id : variantId;
-                                    
-                                    variantHtml = `
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" 
-                                                name="variantSelect" 
-                                                id="variant${index}" 
-                                                value="${variant.trim()}" 
-                                                data-variant-id="${actualVariantId}" 
-                                                ${index === 0 ? 'checked' : ''}>
-                                            <label class="form-check-label" for="variant${index}">
-                                                ${variant}
-                                            </label>
-                                        </div>
-                                    `;
-                                }
-                                return variantHtml;
-                            }).join('')}
-                        </div>
-                    </div>
-                    <div><strong>Total Stock: ${totalStock} pcs</strong></div>
-                `;
-            } else {
-                variantsContainer.innerHTML = 'No variants available';
-                // Create hidden input for non-variant products
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'variantSelect';
-                hiddenInput.checked = true;
-                hiddenInput.dataset.variantId = variantId;
-                variantsContainer.appendChild(hiddenInput);
-            }
-            
-            // Add event listeners to radio buttons
-            document.querySelectorAll('input[name="variantSelect"]').forEach(radio => {
-                radio.addEventListener('change', updateQRCode);
-            });
-            
-            // Initial QR code generation
-            updateQRCode();
-        })
-        .catch(error => {
-            console.error('Error fetching variant data:', error);
-            // Fall back to the original behavior if the fetch fails
-            if (variants) {
-                variantsContainer.innerHTML = `
-                    <div class="mb-3">
-                        <label class="form-label">Select Variant for QR Code:</label>
-                        <div class="variant-options">
-                            ${variants.split('<br>').map((variant, index) => `
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" 
-                                        name="variantSelect" 
-                                        id="variant${index}" 
-                                        value="${variant.trim()}"
-                                        data-variant-id="${variantId}"
-                                        ${index === 0 ? 'checked' : ''}>
-                                    <label class="form-check-label" for="variant${index}">
-                                        ${variant}
-                                    </label>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div><strong>Total Stock: ${totalStock} pcs</strong></div>
-                `;
-            }
-            
-            // Add event listeners to radio buttons
-            document.querySelectorAll('input[name="variantSelect"]').forEach(radio => {
-                radio.addEventListener('change', updateQRCode);
-            });
-            
-            // Initial QR code generation
-            updateQRCode();
-        });
-
-    // Function to update QR code based on selected variant
-    function updateQRCode() {
-        const selectedVariant = document.querySelector('input[name="variantSelect"]:checked');
-        const qrcode = document.getElementById('qrcode');
-        qrcode.innerHTML = '';
-
-        // Use the variant ID from the selected radio button
-        const variantIdToEncode = selectedVariant ? selectedVariant.dataset.variantId : variantId;
-        
-        // Generate QR code with the variant ID
-        new QRCode(qrcode, {
-            text: variantIdToEncode,
-            width: 150,
-            height: 150,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    }
-
-    // Update download button functionality
-    document.getElementById('downloadQRBtn').onclick = function() {
-        const selectedVariant = document.querySelector('input[name="variantSelect"]:checked');
-        const canvas = qrcode.querySelector('canvas');
-        if (canvas && selectedVariant) {
-            const link = document.createElement('a');
-            const variantName = selectedVariant.value.replace(/[^a-zA-Z0-9]/g, '_');
-            link.download = `qr-${productName}-${variantName}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-    };
-
-    // Images Section
-    const productImagesContainer = document.getElementById('productImages');
-    productImagesContainer.innerHTML = '';
-
-    if (productImage) {
-        const img = document.createElement('img');
-        img.src = productImage;
-        img.alt = productName;
-        img.className = 'img-fluid';
-        img.style.maxHeight = '150px'; // Set maximum height
-        img.style.width = 'auto';      // Maintain aspect ratio
-        productImagesContainer.appendChild(img);
-    } else {
-        productImagesContainer.innerHTML = '<p class="text-muted">No image available</p>';
-    }
-});
-
-    // Add Stock button functionality
-    document.querySelector('#productDetailsModal .btn-primary').addEventListener('click', function() {
-        const productId = deleteButton.getAttribute('data-id');
-        // Implement your add stock functionality here
-        alert('Add stock functionality to be implemented');
-    });
-
-
-
+// Stock input logic for Uniforms and Supplies
 document.addEventListener('DOMContentLoaded', function() {
-    // Add click event listener to delete button
-    document.getElementById('deleteProductBtn').addEventListener('click', function() {
-        const productId = this.getAttribute('data-id');
-        
-        if (!productId) {
-            alert('Product ID not found');
-            return;
-        }
-        
-        if (confirm('Are you sure you want to delete this product?')) {
-            fetch('delete_product.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'id=' + productId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Close the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('productDetailsModal'));
-                    modal.hide();
-                    
-                    // Show success message
-                    alert(data.message);
-                    
-                    // Reload the page to refresh the product list
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Failed to delete product');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the product');
-            });
-        }
-    });
-});
+    const typeSelect = document.getElementById('productType');
+    const sizesSection = document.getElementById('sizesContainer') ? document.getElementById('sizesContainer').closest('.col-12.mb-3.mt-2') : null;
+    const gendersSection = document.getElementById('gendersContainer') ? document.getElementById('gendersContainer').closest('.col-12.mb-3.mt-2') : null;
+    const stocksContainer = document.getElementById('stocksContainer');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const sizesContainer = document.getElementById('sizesContainer');
-        const gendersContainer = document.getElementById('gendersContainer');
-        const stocksContainer = document.getElementById('stocksContainer');
+    function updateStockInputs() {
+        if (typeSelect.value === '1') { // Uniform
+            const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
+            const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
 
-        function updateStockInputs() {
-            const selectedSizes = [...document.querySelectorAll('input[name="sizes[]"]:checked')].map(input => input.value);
-            const selectedGenders = [...document.querySelectorAll('input[name="genders[]"]:checked')].map(input => input.value);
-            
-            stocksContainer.innerHTML = ''; // Clear existing stock inputs
-            
+            stocksContainer.innerHTML = '';
+
             if (selectedSizes.length && selectedGenders.length) {
                 selectedSizes.forEach(size => {
                     selectedGenders.forEach(gender => {
@@ -808,70 +753,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         }
+    }
 
-        // Add event listeners to size and gender checkboxes
-        document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
-            checkbox.addEventListener('change', updateStockInputs);
-        });
-
-        const typeSelect = document.getElementById('productType');
-        const sizesSection = document.querySelector('.col-12.mb-3:has(#sizesContainer)');
-        const gendersSection = document.querySelector('.col-12.mb-3:has(#gendersContainer)');
-        const stocksSection = document.querySelector('.col-12:has(#stocksContainer)');
-
-        typeSelect.addEventListener('change', function() {
-            const isSupplies = this.value === '2';
-            
-            // Hide/show size and gender sections
-            sizesSection.style.display = isSupplies ? 'none' : 'block';
-            gendersSection.style.display = isSupplies ? 'none' : 'block';
-            
-            if (isSupplies) {
-                // Clear all checkboxes
-                document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                
-                // Show single stock input for supplies
-                stocksContainer.innerHTML = `
-                    <div class="col-12">
-                        <label class="form-label">Stock Quantity</label>
-                        <input type="number" 
-                               class="form-control" 
-                               name="stocks[total]" 
-                               min="1"
-                               placeholder="Enter total stock quantity" 
-                               required>
-                    </div>`;
-            } else {
-                // Reset stock container and trigger update
-                stocksContainer.innerHTML = '';
-                updateStockInputs();
-            }
-        });
+    // Add event listeners to size and gender checkboxes for uniforms
+    document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateStockInputs);
     });
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const typeSelect = document.getElementById('productType');
-    const sizesSection = document.querySelector('.col-12.mb-3:has(label:contains("Sizes"))');
-    const gendersSection = document.querySelector('.col-12.mb-3:has(label:contains("Gender"))');
-    const stocksContainer = document.getElementById('stocksContainer');
 
     typeSelect.addEventListener('change', function() {
         const isSupplies = this.value === '2';
-        
+
         // Hide/show size and gender sections
-        if (sizesSection) sizesSection.style.display = isSupplies ? 'none' : 'block';
-        if (gendersSection) gendersSection.style.display = isSupplies ? 'none' : 'block';
-        
+        if (sizesSection) sizesSection.style.display = isSupplies ? 'none' : '';
+        if (gendersSection) gendersSection.style.display = isSupplies ? 'none' : '';
+
         if (isSupplies) {
             // Clear all checkboxes
             document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
                 checkbox.checked = false;
             });
-            
+
             // Show single stock input for supplies
             stocksContainer.innerHTML = `
                 <div class="col-12">
@@ -884,115 +785,13 @@ document.addEventListener('DOMContentLoaded', function() {
                            required>
                 </div>`;
         } else {
-            // Clear stocks container for uniform selection
             stocksContainer.innerHTML = '';
+            updateStockInputs();
         }
     });
 
-    // Add event listeners to size and gender checkboxes for uniforms
-    document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateStockInputs);
-    });
-
-    function updateStockInputs() {
-        if (typeSelect.value === '1') { // Only update for uniforms
-            const selectedSizes = [...document.querySelectorAll('input[name="sizes[]"]:checked')].map(input => input.value);
-            const selectedGenders = [...document.querySelectorAll('input[name="genders[]"]:checked')].map(input => input.value);
-            
-            stocksContainer.innerHTML = '';
-            
-            if (selectedSizes.length && selectedGenders.length) {
-                selectedSizes.forEach(size => {
-                    selectedGenders.forEach(gender => {
-                        const div = document.createElement('div');
-                        div.className = 'col-md-4 mb-3';
-                        div.innerHTML = `
-                            <label class="form-label">Stock for ${size} - ${gender}</label>
-                            <input type="number" 
-                                   class="form-control" 
-                                   name="stocks[${size}][${gender}]" 
-                                   min="1"
-                                   placeholder="Enter stock quantity" 
-                                   required>
-                        `;
-                        stocksContainer.appendChild(div);
-                    });
-                });
-            }
-        }
-    }
-});
-
-// Add this validation function to your existing JavaScript code
-function validateStock() {
-    const typeSelect = document.getElementById('productType');
-    const isSupplies = typeSelect.value === '2';
-    let hasValidStock = false;
-
-    if (isSupplies) {
-        // For supplies - check the single stock input
-        const stockInput = document.querySelector('input[name="stocks[total]"]');
-        hasValidStock = stockInput && parseInt(stockInput.value) > 0;
-    } else {
-        // For uniforms - check all variant stock inputs
-        const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
-        stockInputs.forEach(input => {
-            if (parseInt(input.value) > 0) {
-                hasValidStock = true;
-            }
-        });
-    }
-
-    if (!hasValidStock) {
-        alert('Stock quantity must be greater than 0');
-        return false;
-    }
-    return true;
-}
-
-// Add this to your form submit handler
-document.querySelector('form').addEventListener('submit', function(e) {
-    if (!validateStock()) {
-        e.preventDefault();
-    }
-});
-
-// Update your existing stock input creation code to add min attribute
-function updateStockInputs() {
-    if (typeSelect.value === '1') { // Only update for uniforms
-        const selectedSizes = [...document.querySelectorAll('input[name="sizes[]"]:checked')].map(input => input.value);
-        const selectedGenders = [...document.querySelectorAll('input[name="genders[]"]:checked')].map(input => input.value);
-        
-        stocksContainer.innerHTML = '';
-        
-        if (selectedSizes.length && selectedGenders.length) {
-            selectedSizes.forEach(size => {
-                selectedGenders.forEach(gender => {
-                    const div = document.createElement('div');
-                    div.className = 'col-md-4 mb-3';
-                    div.innerHTML = `
-                        <label class="form-label">Stock for ${size} - ${gender}</label>
-                        <input type="number" 
-                               class="form-control" 
-                               name="stocks[${size}][${gender}]" 
-                               min="1"
-                               placeholder="Enter stock quantity" 
-                               required>
-                    `;
-                    stocksContainer.appendChild(div);
-                });
-            });
-        }
-    }
-}
-
-// Update the supplies stock input creation
-typeSelect.addEventListener('change', function() {
-    const isSupplies = this.value === '2';
-    
-    // ... existing code ...
-    
-    if (isSupplies) {
+    // Initial call to set up the correct stock inputs on page load
+    if (typeSelect.value === '2') {
         stocksContainer.innerHTML = `
             <div class="col-12">
                 <label class="form-label">Stock Quantity</label>
@@ -1003,12 +802,188 @@ typeSelect.addEventListener('change', function() {
                        placeholder="Enter total stock quantity" 
                        required>
             </div>`;
+        if (sizesSection) sizesSection.style.display = 'none';
+        if (gendersSection) gendersSection.style.display = 'none';
+    } else {
+        updateStockInputs();
     }
-    
-    // ... rest of your existing code ...
+
+    // Stock validation on form submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let hasValidStock = false;
+        if (typeSelect.value === '2') {
+            const stockInput = document.querySelector('input[name="stocks[total]"]');
+            hasValidStock = stockInput && parseInt(stockInput.value) > 0;
+        } else {
+            const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
+            stockInputs.forEach(input => {
+                if (parseInt(input.value) > 0) {
+                    hasValidStock = true;
+                }
+            });
+        }
+        if (!hasValidStock) {
+            alert('Stock quantity must be greater than 0');
+            e.preventDefault();
+        }
+    });
+});
+
+/* --- The rest of your scripts remain unchanged --- */
+
+//For Tags Section
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('productType');
+    const uniformTagsSection = document.getElementById('uniformTagsSection');
+    const suppliesTagsSection = document.getElementById('suppliesTagsSection');
+
+    function updateTagsSection() {
+        if (typeSelect.value === '1') { // Uniform
+            uniformTagsSection.style.display = '';
+            suppliesTagsSection.style.display = 'none';
+        } else if (typeSelect.value === '2') { // Supplies
+            uniformTagsSection.style.display = 'none';
+            suppliesTagsSection.style.display = '';
+        } else {
+            uniformTagsSection.style.display = 'none';
+            suppliesTagsSection.style.display = 'none';
+        }
+    }
+
+    typeSelect.addEventListener('change', updateTagsSection);
+    updateTagsSection(); // Initial call on page load
+});
+
+//Hide the Stocks Label for Uniforms when it's supplies
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('productType');
+    const stocksLabel = document.getElementById('stocksLabel');
+
+    function updateStocksLabel() {
+        if (typeSelect.value === '2') { // Supplies
+            stocksLabel.style.display = 'none';
+        } else {
+            stocksLabel.style.display = '';
+        }
+    }
+
+    typeSelect.addEventListener('change', updateStocksLabel);
+    updateStocksLabel(); // Initial call on page load
+});
+
+// For checkbox
+document.addEventListener('DOMContentLoaded', function() {
+    // Only one checkbox for uniform tags
+    document.querySelectorAll('.uniform-tag-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('.uniform-tag-checkbox').forEach(function(box) {
+                    if (box !== checkbox) box.checked = false;
+                });
+            }
+        });
+    });
+    // Only one checkbox for supplies tags
+    document.querySelectorAll('.supplies-tag-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('.supplies-tag-checkbox').forEach(function(box) {
+                    if (box !== checkbox) box.checked = false;
+                });
+            }
+        });
+    });
+});
+
+//Showing Product Details to Modal
+document.addEventListener('DOMContentLoaded', function() {
+    // Listen for modal show event
+    var productDetailsModal = document.getElementById('productDetailsModal');
+    productDetailsModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+
+        // Get data from button attributes
+        var productId = button.getAttribute('data-id');
+        var productName = button.getAttribute('data-product_name');
+        var productType = button.getAttribute('data-type');
+        var drNumber = button.getAttribute('data-drnumber');
+        var productPrice = button.getAttribute('data-price');
+        var totalStock = button.getAttribute('data-total_stock');
+        var variants = button.getAttribute('data-variants');
+        var productImage = button.getAttribute('data-image');
+        var variantId = button.getAttribute('data-variant_id');
+
+        // Set values in the modal
+        document.getElementById('productNameView').textContent = productName;
+        document.getElementById('productTypesView').textContent = productType === '1' ? 'Uniform' : 'Supplies';
+        document.getElementById('drNumberView').textContent = drNumber;
+        document.getElementById('productPriceView').textContent = '₱' + parseFloat(productPrice).toFixed(2);
+
+        // Stock/variant info
+        var variantsContainer = document.getElementById('productVariants');
+        if (variants) {
+            variantsContainer.innerHTML = variants + '<br><strong>Total: ' + totalStock + ' pcs</strong>';
+        } else {
+            variantsContainer.innerHTML = '<strong>Total: ' + totalStock + ' pcs</strong>';
+        }
+
+        // Image
+        var productImagesContainer = document.getElementById('productImages');
+        productImagesContainer.innerHTML = '';
+        if (productImage) {
+            var img = document.createElement('img');
+            img.src = productImage;
+            img.alt = productName;
+            img.className = 'img-fluid';
+            img.style.maxHeight = '150px';
+            img.style.width = 'auto';
+            productImagesContainer.appendChild(img);
+        } else {
+            productImagesContainer.innerHTML = '<p class="text-muted">No image available</p>';
+        }
+    });
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script>
+//Multiple delete functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllProducts');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+        // Select/Deselect all checkboxes
+        selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        toggleBulkDelete();
+        });
+
+        // If any checkbox is changed, update selectAll and bulk delete button
+        checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+            toggleBulkDelete();
+        });
+        });
+
+        function toggleBulkDelete() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
+        }
+
+        // Example: Bulk delete action (replace with your AJAX or form submit)
+        bulkDeleteBtn.addEventListener('click', function() {
+        const selectedIds = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+        if (selectedIds.length === 0) return;
+        if (confirm('Are you sure you want to delete the selected products?')) {
+            // TODO: Send selectedIds to server for deletion (AJAX or form)
+            alert('Selected IDs: ' + selectedIds.join(', '));
+        }
+        });
+    });
+</script>
 </body>
 </html>

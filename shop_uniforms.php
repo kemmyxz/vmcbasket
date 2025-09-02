@@ -301,27 +301,23 @@ $search = $_GET['search'] ?? '';
                     <!-- By Year-Level -->
                     <div class="mb-4 mt-3">
                         <h5 class="fw-semibold filter-title" style="color: #26387D">BY YEAR-LEVEL:</h5>
-                        <h6 class="fw-semibold filter-title">Basic Education</h6>
                         <ul class="list-unstyled filter-text">
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Pre-School</li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Elementary</li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Junior High School</li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Senior High School</li>
+                            <h6 class="fw-semibold filter-title">Basic Education</h6>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="Pre-School">Pre-School</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="Elementary">Elementary</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="Junior High School">Junior High School</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="Senior High School">Senior High School</li>
+                            <h6 class="fw-semibold filter-title mt-2">College</h6>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="BS Tourism Management">BS Tourism Management</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="BS Information System">BS Information System</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="BS Hotel and Restaurant Management">BS Hotel and Restaurant Management</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="BS Secondary Education">BS Secondary Education</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="BS Elementary Education">BS Elementary Education</li>
+                            <li><input type="radio" name="year_level" class="form-check-input me-2" value="Criminology">Criminology</li>
                         </ul>
                     </div>
 
-                    <!-- College -->
-                    <div class="mb-4">
-                        <h6 class="fw-semibold filter-title">College</h6>
-                        <ul class="list-unstyled filter-text">
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Tourism Management</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Information System</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Hotel and Restaurant Management</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Secondary Education</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Elementary Education</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">Criminology</li>
-                        </ul>
-                    </div>
+
 
                     <!-- By Gender -->
                     <div class="mb-4">

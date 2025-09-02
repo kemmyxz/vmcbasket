@@ -471,9 +471,9 @@ $rec_result = $conn->query($recommendations);
 
     
     <!-- FAQ SECTION -->
-    <div class="py-4 fade-section ">
+    <div class="py-4 fade-section">
         <div class="container p-5">
-            <h2 class= "mb-5 text-end">
+            <h2 class="mb-5 text-end">
                 <span class="highlight-yellow">Frequently Asked Questions</span>
             </h2>
             <div class="accordion" id="faqAccordion">
@@ -547,138 +547,165 @@ $rec_result = $conn->query($recommendations);
                         </div>
                     </div>
                 </div>
-                <!-- Question 6 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq6">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer6">
-                            Can I cancel my order after placing it?
-                        </button>
-                    </h2>
-                    <div id="answer6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Yes, you can cancel your order as long as it has not yet been processed or verified by the admin. Simply go to the “My Purchase” section, locate the order, and choose the cancel option. Once an order has been verified, it can no longer be canceled.
+                <!-- Hidden Questions Start -->
+                <div id="faqMore" style="display:none;">
+                    <!-- Question 6 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq6">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer6">
+                                Can I cancel my order after placing it?
+                            </button>
+                        </h2>
+                        <div id="answer6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, you can cancel your order as long as it has not yet been processed or verified by the admin. Simply go to the “My Purchase” section, locate the order, and choose the cancel option. Once an order has been verified, it can no longer be canceled.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 7 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq7">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer7">
+                                Can I use the platform if I’m not a VMC student or staff?
+                            </button>
+                        </h2>
+                        <div id="answer7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                No. The VMC Basket is exclusively for currently enrolled students and official staff of Villagers Montessori College. Only administrators can register users, and each account is tied to a valid VMC student number.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 8 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq8">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer8">
+                                Is my personal information secure on this platform?
+                            </button>
+                        </h2>
+                        <div id="answer8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes. The platform is designed with data security in mind. Only administrators can create accounts, and sensitive details such as your full name and student number cannot be edited after registration. All user data is stored securely and handled with strict confidentiality.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 9 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq9">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer9">
+                               Is there a mobile app available?
+                            </button>
+                        </h2>
+                        <div id="answer9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Not at this time. The VMC Basket is a web-based platform optimized for use on desktop and mobile browsers. You can conveniently access it via any modern browser on your computer or smartphone.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 10 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq10">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer10">
+                                How can I reset my password if I forget it?
+                            </button>
+                        </h2>
+                        <div id="answer10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                If you forget your password, simply click on the “Forgot Password” option on the login page. Enter your email address, and a One-Time Password (OTP) will be sent to your registered email address. Use the OTP to verify your identity and reset your password securely.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 11 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq11">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer11">
+                                Can I change my personal information after registration?
+                            </button>
+                        </h2>
+                        <div id="answer11" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                               Yes, you can update select details such as your phone number, email address, birthdate, and year level by visiting the Account Settings page. However, your full name and student number are locked for identity verification purposes and cannot be edited.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 12 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq12">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer12">
+                                Can I leave feedback about a product I purchased?
+                            </button>
+                        </h2>
+                        <div id="answer12" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                            Yes! After you've received your order, you can go to the My Purchase page to leave a star rating, write a review, and upload a photo of the item.                        </div>
+                        </div>
+                    </div>
+                    <!-- Question 13 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq13">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer13">
+                                Can I request customized uniform sizes?
+                            </button>
+                        </h2>
+                        <div id="answer13" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                No. We currently do not accept custom uniform size requests. Only the standard sizes listed on the site are available for purchase.                    </div>
+                            </div>
+                    </div>
+                    <!-- Question 14 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq14">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer14">
+                                Can I return a product after receiving it?
+                            </button>
+                        </h2>
+                        <div id="answer14" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, you may request a return if the product meets our return policy conditions. To do this, go to the “My Purchase” section, locate the order, and select the Return option. Please provide the reason for the return and upload photos of the product you want to return, then click Send Request. Our team will review your request and let you know if your return has been approved.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Question 15 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="faq15">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer15">
+                                What should I do if I have questions or concerns not addressed here?
+                            </button>
+                        </h2>
+                        <div id="answer15" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                               If you can’t find the answer you’re looking for, simply use the chat feature on our website to talk directly with an admin for real-time assistance.
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Question 7 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq7">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer7">
-                            Can I use the platform if I’m not a VMC student or staff?
-                        </button>
-                    </h2>
-                    <div id="answer7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            No. The VMC Basket is exclusively for currently enrolled students and official staff of Villagers Montessori College. Only administrators can register users, and each account is tied to a valid VMC student number.
-                        </div>
-                    </div>
-                </div>
-                <!-- Question 8 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq8">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer8">
-                            Is my personal information secure on this platform?
-                        </button>
-                    </h2>
-                    <div id="answer8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Yes. The platform is designed with data security in mind. Only administrators can create accounts, and sensitive details such as your full name and student number cannot be edited after registration. All user data is stored securely and handled with strict confidentiality.
-                        </div>
-                    </div>
-                </div>
-                <!-- Question 9 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq9">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer9">
-                           Is there a mobile app available?
-                        </button>
-                    </h2>
-                    <div id="answer9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Not at this time. The VMC Basket is a web-based platform optimized for use on desktop and mobile browsers. You can conveniently access it via any modern browser on your computer or smartphone.
-                        </div>
-                    </div>
-                </div>
-                <!-- Question 10 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq10">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer10">
-                            How can I reset my password if I forget it?
-                        </button>
-                    </h2>
-                    <div id="answer10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            If you forget your password, simply click on the “Forgot Password” option on the login page. Enter your email address, and a One-Time Password (OTP) will be sent to your registered email address. Use the OTP to verify your identity and reset your password securely.
-                        </div>
-                    </div>
-                </div>
-                <!-- Question 11 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq11">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer11">
-                            Can I change my personal information after registration?
-                        </button>
-                    </h2>
-                    <div id="answer11" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                           Yes, you can update select details such as your phone number, email address, birthdate, and year level by visiting the Account Settings page. However, your full name and student number are locked for identity verification purposes and cannot be edited.
-                        </div>
-                    </div>
-                </div>
-                <!-- Question 12 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq12">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer12">
-                            Can I leave feedback about a product I purchased?
-                        </button>
-                    </h2>
-                    <div id="answer12" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                        Yes! After you've received your order, you can go to the My Purchase page to leave a star rating, write a review, and upload a photo of the item.                        </div>
-                    </div>
-                </div>
-                <!-- Question 13 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq13">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer13">
-                            Can I request customized uniform sizes?
-                        </button>
-                    </h2>
-                    <div id="answer13" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            No. We currently do not accept custom uniform size requests. Only the standard sizes listed on the site are available for purchase.                    </div>
-                
-                        </div>
-                </div>
-                <!-- Question 14 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq14">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer14">
-                            Can I return a product after receiving it?
-                        </button>
-                    </h2>
-                    <div id="answer14" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                            Yes, you may request a return if the product meets our return policy conditions. To do this, go to the “My Purchase” section, locate the order, and select the Return option. Please provide the reason for the return and upload photos of the product you want to return, then click Send Request. Our team will review your request and let you know if your return has been approved.
-                        </div>
-                    </div>
-                </div>
-                <!-- Question 15 -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="faq15">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#answer15">
-                            What should I do if I have questions or concerns not addressed here?
-                        </button>
-                    </h2>
-                    <div id="answer15" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">
-                           If you can’t find the answer you’re looking for, simply use the chat feature on our website to talk directly with an admin for real-time assistance.
-                        </div>
-                    </div>
-                </div>
+                <!-- Hidden Questions End -->
+            </div>
+            <div class="text-center mt-4">
+                <button id="faqReadMoreBtn" class="custom-navy-btn px-4">Read More</button>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var more = document.getElementById('faqMore');
+            var btn = document.getElementById('faqReadMoreBtn');
+            var expanded = false;
+            btn.addEventListener('click', function () {
+                expanded = !expanded;
+                if (expanded) {
+                    more.style.display = '';
+                    btn.textContent = 'Show Less';
+                    // Scroll to the button if needed
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    more.style.display = 'none';
+                    btn.textContent = 'Read More';
+                    // Optionally scroll back to top of FAQ
+                    document.getElementById('faqAccordion').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
 
     <!-- Footer -->
     <footer class="footer">

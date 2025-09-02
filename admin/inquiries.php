@@ -16,45 +16,80 @@ $result = $conn->query($query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket - Admin/Messages</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar Toggle Button -->
-      <nav class="navbar navbar-light bg-light d-md-none">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" 
-                aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="text-center">
-          <img src="./images/Admin Nav/VMS-LOGO-ALternative-03.png" alt="VMC Logo" class="img-fluid" style="max-width: 150px;">
-          <h5 class="LogoName">VMC Basket</h5>
-        </div>
-      </nav>
-      
-      <!-- Sidebar -->
-      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse"  style="position: fixed;">
-        <div class="text-center my-3 mb-5 d-none d-md-block">
-          <img src="./images/Admin Nav/VMS-LOGO-ALternative-03.png" alt="VMC Logo" class="img-fluid" style="max-width: 150px;">
-          <h4 class="LogoName">VMC Basket</h4>
-        </div>
-        <a href="index.php"><img src="./images/Admin Nav/dashboard-nav.png" alt="Dashboard" class="dashboard-icon" style="max-width: 30px; margin-right: 10px;">Dashboard</a>
-        <a href="orders.php" class="mt-2"><img src="./images/Admin Nav/orders-nav.png" alt="Orders" class="orders-icon" style="max-width: 30px; margin-right: 10px;">Orders</a>
-        <a href="prod.php" class="mt-2"><img src="./images/Admin Nav/products-nav.png" alt="Products" class="products-icon" style="max-width: 30px; margin-right: 10px;">Products</a>
-        <a href="cus.php" class="mt-2 "><img src="./images/Admin Nav/customers-nav.png" alt="Customer" class="customer-icon" style="max-width: 30px; margin-right: 10px;">Students</a>
-        <a href="inquiries.php" class="mt-2 active"><img src="./images/Admin Nav/message-nav-clicked.png" alt="Message" class="message-icon" style="max-width: 30px; margin-right: 10px;">Messages</a>
-        <a href="ratings.php" class="mt-2"><img src="./images/Admin Nav/rating-nav.png" alt="Ratings & Reviews" class="reviews-icon" style="max-width: 30px; margin-right: 10px;">Ratings & Reviews</a>
-        <a href="accounting.php" class="mt-2 mb-2"><img src="./images/Admin Nav/receipt-nav 1.png" alt="Accounting" Class="accounting-icon" style="max-width: 30px; margin-right: 10px;">Receipt Form</a>
-        <a href="#" class="mt-2 mb-2"><img src="./images/Admin Nav/setting-nav.png" alt="Settings" class="settings-icon" style="max-width: 30px; margin-right: 10px;">Settings</a>
-        <a href="logout.php" class="mt-xl-5"><img src="./images/Admin Nav/admin-logout-nav.png" alt="Logout" class="logout-icon" style="max-width: 30px; margin-right: 10px;">Logout</a>
-      </nav>
+        <!-- Top Navbar (visible only on small devices) -->
+            <nav class="navbar navbar-light bg-light d-lg-none">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
+            </nav>
+
+        <!-- Sidebar -->
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+
+                <div class="text-center py-3 d-none d-md-block">
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
+
+                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                    <li class="nav-item">
+                        <a href="index.php" class="nav-link">
+                            <i class="bi bi-house-door me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="orders.php" class="nav-link">
+                            <i class="bi bi-bag-check me-2"></i> Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="prod.php" class="nav-link">
+                            <i class="bi bi-box-seam me-2"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="cus.php" class="nav-link">
+                            <i class="bi bi-people me-2"></i> Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="inquiries.php" class="nav-link active">
+                            <i class="bi bi-chat-dots me-2"></i> Messages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="ratings.php" class="nav-link">
+                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounting.php" class="nav-link">
+                            <i class="bi bi-receipt me-2"></i> Receipt Form
+                        </a>
+                    </li>
+                    <li class="nav-item justify-content-end mt-lg-5">
+                        <a href="logout.php" class="nav-link text-danger fw-semibold">
+                            <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
             <!-- Content Area -->
             <main class="col-md-9 ms-sm-auto col-lg-10 content">

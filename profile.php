@@ -337,8 +337,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </div>
         </div>
-
         <hr>
+        <div class="col-md-6 mb-2">
+            <a href="forgot_password.php" class="text-decoration-none">Reset Password</a>
+        </div>
         <div class="text-center mt-5">
             <button type="submit" class="custom-navy-btn" id="saveBtn" disabled>Save</button>
         </div>

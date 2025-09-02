@@ -1,0 +1,440 @@
+body {
+  font-family: "Poppins", serif;
+}
+
+/*sidebar*/
+.sidebar {
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  font-style: "Kulim Park", sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  color: black;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 5px;
+  font-weight: 400;
+}
+
+.sidebar .nav-link i {
+  font-size: 25px;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #dde1f1;
+  color: #000;
+}
+
+.sidebar .nav-link.active {
+  background-color: #1a3d8f;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.vmc-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-family: "kulim Park", sans-serif;
+  font-weight: 700;
+  font-size: 45px;
+  color: #26387d;
+}
+
+/*search*/
+.search-container {
+  position: relative;
+  width: 400px;
+}
+.search-container input {
+  width: 100%;
+  padding: 10px;
+  background-color: white;
+  border-radius: 10px;
+  border: 3px solid #26387d;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: 0.3s;
+}
+.search-container input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.5);
+}
+.search-container button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.search-container i {
+  width: 40px;
+  height: 40px;
+  color: #26387d;
+}
+
+.admin-btn {
+  background-color: white;
+  color: #26387d;
+  border: 1px solid #26387d;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.admin-btn:hover {
+  background-color: #26387d;
+  color: #fff;
+}
+
+strong {
+  color: #26387d;
+}
+
+/*tables*/
+.table-responsive {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 16px;
+  background: #fff;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table thead,
+.table thead tr,
+.table thead th {
+  background: #26387d !important;
+  color: white !important;
+  text-align: center;
+  font-style: "kulim Park", sans-serif;
+}
+.table tbody tr td {
+  text-align: center;
+  border-bottom: 1px solid #26387d !important;
+}
+.table-dropdown {
+  background-color: #26387d;
+  color: white;
+  font-weight: 600;
+}
+
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #0d6efd;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.product-img {
+  width: 100px;
+  height: auto;
+  justify-content: center;
+}
+
+.profile-img {
+  display: block;
+  margin: auto;
+  width: 100px;
+  height: auto;
+  border-radius: 50%;
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+}
+
+/*pagination*/
+.custom-pagination {
+  background: #f4f4f4;
+  border-radius: 15px;
+  padding: 3px 10px;
+}
+
+.custom-pagination .page-link {
+  border: none;
+  background: transparent;
+  color: #26387d;
+  font-weight: 500;
+  margin: 0 3px;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background-color: #26387d;
+  color: #fff !important;
+  border-radius: 10px;
+  padding: 5px 12px;
+}
+
+.custom-pagination .page-link:focus {
+  box-shadow: none;
+}
+
+/*Modal CSS*/
+.note {
+  background-color: #c8d9e6;
+  color: #003153;
+  padding: 10px 10px;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+.modal-header {
+  box-shadow: 0 2px 6px rgba(7, 148, 0, 0.08);
+}
+
+.modal-footer {
+  box-shadow: 0 2px 6px rgba(7, 148, 0, 0.08);
+}
+
+.modal-header h5 {
+  font-family: "Kulim Park", sans-serif;
+  font-size: 30px;
+  color: #26387d;
+  font-weight: bold;
+}
+
+.modal-body {
+  font-family: "poppins", sans-serif;
+  font-size: 16px;
+  color: black;
+}
+
+/* Custom checkbox style for year-level tags */
+.form-check-input[type="checkbox"].styled-checkbox {
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 0.25em;
+  border: 1px solid black;
+  background-color: #fff;
+  transition: background 0.2s, border-color 0.2s;
+  margin-right: 0.5em;
+  cursor: pointer;
+}
+.form-check-input[type="checkbox"].styled-checkbox:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+.form-check-input[type="checkbox"].styled-checkbox:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.title-text {
+  font-family: "Kulim Park", sans-serif;
+  font-size: 20px;
+  color: #26387d;
+  font-weight: 600;
+}
+
+.custom-navy-btn {
+  background-color: #26387d;
+  color: #fff;
+  border: none;
+  padding: 0.45rem 2rem;
+  border-radius: 5px;
+  font-weight: 400;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(38, 56, 125, 0.15);
+}
+
+.custom-navy-btn:hover,
+.custom-navy-btn:focus {
+  background-color: #1b285c;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(38, 56, 125, 0.25);
+  text-decoration: none;
+}
+
+/*TAGS-BADGES STYLES*/
+#tagsChecklist .form-check {
+  margin-bottom: 0;
+}
+#tagsChecklist .badge {
+  font-size: 0.95em;
+  padding: 0.5em 0.9em;
+}
+.badges {
+  margin: 8px 0;
+}
+.badges .badge {
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(7, 148, 0, 0.08);
+  letter-spacing: 0.5px;
+}
+.green-badge {
+  background-color: #abf3a8;
+  color: #079400;
+  border: 1px solid #79e37b;
+}
+
+.red-badge {
+  background-color: #ffbbc0;
+  color: #d11408;
+  border: 1px solid #d11408;
+}
+.uniform_badge {
+  background-color: #ffc0c4;
+  color: #000;
+}
+.supplies_badge {
+  background-color: #dde1f1;
+  color: #000;
+}
+.preschool_badge {
+  background-color: #abf3a8;
+  color: #000;
+}
+.kinder_badge {
+  background-color: #a8eef3;
+  color: #000;
+}
+.elementary_badge {
+  background-color: #ffed98;
+  color: #000;
+}
+.jhs_badge {
+  background-color: #ff9e5e;
+  color: #000;
+}
+.shs_badge {
+  background-color: #ffbff1;
+  color: #000;
+}
+.bstm_badge {
+  background-color: #ddafaf;
+  color: #000;
+}
+.bsis_badge {
+  background-color: #baaafa;
+  color: #000;
+}
+.bhrm_badge {
+  background-color: #94d6cc;
+  color: #000;
+}
+.secondary_badge {
+  background-color: #96b7ff;
+  color: #000;
+}
+.educ_badge {
+  background-color: #e18cf8;
+  color: #000;
+}
+.crim_badge {
+  background-color: #d2d2d2;
+  color: #000;
+}
+
+.writing_badge {
+  background-color: #d7ff5e;
+  color: #000;
+}
+.paper_badge {
+  background-color: #bfcaff;
+  color: #000;
+}
+.art_badge {
+  background-color: #ecbfff;
+  color: #000;
+}
+/*For Forms*/
+
+.form-select,
+.form-control {
+  border-color: #003153;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+hr {
+  border: 1px solid #dddedf;
+  opacity: 0.5;
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .sidebar .nav-link {
+    font-size: 15px;
+    padding: 5px 10px;
+  }
+  .sidebar .nav-link i {
+    font-size: 22px;
+  }
+  .vmc-logo {
+    width: 120px;
+  }
+}
+@media (max-width: 767.98px) {
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+  .vmc-logo {
+    width: 100px;
+  }
+
+  .note {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  .modal-header h5 {
+    font-size: 18px;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/*For Products*/
+.product-img {
+  display: block;
+  margin: auto;
+  width: 100px;
+  height: auto;
+}
+
+.rounded-100 {
+  border-radius: 100px;
+}
