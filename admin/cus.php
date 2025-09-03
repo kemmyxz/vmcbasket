@@ -158,69 +158,20 @@ for ($i = 1; $i <= $total_pages; $i++) {
   <style>
     .note {
       background-color: #C8D9E6; 
-      color: #003153; 
-      padding: 10px 10px;
+      color: #26387D; 
+      padding: 3px 8px;
       border-radius: 100px; 
       font-size: 16px;
       font-weight: 700;
       text-align: center;
-    }
-    .modal-header {
-      border-bottom: 1px solid #00527F; 
-    }
-    .modal-footer {
-      border-top: 1px solid #00527F; 
-    }
-    .modal-header h5 {
-      font-family: 'Ubuntu', sans-serif;
-      font-size: 24px;
-      color: #00527F;
-      font-weight: bold;
-    }
-    .modal-body {
-      font-family: 'poppins', sans-serif;
-      font-size: 16px;
-      color: #003153;
-    }
-    .form-select, .form-control {
-      border-color: #003153;
-    }
-    /* Remove spinner from number inputs */
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type=number] {
-      -moz-appearance: textfield;
     }
     @media (max-width: 576px) {
       .note {
         font-size: 12px;
         padding: 8px 10px;
       }
-      .modal-header h5 {
-        font-size: 18px;
-      }
     }
 
-   
-    .status {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .status.active {
-        background-color: #e6ffe6;
-        color: #008000;
-    }
-
-    .status.inactive {
-        background-color: #ffe6e6;
-        color: #ff0000;
-    }
   </style>
 </head>
 <body>
@@ -228,7 +179,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
     <div class="row">
      <!-- Sidebar Toggle Button -->
       <!-- Top Navbar (visible only on small devices) -->
-      <nav class="navbar navbar-light bg-light d-lg-none">
+      <nav class="navbar navbar-light bg-light d-md-none">
           <div class="container-fluid d-flex justify-content-between align-items-center">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
@@ -237,7 +188,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
           </div>
       </nav>
 
-  <!-- Sidebar -->
+    <!-- Sidebar -->
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
           <div class="text-center py-3 d-none d-md-block">
@@ -289,74 +240,106 @@ for ($i = 1; $i <= $total_pages; $i++) {
       </nav>
       
       <!-- Content Area -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 content">
+       <!-- Title Page and Search -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
         <div class="d-flex justify-content-end mb-5">
           <div class="search-container">
-            <input type="text" class="form-control" placeholder="">
-            <button><img src="./images/search-icon.png" alt="Search"></button>
+            <input type="text" class="form-control" placeholder="Search...">
+            <button><i class="bi bi-search"></i></button>
           </div>
         </div>
-        <div class="mt-2 d-flex flex-row align-items-center mb-5">
-          <img src="./images/Admin Nav/customers-nav.png" alt="VMC Dashboard" class="img-fluid" style="max-width: 40px; margin-right: 10px;">
-          <h2>STUDENTS</h2>
+        <div class="mt-2 mb-5">
+          <h2>Students</h2>
         </div>
-        <div class="d-flex justify-content-end mb-3"> 
+        <div class="row mb-3 g-2 align-items-center flex-column flex-md-row">
+          <!-- DATE FILTER (Calendar) -->
+          <div class="col-12 col-md">
+            <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="cus.php" style="gap: 8px;">
+              <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
+                <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1" style="font-size: 15px;"><strong>From</strong></label>
+                <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+                <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1" style="font-size: 15px;"><strong>To</strong></label>
+                <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+                <button type="submit" class="admin-btn ms-sm-2">Filter</button>
+              </div>
+            </form>
+          </div>
           <!-- BUTTONS FOR ADDING CUSTOMER -->
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-right: 5px;">
-            <img src="./images/add.png" alt="Add" style="max-width: 20px; margin-right: 5px;">
-            Add Student
-          </button>
-          <button type="button" class="btn btn-primary" onclick="document.getElementById('csv-file').click();">
-            <img src="./images/add.png" alt="Add" style="max-width: 20px; margin-right: 5px;">
-            Add CSV
-          </button>
-          <input type="file" id="csv-file" style="display: none;" onchange="uploadCSV()">
+          <div class="col-12 col-md-auto ms-md-0 mt-2 mt-md-3 d-flex justify-content-lg-end">
+            <div class="btn-group w-100">
+              <button type="button" class="admin-btn dropdown-toggle w-100" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-plus-circle me-2"></i>Add Student
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Add Manually
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#" onclick="document.getElementById('csv-file').click(); return false;">
+                    Add via CSV
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <input type="file" id="csv-file" style="display: none;" onchange="uploadCSV()">
+          </div>
+        </div>
+        <div class="mt-4 mb-3">
+            <strong>Total Products: 100</strong>
+        </div>
+          <!-- Bulk Disable Button (hidden by default) -->
+        <div id="bulkDisableContainer" style="display:none; margin-top: 20px; margin-bottom: 20px;">
+            <button id="bulkDisableBtn" class="btn btn-danger">
+            <i class="bi bi-slash-circle"></i> Disable Account Selected
+            </button>
+        </div>
 
           <!-- ADD CUSTOMER MODAL -->
-          <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" 
-               aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title d-flex align-items-center">
+                  <h5 class="d-flex align-items-center">
                     <img src="./images/profile_pic.png" alt="add user icon" style="margin-right: 5px; height:50px;">Create Student Account
                   </h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body mt-2 mb-3">
+                <div class="modal-body mt-2 p-4">
                   <div class="note">
-                    <p>Note: Your student number must match with your school ID for verification.</p>
+                    <p class="mt-3">Note: Your student number must match with your school ID for verification.</p>
                   </div>
                   <!-- IMPORTANT: Added enctype attribute for file upload -->
                   <form action="cus.php" method="POST" enctype="multipart/form-data">
                     <div class="row mt-4">
                       <div class="col-md-4 mb-2">
                         <label for="Fname" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="name" name="student_fname" required>
+                        <input type="text" class="form-control" id="name" name="student_fname" required placeholder="Enter First Name">
                       </div>
                       <div class="col-md-4 mb-2">
                         <label for="name" class="form-label sm-mt-3">Middle Name</label>
-                        <input type="text" class="form-control" id="name" name="student_mname" required>
+                        <input type="text" class="form-control" id="name" name="student_mname" required placeholder="Enter Middle Name">
                       </div>
                       <div class="col-md-4">
                         <label for="name" class="form-label sm-mt-3">Last Name</label>
-                        <input type="text" class="form-control" id="name" name="student_lname" required>
+                        <input type="text" class="form-control" id="name" name="student_lname" required placeholder="Enter Last Name">
                       </div>
                     </div>
                     <div class="row mt-2">
                       <div class="col-md-6 mb-2">
                         <label for="email" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="example@gmail.com" required>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="example@gmail.com" required placeholder="Enter Email">
                       </div>
                       <div class="col-md-6">
                         <label for="phone" class="form-label sm-mt-3">Phone Number</label>
-                        <input type="tel" class="form-control" id="phone" name="phone_number" placeholder="(+63)09xx xxxx xxx" required>
+                        <input type="number" class="form-control" id="phone" name="phone_number" placeholder="Ex. 0912 3456 789" required>
                       </div>
                     </div>
                     <div class="row mt-2">
                       <div class="col-md-6 mb-2">
                         <label for="studentNumber" class="form-label">Student Number</label>
-                        <input type="text" class="form-control" id="student-number" name="student_no" required>
+                        <input type="text" class="form-control" id="student-number" name="student_no" required  placeholder="Ex. 210001">
                       </div>
                       <div class="col-md-6">
                         <label for="picture" class="form-label">Picture</label>
@@ -369,6 +352,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                         <select class="form-select" id="course" name="year_level" required>
                           <option selected disabled>Choose your year level/course</option>
                           <option value="Pre-School">Pre-School</option>
+                          <option value="Kindergarten">Kindergarten</option>
                           <option value="Elementary Grade 1">Elementary Grade 1</option>
                           <option value="Elementary Grade 2">Elementary Grade 2</option>
                           <option value="Elementary Grade 3">Elementary Grade 3</option>
@@ -397,29 +381,43 @@ for ($i = 1; $i <= $total_pages; $i++) {
                         <input type="date" class="form-control" id="dob" name="birthday" required pattern="\d{4}-\d{2}-\d{2}">
                       </div>
                     </div>
-                    <div class="modal-footer">
+
+                    <div class="modal-footer mt-4">
                       <button type="button" class="btn btn-outline-danger cancel" data-bs-dismiss="modal">Cancel</button>
-                      <button type="submit" class="btn btn-primary add">Add Account</button>
+                      <button type="submit" class="btn custom-navy-btn add">Add Account</button>
                     </div>
                   </form>
                 </div>
               </div>
             </div>
           </div> <!-- End of Modal -->
-        </div>
         
         <!-- CUSTOMER TABLE -->
-        <div class="table-container table-responsive-lg">
-          <table class="table table-bordered table-striped">
+        <div class="table-responsive">
+          <table class="table table-container">
             <thead>
               <tr>
+                <th>
+                <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
+                </th>
                 <th>#</th>
-                <th>Name</th>
-                <th>Student Number</th>        
+                <th>Student Details</th> 
+                <th>Student ID</th>       
                 <th>Phone Number</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Date</th>
+                <th class="align-middle text-center">
+                    <div class="dropdown">
+                    <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="stocksStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                        Status
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
+                        <li><a class="dropdown-item" href="#">All</a></li>
+                        <li><a class="dropdown-item" href="#">Active</a></li>
+                        <li><a class="dropdown-item" href="#">Disabled</a></li>
+                    </ul>
+                    </div>
+                </th>
+                <th>Date Created</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -433,39 +431,141 @@ for ($i = 1; $i <= $total_pages; $i++) {
                   $photoPath = ($row['photo'] === "profile_pic.png") ? "images\profile_pic.png" : "uploads/" . $row['photo'];
                 ?>
                 <tr>
-                  <td ><?= $count++; ?></td>
+                  <td>
+                    <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
+                  </td>
+                  <td><?= $count++; ?></td>
                   <td class="text-start">
-                  <img src="<?php echo $photoPath; ?>" alt="User" class="user-img" style="width:auto; height:50px">
-                    <span><?php echo $row['student_fname'] . " " . $row['student_lname']; ?></span>
+                    <div class="d-flex align-items-center">
+                      <img src="<?php echo $photoPath; ?>" alt="User" class="user-img me-2" style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
+                      <div>
+                        <span><?php echo $row['student_fname'] . " " . $row['student_lname']; ?></span><br>
+                        <small class="text-muted"><?php echo $row['email']; ?></small>
+                      </div>
+                    </div>
                   </td>
                   <td><?php echo $row['student_no']; ?></td>
-                  
                   <td><?php echo $row['phone_number']; ?></td>
-                  <td><?php echo $row['email']; ?></td>
-                  
                   <td>
                     <?php 
                       $status = $row['active_status']; 
                       $statusClass = strtolower($status);
                   ?>
                    <span class="status <?php echo $statusClass; ?>"><?php echo $status; ?></span></span></td>
-                  <td><?php echo $row['created_at']; ?></td>
-                </tr>
-              <?php endwhile; ?>
-            </tbody>
-          </table>
-        </div>
-        <nav class="d-flex justify-content-end mt-3">
-    <ul class="pagination justify-content-center">
-        <li class="page-item <?= $previous_disabled; ?>"><a class="page-link" href="?page=<?= $page - 1; ?>">Previous</a></li>
-        <?= $page_links; ?>
-        <li class="page-item <?= $next_disabled; ?>"><a class="page-link" href="?page=<?= $page + 1; ?>">Next</a></li>
-    </ul>
-</nav>
-      </main>
-    </div>
-  </div>
-  
+                    <td class="text-center"><?php echo $row['created_at']; ?></td>
+                    <td class="text-center">
+                    <button class="btn btn-link" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#studentInfoModal"
+                      style="font-size: 1.5rem; color: #333;"
+                    >
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    </td>
+                    </tr>
+                    <?php endwhile; ?>
+                    </tbody>
+                    </table>
+                    </div>
+                    <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
+                      <ul class="pagination justify-content-center custom-pagination">
+                      <li class="page-item <?= $previous_disabled; ?>"><a class="page-link" href="?page=<?= $page - 1; ?>"><span aria-hidden="true">&lt;</span></a></li>
+                      <?= $page_links; ?>
+                      <li class="page-item <?= $next_disabled; ?>"><a class="page-link" href="?page=<?= $page + 1; ?>"><span aria-hidden="true">&gt;</span></a></li>
+                      </ul>
+                    </nav>
+                  </main>
+                </div>
+              </div>
+
+              <!-- View Student Info Modal -->
+              <div class="modal fade" id="studentInfoModal" tabindex="-1" aria-labelledby="studentInfoModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <!-- Header -->
+                    <div class="modal-header">
+                      <h5 class="modal-title fw-bold" id="studentInfoModalLabel">Student Details</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="modal-body student-modal-body">
+                      <div class="row mb-4">
+                        <!-- Profile Picture -->
+                        <div class="col-md-3 text-center student-modal-photo">
+                          <img id="modal-student-photo"
+                            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                            class="img-fluid rounded"
+                            style="max-width:150px;"
+                            alt="Student Profile">
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="col-md-9 student-modal-info">
+                          <p><strong>Name:</strong> <span id="modal-student-name"></span></p>
+                          <p><strong>Student ID:</strong> <span id="modal-student-no"></span></p>
+                          <p><strong>Email:</strong> <span id="modal-student-email"></span></p>
+                          <p><strong>Phone Number:</strong> <span id="modal-student-phone"></span></p>
+                          <p><strong>Year-Level/Course:</strong> <span id="modal-student-year"></span></p>
+                          <p><strong>Date of Birthday:</strong> <span id="modal-student-birthday"></span></p>
+                        </div>
+                      </div>
+
+                      <!-- Search bar and Pagination aligned -->
+                      <div class="row mb-3 align-items-center">
+                        <div class="col-md-6">
+                          <div class="search-container">
+                            <input type="text" class="form-control" placeholder="Search...">
+                            <button><i class="bi bi-search"></i></button>
+                          </div>
+                        </div>
+                        <div class="col-md-6 d-flex justify-content-end">
+                          <nav aria-label="Page navigation">
+                            <ul class="pagination custom-pagination mb-0">
+                              <li class="page-item <?= $previous_disabled; ?>"><a class="page-link" href="?page=<?= $page - 1; ?>"><span aria-hidden="true">&lt;</span></a></li>
+                              <?= $page_links; ?>
+                              <li class="page-item <?= $next_disabled; ?>"><a class="page-link" href="?page=<?= $page + 1; ?>"><span aria-hidden="true">&gt;</span></a></li>
+                            </ul>
+                          </nav>
+                        </div>
+                      </div>
+
+                      <!-- Orders Table -->
+                      <div class="table-responsive">
+                        <table class="table align-middle">
+                          <thead class="table-light">
+                            <tr>
+                              <th>Photo</th>
+                              <th>Transaction Id</th>
+                              <th>Order Details</th>
+                              <th>Ratings</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <!-- Notebook -->
+                            <tr>
+                              <td><img src="https://via.placeholder.com/60" class="img-thumbnail" alt="Notebook"></td>
+                              <td>#123456789</td>
+                              <td>
+                                <strong>Notebook</strong><br>
+                                #12345678<br>
+                                10/10/2024<br>
+                                Qty: 5
+                              </td>
+                              <td>
+                                <div class="text-warning">
+                                  ★★★★☆
+                                </div>
+                                <small>The notebooks are sturdy and last all year.</small>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
   <script>
     // Corrected event: Listen for change on the DOB input.
     document.getElementById('dob').addEventListener('change', function () {
@@ -501,8 +601,61 @@ for ($i = 1; $i <= $total_pages; $i++) {
   }
 
   </script>
+
+  <script>
+    // Multiple disable functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const selectAll = document.getElementById('selectAllProducts');
+      const checkboxes = document.querySelectorAll('.product-checkbox');
+      const bulkDisableContainer = document.getElementById('bulkDisableContainer');
+      const bulkDisableBtn = document.getElementById('bulkDisableBtn');
+
+      // Select/Deselect all checkboxes
+      selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        toggleBulkDisable();
+      });
+
+      // If any checkbox is changed, update selectAll and bulk disable button
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+          selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+          toggleBulkDisable();
+        });
+      });
+
+      function toggleBulkDisable() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        bulkDisableContainer.style.display = anyChecked ? 'block' : 'none';
+      }
+
+      // Bulk disable action (AJAX example)
+      bulkDisableBtn.addEventListener('click', function() {
+        const selectedIds = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.value);
+        if (selectedIds.length === 0) return;
+        if (confirm('Are you sure you want to disable the selected accounts?')) {
+          // AJAX request to disable accounts
+          fetch('bulk_disable.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ids: selectedIds})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert('Selected accounts have been disabled.');
+              location.reload();
+            } else {
+              alert('Error disabling accounts.');
+            }
+          })
+          .catch(() => alert('Server error.'));
+        }
+      });
+    });
+  </script>
   
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
-          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

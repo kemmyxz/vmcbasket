@@ -618,6 +618,105 @@ footer {
   font-size: 16px;
 }
 
+/*TAGS-BADGES STYLES*/
+#tagsChecklist .form-check {
+  margin-bottom: 0;
+}
+#tagsChecklist .badge {
+  font-size: 0.95em;
+  padding: 0.5em 0.9em;
+}
+.badges {
+  margin: 8px 0;
+}
+.badges .badge {
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(7, 148, 0, 0.08);
+  letter-spacing: 0.5px;
+}
+.green-badge {
+  background-color: #abf3a8;
+  color: #079400;
+  border: 1px solid #79e37b;
+}
+
+.red-badge {
+  background-color: #ffbbc0;
+  color: #d11408;
+  border: 1px solid #d11408;
+}
+.uniform_badge {
+  background-color: #ffc0c4;
+  color: #000;
+}
+.supplies_badge {
+  background-color: #dde1f1;
+  color: #000;
+}
+.preschool_badge {
+  background-color: #abf3a8;
+  color: #000;
+}
+.kinder_badge {
+  background-color: #a8eef3;
+  color: #000;
+}
+.elementary_badge {
+  background-color: #ffed98;
+  color: #000;
+}
+.jhs_badge {
+  background-color: #ff9e5e;
+  color: #000;
+}
+.shs_badge {
+  background-color: #ffbff1;
+  color: #000;
+}
+.bstm_badge {
+  background-color: #ddafaf;
+  color: #000;
+}
+.bsis_badge {
+  background-color: #baaafa;
+  color: #000;
+}
+.bhrm_badge {
+  background-color: #94d6cc;
+  color: #000;
+}
+.secondary_badge {
+  background-color: #96b7ff;
+  color: #000;
+}
+.educ_badge {
+  background-color: #e18cf8;
+  color: #000;
+}
+.crim_badge {
+  background-color: #d2d2d2;
+  color: #000;
+}
+
+.writing_badge {
+  background-color: #d7ff5e;
+  color: #000;
+}
+.paper_badge {
+  background-color: #bfcaff;
+  color: #000;
+}
+.art_badge {
+  background-color: #ecbfff;
+  color: #000;
+}
+
 @media (max-width: 991.98px) {
   .navbar-custom {
     padding: 0.5rem 1rem;

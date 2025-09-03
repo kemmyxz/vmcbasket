@@ -173,19 +173,6 @@ $calendarEvents = getCalendarEvents();
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .tab-button {
-      border: none;
-      background-color: #D5E9F3;
-      font-weight: 600;
-      padding: 10px 20px;
-      color: #898A8B;
-      border-bottom: 2px solid transparent;
-    }
-
-    .tab-button.active {
-      border-bottom: 2px solid #3D87F5;
-      color: #3D87F5;
-    }
 
     .status-badge {
       padding: 5px 12px;
@@ -219,108 +206,6 @@ $calendarEvents = getCalendarEvents();
       color: #E8261A;
     }
 
-    /* Calendar Header */
-    .fc-toolbar-title {
-      font-size: 24px;
-      color: #343a40;
-    }
-
-    /* Events styling */
-    .fc-event {
-      font-size: 14px;
-      font-weight: bold;
-      border: none;
-      padding: 2px 5px;
-      border-radius: 5px;
-    }
-
-    /* Specific Colors */
-    .fc-event-completed {
-      background-color: #28a745 !important;
-      color: white !important;
-    }
-
-    .fc-event-pending {
-      background-color: #ffc107 !important;
-      color: black !important;
-    }
-
-    .fc-event-cancelled {
-      background-color: #dc3545 !important;
-      color: white !important;
-    }
-
-    .fc-event-refunded {
-      background-color: #02395E !important;
-      color: white !important;
-    }
-
-    .fc-event-returned {
-      background-color: #4400FF !important;
-      color: white !important;
-    }
-
-    .fc-event-topickup {
-      background-color: #17a2b8 !important;
-      color: white !important;
-    }
-
-    /* Hover Day Cell */
-    .fc-daygrid-day:hover {
-      background-color: #e9ecef;
-      cursor: pointer;
-    }
-
-    /* Style the day headers (Mon, Tue, Wed, etc.) */
-    .fc-col-header-cell {
-      background-color: #00527F;
-      font-weight: bold;
-      font-size: 1rem;
-      color: white;
-      padding: 10px 0;
-    }
-
-    .fc-col-header-cell-cushion {
-      text-decoration: none !important;
-      color: inherit;
-    }
-
-    /* Remove underline on day numbers */
-    .fc-daygrid-day-number {
-      text-decoration: none !important;
-      font-weight: 500;
-      color: #555;
-    }
-
-    .fc-daygrid-day-number:hover {
-      text-decoration: none;
-      color: #000;
-    }
-
-    #calendarModal .btn {
-      background-color: #0d6efd;
-      /* Bootstrap primary blue */
-      color: white;
-      border-radius: 10px;
-      font-weight: 600;
-      padding: 8px 16px;
-      font-size: 1rem;
-      transition: background-color 0.3s;
-    }
-
-    #calendarModal .btn:hover {
-      background-color: #0b5ed7;
-      /* Darker blue on hover */
-    }
-
-    /* Specific style for 'View This Month' button if you want */
-    #viewMonthButton {
-      background-color: #198754;
-    }
-
-    #viewMonthButton:hover {
-      background-color: #157347;
-    }
 
     #orderDetailsModal .modal-body h6 {
       font-weight: 600;
@@ -352,33 +237,6 @@ $calendarEvents = getCalendarEvents();
     vertical-align: middle;
 }
 
-    /* Add a legend for the calendar */
-    .calendar-legend {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        padding: 10px;
-        flex-wrap: wrap;
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.9rem;
-    }
-
-    .legend-color {
-        width: 15px;
-        height: 15px;
-        border-radius: 3px;
-    }
-
-    .legend-complete { background-color: #198754; }
-    .legend-pending { background-color: #ffc107; }
-    .legend-topickup { background-color: #17a2b8; }
-    .legend-cancelled { background-color: #dc3545; }
-    .legend-refunded { background-color: #02395E; }
   </style>
 </head>
 
@@ -387,7 +245,7 @@ $calendarEvents = getCalendarEvents();
     <div class="row">
       <!-- Sidebar Toggle Button -->
       <!-- Top Navbar (visible only on small devices) -->
-          <nav class="navbar navbar-light bg-light d-lg-none">
+          <nav class="navbar navbar-light bg-light d-md-none">
               <div class="container-fluid d-flex justify-content-between align-items-center">
                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                       <span class="navbar-toggler-icon"></span>
@@ -448,196 +306,217 @@ $calendarEvents = getCalendarEvents();
           </nav>
 
       <!-- Content Area -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 content">
+      <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
         <div class="d-flex justify-content-end mb-5">
           <div class="search-container">
-            <input type="text" class="form-control" placeholder="">
-            <button><img src="./images/search-icon.png" alt="Search"></button>
+              <input type="text" class="form-control" placeholder="Search...">
+              <button><i class="bi bi-search"></i></button>
           </div>
         </div>
-        <div class="mt-2 d-flex flex-row align-items-center mb-5">
-          <img src="./images/admin nav/Orders.png" alt="VMC Dashboard" class="img-fluid"
-            style="max-width: 40px; margin-right: 10px;">
+        <div class="mt-2 mb-5">
           <h2>Orders</h2>
-          <!-- <span class="ms-3 text-secondary"> 5 Orders found</span> -->
-          <button id="calendarButton" type="button" class="btn btn-primary d-flex align-items-end justify-content-center ms-auto"
-            data-bs-toggle="modal" data-bs-target="#calendarModal">
-          </button>
         </div>
-        <div class="d-flex justify-content-end mb-3">
-
-
-          <!-- Calendar Modal -->
-          <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="calendarModalLabel">Monthly Transactions</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <div id="calendar" style="padding: 10px; background-color: #F0F5F8; border-radius: 10px;"></div>
-                  <div class="text-end mt-3">
-                    <button id="viewMonthButton" class="btn btn-success">View This Month</button>
-                  </div>
-                  <div class="calendar-legend mt-3">
-                    <div class="legend-item">
-                      <div class="legend-color legend-complete"></div>
-                      <span>Completed</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color legend-pending"></div>
-                      <span>Pending</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color legend-topickup"></div>
-                      <span>To Pick Up</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color legend-cancelled"></div>
-                      <span>Cancelled</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color legend-refunded"></div>
-                      <span>Refunded</span>
-                    </div>
-                  </div>
-                </div>
+         <div class="col-12 col-md mb-3">
+            <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="cus.php" style="gap: 8px;">
+              <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
+                <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1" style="font-size: 15px;"><strong>From</strong></label>
+                <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+                <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1" style="font-size: 15px;"><strong>To</strong></label>
+                <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+                <button type="submit" class="admin-btn ms-sm-2">Filter</button>
               </div>
-            </div>
+            </form>
           </div>
-        </div>
+          <div class="mt-4 mb-3">
+            <strong>Total Orders: 100</strong>
+          </div>
+
+           <!-- Bulk Delete Button (hidden by default) -->
+            <div id="bulkDeleteContainer" style="display:none; margin-top: 16px;">
+                <button id="bulkDeleteBtn" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete Selected
+                </button>
+            </div>
 
         <!-- TABLE -->
-        <div class="table-container table-responsive-lg">
-
-          <div class="d-flex mb-3">
-            <button class="tab-button">All Orders</button>
-            <button class="tab-button">Pending</button>
-            <button class="tab-button">To Pick Up</button>
-            <button class="tab-button">Completed</button>
-            <button class="tab-button">Cancelled</button>
-            <button class="tab-button">Returns</button>
-            <button class="tab-button">Refunded</button>
+        <div class="table-responsive">
+            <div class="d-flex">
+              <button class="tab-button active">All Orders</button>
+              <button class="tab-button">Pending</button>
+              <button class="tab-button">To Pick Up</button>
+              <button class="tab-button">Completed</button>
+              <button class="tab-button">Cancelled</button>
+              <button class="tab-button">Returned</button>
+              <button class="tab-button curve-tab">Refunded</button>
+            </div>
+            <table class="table table-container">
+              <thead>
+                  <tr>
+                      <th>
+                        <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
+                      </th>
+                      <th>#</th>
+                      <th>Product Details</th>
+                      <th>Customer Details</th>
+                      <th class="align-middle text-center">
+                          <div class="dropdown">
+                          <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="mopDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                              MOP
+                          </button>
+                          <ul class="dropdown-menu" aria-labelledby="mopDropdown">
+                              <li><a class="dropdown-item" href="#">All</a></li>
+                              <li><a class="dropdown-item" href="#">Send Online Receipt (Gcash)</a></li>
+                              <li><a class="dropdown-item" href="#">Cash (Pay at the Counter)</a></li>
+                          </ul>
+                          </div>
+                      </th>
+                      <th>Status</th>
+                      <th>Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <?php $count = 1; foreach ($grouped_orders as $order) : ?>
+                      <tr>
+                          <td>
+                              <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
+                          </td>
+                          <td><?= $count++ ?></td>
+                          <td>
+                            <div class="d-flex flex-column h-100 justify-content-between">
+                              <div>
+                                <?php foreach ($order['products'] as $product) : ?>
+                                  <div class="d-flex align-items-center mb-2">
+                                    <img src="<?= $product['image'] ?>" 
+                                      alt="<?= $product['product_name'] ?>" 
+                                      class="product-thumbnail me-2"
+                                      style="width: 40px; height: 40px; object-fit: cover;">
+                                    <span>
+                                      <?= $product['product_name'] ?> (x<?= $product['quantity'] ?>) - ₱<?= number_format($product['price'], 2) ?>
+                                    </span>
+                                  </div>
+                                <?php endforeach; ?>
+                              </div>
+                              <div class="mt-2">
+                                <strong class="text-start">Total Amount: </strong>₱<?= number_format($order['total_amount'], 2) ?>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="text-start">
+                              <strong>Receipt No.: </strong><?= $order['receipt_id'] ?><br>
+                              <strong>Student Name: </strong><?= $order['customer_name'] ?><br>
+                              <strong>Customer Type: </strong><?= $order['user_id'] ? 'Registered Student' : 'Walk-in Customer' ?><br>
+                              <strong>Date Ordered: </strong><?= $order['date_ordered'] ?><br>
+                              <!--<//?php //if($order['phone'] != 'N/A'): ?>
+                                  <strong>Phone: </strong><//?= $order['phone'] ?>
+                              <//?php //endif; ?>-->
+                          </td>
+                          <td>
+                            <?php
+                              // Break long payment method text for better table fit
+                              $mop = $order['payment_method'];
+                              if (strlen($mop) > 20) {
+                                // Insert a <br> after 20 characters or at the first space after 15 chars
+                                $breakAt = strpos($mop, ' ', 15);
+                                if ($breakAt !== false && $breakAt < strlen($mop) - 1) {
+                                  $mop = substr($mop, 0, $breakAt) . '<br>' . substr($mop, $breakAt + 1);
+                                } else {
+                                  $mop = wordwrap($mop, 20, '<br>', true);
+                                }
+                              }
+                              echo $mop;
+                            ?>
+                            <br>
+                          </td>
+                          <td><span class="status-badge <?= $order['order_status'] ?>"><?= $order['order_status'] ?></span></td>
+                          <td>
+                            <div class="dropdown text-center">
+                            <button class="btn btn-link p-0" type="button" id="actionDropdown<?= $order['receipt_id'] ?>" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.5rem; color: #333;">
+                              <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="actionDropdown<?= $order['receipt_id'] ?>">
+                              <li>
+                              <button class="dropdown-item view-details"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#orderDetailsModal"
+                                  data-receipt-id="<?= $order['receipt_id'] ?>"
+                                  data-customer="<?= htmlspecialchars($order['customer_name']) ?>"
+                                  data-email="<?= htmlspecialchars($order['email']) ?>"
+                                  data-date="<?= $order['date_ordered'] ?>"
+                                  data-payment="<?= htmlspecialchars($order['payment_method']) ?>"
+                                  data-products='<?= json_encode($order['products']) ?>'
+                                  data-total="<?= $order['total_amount'] ?>">
+                                <i class="bi bi-file-text me-2"></i>View Details
+                              </button>
+                              </li>
+                              <li>
+                              <button class="dropdown-item text-danger delete-order"
+                                  data-receipt-id="<?= $order['receipt_id'] ?>">
+                                <i class="bi bi-trash me-2"></i>Delete
+                              </button>
+                              </li>
+                            </ul>
+                            </div>
+                            <br>
+                            <?php if(($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending') 
+                              || ($order['payment_method'] == 'Send Online Receipt' && $order['order_status'] == 'ToPickUp')): ?>
+                            <button class="bi bi-check-circle btn btn-success complete-order" 
+                                data-receipt-id="<?= $order['receipt_id'] ?>"
+                                style="border-radius: 5px;">
+                              Complete  
+                            </button>
+                            <?php endif; ?>
+                          </td>
+                      </tr>
+                  <?php endforeach; ?>
+              </tbody>
+            </table>
           </div>
-          <table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Product</th>
-            <th>Total Amount</th>
-            <th>Customer Details</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php $count = 1; foreach ($grouped_orders as $order) : ?>
-            <tr>
-                <td><?= $count++ ?></td>
-                
-                
-                <td>
-                    <?php foreach ($order['products'] as $product) : ?>
-                        <div class="d-flex align-items-center mb-2">
-                            <img src="<?= $product['image'] ?>" 
-                                 alt="<?= $product['product_name'] ?>" 
-                                 class="product-thumbnail me-2"
-                                 style="width: 40px; height: 40px; object-fit: cover;">
-                            <span>
-                                <?= $product['product_name'] ?> (x<?= $product['quantity'] ?>) - ₱<?= number_format($product['price'], 2) ?>
-                            </span>
-                        </div>
-                    <?php endforeach; ?>
-                </td>
-                <td>₱<?= number_format($order['total_amount'], 2) ?></td>
-                <td class="text-start">
-                    <strong>Receipt No.: </strong><?= $order['receipt_id'] ?><br>
-                    <strong>Student Name: </strong><?= $order['customer_name'] ?><br>
-                    <strong>Customer Type: </strong><?= $order['user_id'] ? 'Registered Student' : 'Walk-in Customer' ?><br>
-                    <strong>Date Ordered: </strong><?= $order['date_ordered'] ?><br>
-                    <strong>Payment: </strong> <?= $order['payment_method'] ?><br>
-                    <?php if($order['phone'] != 'N/A'): ?>
-                        <strong>Phone: </strong><?= $order['phone'] ?>
-                    <?php endif; ?>
-                </td>
-                <td><span class="status-badge <?= $order['order_status'] ?>"><?= $order['order_status'] ?></span></td>
-                <td >
-    <button class="btn btn-primary view-details" 
-            data-bs-toggle="modal" 
-            data-bs-target="#orderDetailsModal"
-            data-receipt-id="<?= $order['receipt_id'] ?>"
-            data-customer="<?= htmlspecialchars($order['customer_name']) ?>"
-            data-email="<?= htmlspecialchars($order['email']) ?>"
-            data-date="<?= $order['date_ordered'] ?>"
-            data-payment="<?= htmlspecialchars($order['payment_method']) ?>"
-            data-products='<?= json_encode($order['products']) ?>'
-            data-total="<?= $order['total_amount'] ?>">
-        <i class="bi bi-file-text " ></i> Details
-    </button>
-    <br><br>
-    <?php if(($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending') 
-         || ($order['payment_method'] == 'Send Online Receipt' && $order['order_status'] == 'ToPickUp')): ?>
-    <button class="bi bi-check-circle btn btn-success complete-order" 
-            data-receipt-id="<?= $order['receipt_id'] ?>"
-            style="border-radius: 5px;">
-        COMPLETE
-    </button>
-<?php endif; ?>
-</td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
 
-          
-        </div>
-        <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
-    <ul class="pagination justify-content-center">
-        <?php if($total_pages > 1): ?>
-            <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                <a class="page-link" href="?page=<?= $page - 1 ?>" <?= ($page <= 1) ? 'tabindex="-1" aria-disabled="true"' : '' ?>>Previous</a>
-            </li>
-            
-            <?php
-            // Calculate range of pages to show
-            $start_page = max(1, min($page - 2, $total_pages - 4));
-            $end_page = min($total_pages, max(5, $page + 2));
-            
-            // Show first page if not in range
-            if($start_page > 1) {
-                echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
-                if($start_page > 2) {
-                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-                }
-            }
-            
-            // Show page numbers
-            for($i = $start_page; $i <= $end_page; $i++): ?>
-                <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
-                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-                </li>
-            <?php endfor;
-            
-            // Show last page if not in range
-            if($end_page < $total_pages) {
-                if($end_page < $total_pages - 1) {
-                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-                }
-                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">' . $total_pages . '</a></li>';
-            }
-            ?>
-            
-            <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                <a class="page-link" href="?page=<?= $page + 1 ?>" <?= ($page >= $total_pages) ? 'tabindex="-1" aria-disabled="true"' : '' ?>>Next</a>
-            </li>
-        <?php endif; ?>
-    </ul>
-</nav>
-      </main>
-    </div>
+          <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
+              <ul class="pagination justify-content-center custom-pagination">
+              <?php if($total_pages > 1): ?>
+                  <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                      <a class="page-link" href="?page=<?= $page - 1 ?>" <?= ($page <= 1) ? 'tabindex="-1" aria-disabled="true"' : '' ?>><span aria-hidden="true">&lt;</span></a>
+                  </li>
+                  
+                  <?php
+                  // Calculate range of pages to show
+                  $start_page = max(1, min($page - 2, $total_pages - 4));
+                  $end_page = min($total_pages, max(5, $page + 2));
+                  
+                  // Show first page if not in range
+                  if($start_page > 1) {
+                      echo '<li class="page-item"><a class="page-link" href="?page=1">1</a></li>';
+                      if($start_page > 2) {
+                          echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                      }
+                  }
+                  
+                  // Show page numbers
+                  for($i = $start_page; $i <= $end_page; $i++): ?>
+                      <li class="page-item <?= ($page == $i) ? 'active' : '' ?>">
+                          <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                      </li>
+                  <?php endfor;
+                  
+                  // Show last page if not in range
+                  if($end_page < $total_pages) {
+                      if($end_page < $total_pages - 1) {
+                          echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                      }
+                      echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">' . $total_pages . '</a></li>';
+                  }
+                  ?>
+                  
+                  <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                      <a class="page-link" href="?page=<?= $page + 1 ?>" <?= ($page >= $total_pages) ? 'tabindex="-1" aria-disabled="true"' : '' ?>><span aria-hidden="true">&gt;</span></a>
+                  </li>
+              <?php endif; ?>
+          </ul>
+      </nav>
+    </main>
   </div>
+</div>
 
 
 
@@ -669,9 +548,14 @@ $calendarEvents = getCalendarEvents();
               <tbody id="productDetails">
                 <!-- Product details will be dynamically populated -->
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4" class="text-end"><strong>Total Amount:</strong></td>
+                  <td id="modalTotalAmount">₱0.00</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
-
           <hr>
 
           <!-- Customer Info -->
@@ -705,7 +589,6 @@ $calendarEvents = getCalendarEvents();
                 <button type="button" class="btn btn-danger invalid-receipt">Invalid Receipt</button>
             </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -1022,15 +905,61 @@ function updateReceiptStatus(receiptId) {
     }
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Patch the view-details handler to update the total in the modal
+      document.querySelectorAll('.view-details').forEach(button => {
+        button.addEventListener('click', function() {
+          const products = JSON.parse(this.getAttribute('data-products'));
+          let total = 0;
+          products.forEach(product => {
+            total += parseFloat(product.subtotal);
+          });
+          document.getElementById('modalTotalAmount').textContent = '₱' + total.toFixed(2);
+        });
+      });
+    });
+  </script>
 
+  <script>
+//Multiple delete functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllProducts');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
 
+        // Select/Deselect all checkboxes
+        selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        toggleBulkDelete();
+        });
 
+        // If any checkbox is changed, update selectAll and bulk delete button
+        checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+            toggleBulkDelete();
+        });
+        });
 
+        function toggleBulkDelete() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
+        }
 
+        // Example: Bulk delete action (replace with your AJAX or form submit)
+        bulkDeleteBtn.addEventListener('click', function() {
+        const selectedIds = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+        if (selectedIds.length === 0) return;
+        if (confirm('Are you sure you want to delete the selected products?')) {
+            // TODO: Send selectedIds to server for deletion (AJAX or form)
+            alert('Selected IDs: ' + selectedIds.join(', '));
+        }
+        });
+    });
+</script>
 </body>
-
 </html>

@@ -156,7 +156,7 @@ $total_pages = ceil($total_records / $limit);
         <div class="row">
         <!-- Sidebar Toggle Button -->
         <!-- Top Navbar (visible only on small devices) -->
-            <nav class="navbar navbar-light bg-light d-lg-none">
+            <nav class="navbar navbar-light bg-light d-md-none">
                 <div class="container-fluid d-flex justify-content-between align-items-center">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -228,224 +228,226 @@ $total_pages = ceil($total_records / $limit);
                 <h2 class="mb-0">Product</h2>
             </div>
 
-        <!--Total Products, Add Products Button, and Modal-->
-        <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
-            <div>
-            <strong>Total Products: 100</strong>
-            </div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-            <!-- Bulk Delete Button (hidden by default) -->
-            <div id="bulkDeleteContainer" style="display:none;">
-                <button id="bulkDeleteBtn" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Delete Selected
+            <!--Total Products, Add Products Button, and Modal-->
+            <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                <div>
+                <strong>Total Products: 100</strong>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                <!-- Bulk Delete Button (hidden by default) -->
+                <div id="bulkDeleteContainer" style="display:none;">
+                    <button id="bulkDeleteBtn" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete Selected
+                    </button>
+                </div>
+                <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
+                <button type="button" class="admin-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    Add <i class="bi bi-plus-circle ms-1"></i>
                 </button>
-            </div>
-            <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
-            <button type="button" class="admin-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                Add <i class="bi bi-plus-circle ms-1"></i>
-            </button>
-            </div>
-        </div>
-
-        <!-- ADD NEW PRODUCTS FORM -->
-        <div class="modal fade" id="addProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h5  class="d-flex align-items-center">
-                    <img src="./images/add-product.png" alt="add user icon" style="margin-right: 5px; height:50px;">Add New Product
-                    </h5>                                    
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+            </div>
 
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <!-- Product Details Section -->
-                    <h5 class="title-text mb-3">Product Details</h5>
-                    <form action="" method="POST" enctype="multipart/form-data">
+        
 
-                    <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Type</label>
-                        <select class="form-select" name="type" id="productType" required>
-                        <option value="">Choose Type</option >
-                        <option value="1">Uniform</option>
-                        <option value="2">Supplies</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" name="product_name" placeholder="Enter product name" required>
-                    </div>
-                    
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">Delivery Receipt Number</label>
-                        <input type="text" class="form-control" name="dr_number" placeholder="Ex. DR1234567" required>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">Price</label>
-                        <input type="number" class="form-control" name="price" placeholder="Enter price" required>
+            <!-- ADD NEW PRODUCTS FORM -->
+            <div class="modal fade" id="addProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h5  class="d-flex align-items-center">
+                        <img src="./images/add-product.png" alt="add user icon" style="margin-right: 5px; height:50px;">Add New Product
+                        </h5>                                    
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <!-- Uniform Tags Badges Section -->
-                    <div class="col-12 mb-3 mt-2" id="uniformTagsSection" style="display:none;">
-                        <label class="form-label">Year-level Tags</label>
-                        <div class="d-flex flex-wrap gap-2">
-                            <?php
-                            $uniformTags = [
-                                ['id' => 'tagPreschool', 'value' => 'Pre-school', 'badge' => 'preschool_badge', 'label' => 'Pre-school', 'badgeId' => 'badgePreschool'],
-                                ['id' => 'tagKindergarten', 'value' => 'Kindergarten', 'badge' => 'kinder_badge', 'label' => 'Kindergarten', 'badgeId' => 'badgeKindergarten'],
-                                ['id' => 'tagElementary', 'value' => 'Elementary', 'badge' => 'elementary_badge', 'label' => 'Elementary', 'badgeId' => 'badgeElem'],
-                                ['id' => 'tagJuniorHigh', 'value' => 'Junior High School', 'badge' => 'jhs_badge', 'label' => 'Junior High School', 'badgeId' => 'badgeJHS'],
-                                ['id' => 'tagSeniorHigh', 'value' => 'Senior High School', 'badge' => 'shs_badge', 'label' => 'Senior High School', 'badgeId' => 'badgeSHS'],
-                                ['id' => 'tagTourism', 'value' => 'BS Tourism Management', 'badge' => 'bstm_badge', 'label' => 'BS Tourism Management', 'badgeId' => 'badgeTM'],
-                                ['id' => 'tagBSIS', 'value' => 'BS Information System', 'badge' => 'bsis_badge', 'label' => 'BS Information System', 'badgeId' => 'badgeBSIS'],
-                                ['id' => 'tagBHRM', 'value' => 'BS Hotel and Restaurant Management', 'badge' => 'bhrm_badge', 'label' => 'BS Hotel and Restaurant Management', 'badgeId' => 'badgeBHRM'],
-                                ['id' => 'tagSecondary', 'value' => 'BS Secondary Education', 'badge' => 'secondary_badge', 'label' => 'BS Secondary Education', 'badgeId' => 'badgeSecondary'],
-                                ['id' => 'tagEduc', 'value' => 'BS Elementary Education', 'badge' => 'educ_badge', 'label' => 'BS Elementary Education', 'badgeId' => 'badgeEduc'],
-                                ['id' => 'tagCrim', 'value' => 'Criminology', 'badge' => 'crim_badge', 'label' => 'Criminology', 'badgeId' => 'badgeCriminology'],
-                            ];
-                            foreach ($uniformTags as $tag) {
-                                ?>
-                                <div class="form-check">
-                                    <input class="form-check-input styled-checkbox uniform-tag-checkbox" type="checkbox" id="<?= $tag['id'] ?>" name="tags[]" value="<?= $tag['value'] ?>">
-                                    <label class="form-check-label" for="<?= $tag['id'] ?>">
-                                        <span class="badge <?= $tag['badge'] ?> me-2" id="<?= $tag['badgeId'] ?>"><?= $tag['label'] ?></span>
-                                    </label>
-                                </div>
-                                <?php
-                            }
-                            ?>
-                        </div>
-                    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <!-- Product Details Section -->
+                        <h5 class="title-text mb-3">Product Details</h5>
+                        <form action="" method="POST" enctype="multipart/form-data">
 
-                    <!-- Supplies Tags Badges Section (Only one can be selected) -->
-                    <div class="col-12 mb-3 mt-2" id="suppliesTagsSection" style="display:none;">
-                        <label class="form-label">School Supplies Tags</label>
-                        <div class="d-flex flex-wrap gap-2">
-                            <?php
-                            $suppliesTags = [
-                                ['id' => 'tagWriting', 'value' => 'Writing Tools', 'badge' => 'writing_badge', 'label' => 'Writing Tools', 'badgeId' => 'badgeWriting'],
-                                ['id' => 'tagPaper', 'value' => 'Paper Products', 'badge' => 'paper_badge', 'label' => 'Paper Products', 'badgeId' => 'badgePaper'],
-                                ['id' => 'tagArt', 'value' => 'Art Supplies', 'badge' => 'art_badge', 'label' => 'Art Supplies', 'badgeId' => 'badgeArt'],
-                            ];
-                            foreach ($suppliesTags as $tag) {
-                                ?>
-                                <div class="form-check">
-                                    <input class="form-check-input styled-checkbox supplies-tag-checkbox" type="checkbox" id="<?= $tag['id'] ?>" name="tags[]" value="<?= $tag['value'] ?>">
-                                    <label class="form-check-label" for="<?= $tag['id'] ?>">
-                                        <span class="badge <?= $tag['badge'] ?> me-2" id="<?= $tag['badgeId'] ?>"><?= $tag['label'] ?></span>
-                                    </label>
-                                </div>
-                                <?php
-                            }
-                            ?>
+                        <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="type" id="productType" required>
+                            <option value="">Choose Type</option >
+                            <option value="1">Uniform</option>
+                            <option value="2">Supplies</option>
+                            </select>
                         </div>
-                    </div>
-
-                    <!-- Sizes Selection -->
-                    <div class="col-12 mb-3 mt-2">
-                        <label class="form-label">Sizes</label>
-                        <div class="row" id="sizesContainer">
-                        <div class="col-md-4 mb-2">
-                            <div class="form-check">
-                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="XS" id="sizeXS">
-                            <label class="form-check-label" for="sizeXS">XS</label>
-                            </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" class="form-control" name="product_name" placeholder="Enter product name" required>
                         </div>
-                        <div class="col-md-4 mb-2">
-                            <div class="form-check">
-                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Small" id="sizeS">
-                            <label class="form-check-label" for="sizeS">Small</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <div class="form-check">
-                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Medium" id="sizeM">
-                            <label class="form-check-label" for="sizeM">Medium</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <div class="form-check">
-                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Large" id="sizeL">
-                            <label class="form-check-label" for="sizeL">Large</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <div class="form-check">
-                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="XL" id="sizeXL">
-                            <label class="form-check-label" for="sizeXL">XL</label>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <div class="form-check">
-                            <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="2XL" id="size2XL">
-                            <label class="form-check-label" for="size2XL">2XL</label>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-
-                    <!-- Gender Selection -->
-                    <div class="col-12 mb-3 mt-2">
-                        <label class="form-label">Gender</label>
-                        <div class="row" id="gendersContainer">
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Male" id="genderMale">
-                                <label class="form-check-label" for="genderMale">Male</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Female" id="genderFemale">
-                                <label class="form-check-label" for="genderFemale">Female</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check">
-                                <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Unisex" id="genderUnisex">
-                                <label class="form-check-label" for="genderUnisex">Unisex</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Stocks -->
-                    <div class="col-12 mt-2">
-                        <label class="form-label" id="stocksLabel">Stocks for each Sizes and Gender</label>
-                        <div class="row" id="stocksContainer">
-                        <!-- Stock inputs will be dynamically added here -->
-                        </div>
-                    </div>
-                </div>
-
-                    <div class="col-md-12 mt-2">
-                        <label class="form-label">Maximum Quantity to be Sold</label>
-                        <input type="number" class="form-control" name="max_quantity" placeholder="Ex. 5 pcs" required>
-                    </div>
-                <!-- Image Upload Section -->
-                <hr>
-                <h5 class="title-text mt-3 mb-3">Add Images</h5>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label class="form-label">Picture</label>
-                        <input type="file" class="form-control" name="product_image" required>
                         
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Delivery Receipt Number</label>
+                            <input type="text" class="form-control" name="dr_number" placeholder="Ex. DR1234567" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Price</label>
+                            <input type="number" class="form-control" name="price" placeholder="Enter price" required>
+                        </div>
+
+                        <!-- Uniform Tags Badges Section -->
+                        <div class="col-12 mb-3 mt-2" id="uniformTagsSection" style="display:none;">
+                            <label class="form-label">Year-level Tags</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <?php
+                                $uniformTags = [
+                                    ['id' => 'tagPreschool', 'value' => 'Pre-school', 'badge' => 'preschool_badge', 'label' => 'Pre-school', 'badgeId' => 'badgePreschool'],
+                                    ['id' => 'tagKindergarten', 'value' => 'Kindergarten', 'badge' => 'kinder_badge', 'label' => 'Kindergarten', 'badgeId' => 'badgeKindergarten'],
+                                    ['id' => 'tagElementary', 'value' => 'Elementary', 'badge' => 'elementary_badge', 'label' => 'Elementary', 'badgeId' => 'badgeElem'],
+                                    ['id' => 'tagJuniorHigh', 'value' => 'Junior High School', 'badge' => 'jhs_badge', 'label' => 'Junior High School', 'badgeId' => 'badgeJHS'],
+                                    ['id' => 'tagSeniorHigh', 'value' => 'Senior High School', 'badge' => 'shs_badge', 'label' => 'Senior High School', 'badgeId' => 'badgeSHS'],
+                                    ['id' => 'tagTourism', 'value' => 'BS Tourism Management', 'badge' => 'bstm_badge', 'label' => 'BS Tourism Management', 'badgeId' => 'badgeTM'],
+                                    ['id' => 'tagBSIS', 'value' => 'BS Information System', 'badge' => 'bsis_badge', 'label' => 'BS Information System', 'badgeId' => 'badgeBSIS'],
+                                    ['id' => 'tagBHRM', 'value' => 'BS Hotel and Restaurant Management', 'badge' => 'bhrm_badge', 'label' => 'BS Hotel and Restaurant Management', 'badgeId' => 'badgeBHRM'],
+                                    ['id' => 'tagSecondary', 'value' => 'BS Secondary Education', 'badge' => 'secondary_badge', 'label' => 'BS Secondary Education', 'badgeId' => 'badgeSecondary'],
+                                    ['id' => 'tagEduc', 'value' => 'BS Elementary Education', 'badge' => 'educ_badge', 'label' => 'BS Elementary Education', 'badgeId' => 'badgeEduc'],
+                                    ['id' => 'tagCrim', 'value' => 'Criminology', 'badge' => 'crim_badge', 'label' => 'Criminology', 'badgeId' => 'badgeCriminology'],
+                                ];
+                                foreach ($uniformTags as $tag) {
+                                    ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input styled-checkbox uniform-tag-checkbox" type="checkbox" id="<?= $tag['id'] ?>" name="tags[]" value="<?= $tag['value'] ?>">
+                                        <label class="form-check-label" for="<?= $tag['id'] ?>">
+                                            <span class="badge <?= $tag['badge'] ?> me-2" id="<?= $tag['badgeId'] ?>"><?= $tag['label'] ?></span>
+                                        </label>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                        </div>
+
+                        <!-- Supplies Tags Badges Section (Only one can be selected) -->
+                        <div class="col-12 mb-3 mt-2" id="suppliesTagsSection" style="display:none;">
+                            <label class="form-label">School Supplies Tags</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <?php
+                                $suppliesTags = [
+                                    ['id' => 'tagWriting', 'value' => 'Writing Tools', 'badge' => 'writing_badge', 'label' => 'Writing Tools', 'badgeId' => 'badgeWriting'],
+                                    ['id' => 'tagPaper', 'value' => 'Paper Products', 'badge' => 'paper_badge', 'label' => 'Paper Products', 'badgeId' => 'badgePaper'],
+                                    ['id' => 'tagArt', 'value' => 'Art Supplies', 'badge' => 'art_badge', 'label' => 'Art Supplies', 'badgeId' => 'badgeArt'],
+                                ];
+                                foreach ($suppliesTags as $tag) {
+                                    ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input styled-checkbox supplies-tag-checkbox" type="checkbox" id="<?= $tag['id'] ?>" name="tags[]" value="<?= $tag['value'] ?>">
+                                        <label class="form-check-label" for="<?= $tag['id'] ?>">
+                                            <span class="badge <?= $tag['badge'] ?> me-2" id="<?= $tag['badgeId'] ?>"><?= $tag['label'] ?></span>
+                                        </label>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                        </div>
+
+                        <!-- Sizes Selection -->
+                        <div class="col-12 mb-3 mt-2">
+                            <label class="form-label">Sizes</label>
+                            <div class="row" id="sizesContainer">
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="XS" id="sizeXS">
+                                <label class="form-check-label" for="sizeXS">XS</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Small" id="sizeS">
+                                <label class="form-check-label" for="sizeS">Small</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Medium" id="sizeM">
+                                <label class="form-check-label" for="sizeM">Medium</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="Large" id="sizeL">
+                                <label class="form-check-label" for="sizeL">Large</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="XL" id="sizeXL">
+                                <label class="form-check-label" for="sizeXL">XL</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                <input class="form-check-input styled-checkbox" type="checkbox" name="sizes[]" value="2XL" id="size2XL">
+                                <label class="form-check-label" for="size2XL">2XL</label>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- Gender Selection -->
+                        <div class="col-12 mb-3 mt-2">
+                            <label class="form-label">Gender</label>
+                            <div class="row" id="gendersContainer">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                    <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Male" id="genderMale">
+                                    <label class="form-check-label" for="genderMale">Male</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                    <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Female" id="genderFemale">
+                                    <label class="form-check-label" for="genderFemale">Female</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                    <input class="form-check-input styled-checkbox" type="checkbox" name="genders[]" value="Unisex" id="genderUnisex">
+                                    <label class="form-check-label" for="genderUnisex">Unisex</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stocks -->
+                        <div class="col-12 mt-2">
+                            <label class="form-label" id="stocksLabel">Stocks for each Sizes and Gender</label>
+                            <div class="row" id="stocksContainer">
+                            <!-- Stock inputs will be dynamically added here -->
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="col-md-12 mt-2">
+                            <label class="form-label">Maximum Quantity to be Sold</label>
+                            <input type="number" class="form-control" name="max_quantity" placeholder="Ex. 5 pcs" required>
+                        </div>
+                    <!-- Image Upload Section -->
+                    <hr>
+                    <h5 class="title-text mt-3 mb-3">Add Images</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label">Picture</label>
+                            <input type="file" class="form-control" name="product_image" required>
+                            
+                        </div>
                     </div>
                 </div>
-            </div>
 
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn custom-navy-btn">Add Product</button>
-                </div>
-            </form>
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn custom-navy-btn">Add Product</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
         <!-- PRODUCTS TABLE -->
         <div class="table-responsive">
@@ -460,7 +462,7 @@ $total_pages = ceil($total_records / $limit);
             <th>Product Details</th>
             <th>Price</th>
             <th>Stock</th>
-            <th class="align-middle text-start">
+            <th class="align-middle text-center">
                 <div class="dropdown">
                 <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="tagsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
                     Tags
@@ -473,8 +475,8 @@ $total_pages = ceil($total_records / $limit);
                 </ul>
                 </div>
             </th>
-            <th class="align-middle text-start">Restock History </th>
-            <th class="align-middle text-start">
+            <th class="align-middle text-center">Restock History </th>
+            <th class="align-middle text-center">
                 <div class="dropdown">
                 <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="stocksStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
                     Status
@@ -483,7 +485,6 @@ $total_pages = ceil($total_records / $limit);
                     <li><a class="dropdown-item" href="#">All</a></li>
                     <li><a class="dropdown-item" href="#">In Stock</a></li>
                     <li><a class="dropdown-item" href="#">Out of Stock</a></li>
-                    <!-- Add more tag options as needed -->
                 </ul>
                 </div>
             </th>
@@ -496,7 +497,7 @@ $total_pages = ceil($total_records / $limit);
             <?php $count = $offset + 1; while ($row = $result->fetch_assoc()): ?>
                 <tr>
                 <td>
-                <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
+                    <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
                 </td>
                 <td><?= $count++; ?></td>
                 <td>
@@ -520,14 +521,14 @@ $total_pages = ceil($total_records / $limit);
                 <td>
                 <!-- Status: In Stock/Out of Stock -->
                 <?php if ($row['total_stock'] > 0): ?>
-                <span class="badge green-badge">In Stock</span>
+                <span class="status active">In Stock</span>
                 <?php else: ?>
-                <span class="badge bg-danger">Out of Stock</span>
+                <span class="status inactive">Out of Stock</span>
                 <?php endif; ?>
                 </td>
                 <td>
                 <div class="dropdown">
-                    <button class="btn btn-light p-0 m-0" type="button" id="actionDropdown<?= $row['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-link p-0 m-0" type="button" id="actionDropdown<?= $row['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.5rem; color: #333;">
                     <i class="bi bi-three-dots-vertical fs-5"></i>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="actionDropdown<?= $row['id']; ?>">
@@ -548,7 +549,7 @@ $total_pages = ceil($total_records / $limit);
                         data-type="<?= $row['type']; ?>"
                         data-image="<?= htmlspecialchars($row['image']); ?>"
                         >
-                        <i class="bi bi-eye me-2"></i> View
+                        <i class="bi bi-file-text me-2"></i>View Details
                         </button>
                     </li>
                     <li>
