@@ -31,24 +31,19 @@ while ($row = $result->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket - Admin/Receipt Form</title>
-    <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <?php include 'links.php'; ?>
     <style>
          .bottom-label{
-            background-color: #00527F;
+            background-color: #26387D;
             color: white;
-            font-size: 20px;
-            font-weight: 500;
-            padding: 10px;
+            font-style: "Kulim Park", sans-serif;
+            padding: 0px;
         }
 
+        .bottom-label h2 {
+            color: white;
+            font-weight: 600;
+        }
         /* Match Bootstrap's form-control height and padding */
         .select2-container--default .select2-selection--single {
             height: 38px;
@@ -82,11 +77,11 @@ while ($row = $result->fetch_assoc()) {
 
         /* Style for the Select2 search box inside dropdown */
         .select2-container--default .select2-search--dropdown .select2-search__field {
-        padding-left: 30px;
-        background-image: url('../Images/search-icon.png'); /* Replace with your icon path */
-        background-repeat: no-repeat;
-        background-position: 8px 50%;
-        background-size: 14px 14px;
+            padding-left: 30px;
+            background-image: url('images/search-icon.png'); /* Make sure the path is correct */
+            background-repeat: no-repeat;
+            background-position: 8px 50%;
+            background-size: 14px 14px;
         }
 
     </style>
@@ -95,92 +90,91 @@ while ($row = $result->fetch_assoc()) {
 <body>
     <div class="container-fluid">
         <div class="row">
-             <!-- Sidebar Toggle Button -->
-      <!-- Top Navbar (visible only on small devices) -->
-          <nav class="navbar navbar-light bg-light d-lg-none">
-              <div class="container-fluid d-flex justify-content-between align-items-center">
-                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                      <span class="navbar-toggler-icon"></span>
-                  </button>
-                  <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-              </div>
-          </nav>
+            <!-- Top Navbar (visible only on small devices) -->
+            <nav class="navbar navbar-light bg-light d-md-none">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
+            </nav>
 
-      <!-- Sidebar -->
-          <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-              <div class="text-center py-3 d-none d-md-block">
-                  <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-              </div>
+            <div class="text-center py-3 d-none d-md-block">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            </div>
 
-              <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
-                  <li class="nav-item">
-                      <a href="index.php" class="nav-link">
-                          <i class="bi bi-house-door me-2"></i> Dashboard
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="orders.php" class="nav-link">
-                          <i class="bi bi-bag-check me-2"></i> Orders
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="prod.php" class="nav-link">
-                          <i class="bi bi-box-seam me-2"></i> Products
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="cus.php" class="nav-link">
-                          <i class="bi bi-people me-2"></i> Students
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="inquiries.php" class="nav-link">
-                          <i class="bi bi-chat-dots me-2"></i> Messages
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="ratings.php" class="nav-link">
-                          <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                      </a>
-                  </li>
-                  <li class="nav-item">
-                      <a href="accounting.php" class="nav-link active">
-                          <i class="bi bi-receipt me-2"></i> Receipt Form
-                      </a>
-                  </li>
-                  <li class="nav-item justify-content-end mt-lg-5">
-                      <a href="logout.php" class="nav-link text-danger fw-semibold">
-                          <i class="bi bi-box-arrow-right me-2"></i> Log Out
-                      </a>
-                  </li>
-              </ul>
-          </nav>
+            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                <li class="nav-item">
+                    <a href="index.php" class="nav-link">
+                        <i class="bi bi-house-door me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php" class="nav-link">
+                        <i class="bi bi-bag-check me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="prod.php" class="nav-link">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cus.php" class="nav-link">
+                        <i class="bi bi-people me-2"></i> Students
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="chat.php" class="nav-link">
+                        <i class="bi bi-chat-dots me-2"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ratings.php" class="nav-link">
+                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounting.php" class="nav-link active">
+                        <i class="bi bi-receipt me-2"></i> Receipt Form
+                    </a>
+                </li>
+                <!-- Logout for small screens (visible only on xs/sm) -->
+                <li class="nav-item d-block d-md-none">
+                    <a href="logout.php" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+            <!-- Logout at the bottom for md/lg screens -->
+            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                <ul class="nav flex-column px-2">
+                    <li class="nav-item">
+                        <a href="logout.php" class="nav-link text-danger fw-semibold">
+                            <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
             <!-- Content Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content">
-                <div class="d-flex justify-content-end mb-5">
-                    <div class="search-container">
-                        <input type="text" class="form-control" placeholder="">
-                        <button><img src="./images/search-icon.png" alt="Search"></button>
-                    </div>
-                </div>
-                <div class="mt-2 d-flex flex-row align-items-center mb-5">
-                    <img src="./images/Admin Nav/receipt-nav 1.png" alt="VMC Dashboard" class="img-fluid" style="max-width: 40px; margin-right: 10px;">
-                    <h2>Receipt Form</h2>
-                </div>
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
                 
                 <!-- Content -->
-                <div class="table-container p-5 overflow-hidden position-relative">
-                    <div class="bottom-label text-start p-4 position-absolute top-0 start-0 w-100" style="z-index:1; border-top-left-radius: 8px; border-top-right-radius: 8px;">
-                        <div class="fw-semibold">Receipt for Walk-in</div>
+                <div class="container p-5 overflow-hidden position-relative">
+                    <div class="bottom-label text-start p-3 position-absolute top-0 start-0 w-100">
+                        <h2>Receipt Form</h2>
+                        <p>Receipt for Walk-in Students</p>
                     </div>
-                    <div style="padding-top: 52px;"></div><!-- Add space for the label height -->
-                    <form></form> 
+                    <div style="margin-top: 100px;"></div><!-- Add space for the label height -->
                         <div class="row mb-3">
-
-                            <div class="col-md-6">
-                                <label for="customerName" class="form-label">Name</label>
+                            <div class="col-md-12">
+                                <label for="customerName" class="form-label">Customer Name</label>
                                 <input type="text" class="form-control" id="customerName" placeholder="Enter Name">
                             </div>
                         </div>
@@ -188,8 +182,8 @@ while ($row = $result->fetch_assoc()) {
                         <div id="product-group">
                             <div class="row mb-3 product-item align-items-end">
                                 <div class="col-md-4">
-                                    <label class="form-label">Product Name</label>
-                                    <select class="form-select product-select with-search-icon" name="product[]" data-price="">
+                                    <label for="productName" class="form-label">Product Name</label>
+                                    <select class="form-select product-select with-search-icon" name="product[]">
                                         <option value="" disabled selected>Select Product</option>
                                         <?php foreach ($products as $product): ?>
                                             <option value="<?= $product['id'] ?>" 
@@ -218,7 +212,7 @@ while ($row = $result->fetch_assoc()) {
                                         <label class="form-label">Price</label>
                                         <div class="input-group">
                                             <span class="input-group-text">₱</span>
-                                            <input type="number" class="form-control" name="price[]" min="0" step="0.01" placeholder="0.00">
+                                            <input type="number" class="form-control" name="price[]" min="0" step="0.01" placeholder="0.00" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -259,7 +253,7 @@ while ($row = $result->fetch_assoc()) {
                     </div>
 
                     <div class="text-end">
-                        <button type="button" class="btn btn-primary" id="submitBtn">Submit</button>
+                        <button type="button" class="admin-btn" id="submitBtn">Submit</button>
                     </div>
                 </form>
             </div>
@@ -269,38 +263,45 @@ while ($row = $result->fetch_assoc()) {
 
     <!-- Receipt Modal -->
     <div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content p-4">
-        <div class="modal-header border-bottom border-dark">
-            <h5 class="modal-title" id="receiptModalLabel">VMC Basket - Receipt Preview</h5>
-            <button type="button" class="btn-close" id="resetFormBtn" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="receiptContent">
-            <div class="text-center mb-4">
-            <img src="./images/Admin Nav/VMS-LOGO-Alternative-03.png" alt="VMC Logo" style="max-width: 100px;">
-            <h4 class="mt-2 LogoName">VMC Basket</h4>
-            <p class="mb-0">Official Receipt</p>
-            <p class="text-muted mb-0" id="currentDateTime"></p>
-            <hr>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content p-4">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="receiptModalLabel">VMC Basket - Receipt Preview</h5>
+                    <button type="button" class="btn-close" id="resetFormBtn" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            <div class="modal-body" id="receiptContent">
+                <div class="text-center mb-4">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" style="max-width: 100px;">
+                <h4 class="mt-2 LogoName mb-0">VMC Basket</h4>
+                <p class="mb-2">Official Receipt</p>
+                <p class="text-muted mb-0" id="currentDateTime"></p>
+                <hr>
             </div>
             <div id="receiptDetails">
             <!-- Receipt content will be injected here by JS -->
             </div>
+            <!-- QR Code Placeholder -->
+            <div id="qrCodePlaceholder" class="text-center my-3">
+                <!-- QR code will be rendered here -->
+                <div style="display:inline-block; width:120px; height:120px; background:#eee; border:2px dashed #bbb; border-radius:8px; line-height:120px; color:#bbb; font-size:18px; font-family:monospace;">
+                    QR Code
+                </div>
+            </div>
+            <div class="modal-footer justify-content-end">
+                <button type="button" class="btn custom-navy-btn btn-lg" id="downloadBtn" onclick="downloadReceipt()">Print</button>
+            </div>
+            </div>
         </div>
-        <div class="modal-footer justify-content-end">
-              <button type="button" class="btn btn-outline-primary btn-lg" id="downloadBtn" onclick="downloadReceipt()">Print</button>
-        </div>
-        </div>
-    </div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 
 <script>
-$(document).ready(function () {
+    
+    $(document).ready(function () {
     // Generate Receipt ID
     function generateReceiptId() {
         const date = new Date();
@@ -315,7 +316,7 @@ $(document).ready(function () {
         return `VMC-${year}${month}${day}-${hours}${minutes}${seconds}-${random}`;
     }
 
-    // Initialize Select2 with dynamic product loading
+    // Initialize Select2 with dynamic product loading and disable already selected products
     function initializeProductSelect(select) {
         $(select).select2({
             placeholder: "Select Product",
@@ -346,9 +347,37 @@ $(document).ready(function () {
                     sizeSelect.append(`<option value="${size}">${size}</option>`);
                 });
             }
-            
+
+            // Update all selects to disable already selected products
+            updateProductSelectOptions();
+
             // Update total
             calculateTotal();
+        });
+    }
+
+    // Disable already selected products in all selects
+    function updateProductSelectOptions() {
+        // Get all selected product IDs
+        const selectedIds = [];
+        $('.product-select').each(function() {
+            const val = $(this).val();
+            if (val) selectedIds.push(val);
+        });
+
+        $('.product-select').each(function() {
+            const currentVal = $(this).val();
+            $(this).find('option').each(function() {
+                const optionVal = $(this).attr('value');
+                // Don't disable the currently selected value in its own select
+                if (optionVal && selectedIds.includes(optionVal) && optionVal !== currentVal) {
+                    $(this).prop('disabled', true);
+                } else {
+                    $(this).prop('disabled', false);
+                }
+            });
+            // Refresh select2 to reflect disabled options
+            $(this).trigger('change.select2');
         });
     }
 
@@ -365,6 +394,7 @@ $(document).ready(function () {
 
     // Initialize first product select
     initializeProductSelect('.product-select');
+    updateProductSelectOptions();
 
     // Add item button handler
     $('#addItemBtn').on('click', function() {
@@ -415,7 +445,44 @@ $(document).ready(function () {
         `;
         
         $('#product-group').append(newItem);
-        initializeProductSelect($('#product-group .product-select').last());
+        const $newSelect = $('#product-group .product-select').last();
+        initializeProductSelect($newSelect);
+        updateProductSelectOptions();
+    });
+
+    // Removing an Item
+    $(document).on('click', '.remove-item', function () {
+        $(this).closest('.product-item').remove();
+        // After removing, update disabled options so the removed product becomes available again
+        updateProductSelectOptions();
+        calculateTotal();
+        // Hide remove buttons if only one item left
+        if ($('.product-item').length === 1) {
+            $('.remove-item').addClass('d-none');
+        }
+    });
+
+    // Show remove button if more than one product-item
+    $(document).on('DOMNodeInserted', '#product-group', function () {
+        if ($('.product-item').length > 1) {
+            $('.remove-item').removeClass('d-none');
+        }
+    });
+
+    // When a product is removed, update the options
+    $(document).on('click', '.remove-item', function () {
+        $(this).closest('.product-item').remove();
+        calculateTotal();
+        updateProductSelectOptions();
+        // Hide remove buttons if only one item left
+        if ($('.product-item').length === 1) {
+            $('.remove-item').addClass('d-none');
+        }
+    });
+
+    // Also update options if user clears a select2 selection
+    $(document).on('change', '.product-select', function() {
+        updateProductSelectOptions();
     });
 
     // Submit button handler
@@ -443,7 +510,7 @@ $(document).ready(function () {
         receiptHTML += `<p><strong>Receipt ID:</strong> ${receiptId}</p>`;
         receiptHTML += `<p><strong>Customer Name:</strong> ${customerName}</p>`;
         receiptHTML += `<hr>`;
-        receiptHTML += `<table class="table table-bordered">
+        receiptHTML += `<table class="table">
             <thead>
             <tr>
                 <th>Product</th>
@@ -512,6 +579,7 @@ $(document).ready(function () {
     $(document).on('change', 'input[name="price[]"], input[name="quantity[]"]', calculateTotal);
 });
 
+//Download Receipt as PDF
 async function downloadReceipt() {
     const receiptId = $('#receiptDetails').find('p:first').text().split(':')[1].trim();
     const customerName = $('#customerName').val().trim();

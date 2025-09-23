@@ -180,11 +180,8 @@ $total_pages = ceil($total_records / $limit);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -218,56 +215,67 @@ $total_pages = ceil($total_records / $limit);
                 </div>
             </nav>
 
-            <!-- Sidebar -->
+        <!-- Sidebar -->
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-                <div class="text-center py-3 d-none d-md-block">
-                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-                </div>
+            <div class="text-center py-3 d-none d-md-block">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            </div>
 
-                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                <li class="nav-item">
+                    <a href="index.php" class="nav-link">
+                        <i class="bi bi-house-door me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php" class="nav-link">
+                        <i class="bi bi-bag-check me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="prod.php" class="nav-link active">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cus.php" class="nav-link">
+                        <i class="bi bi-people me-2"></i> Students
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="chat.php" class="nav-link">
+                        <i class="bi bi-chat-dots me-2"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ratings.php" class="nav-link">
+                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounting.php" class="nav-link">
+                        <i class="bi bi-receipt me-2"></i> Receipt Form
+                    </a>
+                </li>
+                <!-- Logout for small screens (visible only on xs/sm) -->
+                <li class="nav-item d-block d-md-none">
+                    <a href="logout.php" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+            <!-- Logout at the bottom for md/lg screens -->
+            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                <ul class="nav flex-column px-2">
                     <li class="nav-item">
-                        <a href="index.php" class="nav-link">
-                            <i class="bi bi-house-door me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="orders.php" class="nav-link">
-                            <i class="bi bi-bag-check me-2"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="prod.php" class="nav-link active">
-                            <i class="bi bi-box-seam me-2"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="cus.php" class="nav-link">
-                            <i class="bi bi-people me-2"></i> Students
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="inquiries.php" class="nav-link">
-                            <i class="bi bi-chat-dots me-2"></i> Messages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="ratings.php" class="nav-link">
-                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="accounting.php" class="nav-link">
-                            <i class="bi bi-receipt me-2"></i> Receipt Form
-                        </a>
-                    </li>
-                    <li class="nav-item justify-content-end mt-lg-5">
                         <a href="logout.php" class="nav-link text-danger fw-semibold">
                             <i class="bi bi-box-arrow-right me-2"></i> Log Out
                         </a>
                     </li>
                 </ul>
-            </nav>
+            </div>
+        </nav>
 
             <!-- Title Page and Search -->
             <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
@@ -281,27 +289,26 @@ $total_pages = ceil($total_records / $limit);
                     <h2 class="mb-0">Product</h2>
                 </div>
 
-                <!--Total Products, Add Products Button, and Modal-->
-                <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
-                    <div>
-                        <strong>Total Products: 100</strong>
-                    </div>
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <!-- Bulk Delete Button (hidden by default) -->
-                        <div id="bulkDeleteContainer" style="display:none;">
-                            <button id="bulkDeleteBtn" class="btn btn-danger">
-                                <i class="bi bi-trash"></i> Delete Selected
-                            </button>
-                        </div>
-                        <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
-                        <button type="button" class="admin-btn" data-bs-toggle="modal"
-                            data-bs-target="#addProductModal">
-                            Add <i class="bi bi-plus-circle ms-1"></i>
-                        </button>
-                    </div>
+            <!--Total Products, Add Products Button, and Modal-->
+            <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                <div>
+                <strong>Total Products: 100</strong>
                 </div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                <!-- Bulk Delete Button (hidden by default) -->
+                <div id="bulkDeleteContainer" style="display:none;">
+                    <button id="bulkDeleteBtn" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete Selected
+                    </button>
+                </div>
+                <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
+                <button type="button" class="admin-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    Add <i class="bi bi-plus-circle ms-1"></i>
+                </button>
+                </div>
+            </div>
 
-
+        
 
                 <!-- ADD NEW PRODUCTS FORM -->
                 <div class="modal fade" id="addProductModal" data-bs-backdrop="static" data-bs-keyboard="false"
@@ -530,172 +537,162 @@ $total_pages = ceil($total_records / $limit);
                     </div>
                 </div>
 
-                <!-- PRODUCTS TABLE -->
-                <div class="table-responsive">
-                    <table class="table table-container">
-                        <thead class="thead">
-                            <tr>
-                                <th>
-                                    <input type="checkbox" id="selectAllProducts" title="Select All"
-                                        class="custom-checkbox">
-                                </th>
-                                <th>#</th>
-                                <th>Image</th>
-                                <th>Product Details</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th class="align-middle text-center">
-                                    <div class="dropdown">
-                                        <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle"
-                                            type="button" id="tagsDropdown" data-bs-toggle="dropdown"
-                                            aria-expanded="false" style="text-decoration:none;">
-                                            Types
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
-                                            <li><a class="dropdown-item" href="#">All</a></li>
-                                            <li><a class="dropdown-item" href="#">Uniform</a></li>
-                                            <li><a class="dropdown-item" href="#">Supplies</a></li>
-                                            <!-- Add more tag options as needed -->
-                                        </ul>
-                                    </div>
-                                </th>
-                                <th class="align-middle text-center">Restock History </th>
-                                <th class="align-middle text-center">
-                                    <div class="dropdown">
-                                        <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle"
-                                            type="button" id="stocksStatusDropdown" data-bs-toggle="dropdown"
-                                            aria-expanded="false" style="text-decoration:none;">
-                                            Status
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
-                                            <li><a class="dropdown-item" href="#">All</a></li>
-                                            <li><a class="dropdown-item" href="#">In Stock</a></li>
-                                            <li><a class="dropdown-item" href="#">Out of Stock</a></li>
-                                        </ul>
-                                    </div>
-                                </th>
-                                <th class="align-middle text-start">Action</th>
-                            </tr>
-                        </thead>
-                        <!--table-body-->
-                        <tbody class="image-table-body text-center">
-                            <?php if ($result->num_rows > 0): ?>
-                                <?php $count = $offset + 1;
-                                while ($row = $result->fetch_assoc()): ?>
-                                    <tr>
-                                        <td>
-                                            <input type="checkbox" class="custom-checkbox product-checkbox"
-                                                value="<?= $row['id']; ?>">
-                                        </td>
-                                        <td><?= $count++; ?></td>
-                                        <td>
-                                            <img src="<?= $row['image'] ?: 'default.png'; ?>" class="product-img"
-                                                alt="Product Image" name="product_image">
-                                        </td>
-                                        <td>
-                                            <strong><?= $row['product_name']; ?></strong><br>
-                                            <small>D.R. No: <?= $row['dr_number']; ?></small>
-                                        </td>
-                                        <td>₱<?= number_format($row['price'], 2); ?></td>
-
-                                        <td>
-                                            <?php if (!empty($row['size_variants'])): ?>
-                                                <?= $row['size_variants']; ?><br>
-                                                <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
-                                            <?php else: ?>
-                                                <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
-                                            <?php endif; ?>
-                                        </td>
-
-
-                                        <td>
-                                            <?php if ($row['type_name'] === 'Uniform'): ?>
-                                                <span class="badge bg-primary"><?= htmlspecialchars($row['type_name']); ?></span>
-                                            <?php else: ?>
-                                                <span class="badge bg-success"><?= htmlspecialchars($row['type_name']); ?></span>
-                                            <?php endif; ?>
-                                        </td>
-
-                                        <td>restock by<br><?= $row['date_modified']; ?></td>
-                                        <td>
-                                            <!-- Status: In Stock/Out of Stock -->
-                                            <?php if ($row['total_stock'] > 0): ?>
-                                                <span class="status active">In Stock</span>
-                                            <?php else: ?>
-                                                <span class="status inactive">Out of Stock</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-link p-0 m-0" type="button"
-                                                    id="actionDropdown<?= $row['id']; ?>" data-bs-toggle="dropdown"
-                                                    aria-expanded="false" style="font-size: 1.5rem; color: #333;">
-                                                    <i class="bi bi-three-dots-vertical fs-5"></i>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="actionDropdown<?= $row['id']; ?>">
-                                                    <li>
-                                                        <!--View Button -->
-                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
-                                                            data-bs-target="#productDetailsModal" data-id="<?= $row['id']; ?>"
-                                                            data-variant_id="<?= $row['variant_id']; ?>"
-                                                            data-product_name="<?= htmlspecialchars($row['product_name']); ?>"
-                                                            data-drnumber="<?= htmlspecialchars($row['dr_number']); ?>"
-                                                            data-price="<?= $row['price']; ?>"
-                                                            data-total_stock="<?= $row['total_stock']; ?>"
-                                                            data-variants="<?= htmlspecialchars($row['size_variants']); ?>"
-                                                            data-type="<?= $row['type']; ?>"
-                                                            data-image="<?= htmlspecialchars($row['image']); ?>">
-                                                            <i class="bi bi-file-text me-2"></i>View Details
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <!--Restock Button -->
-                                                        <button type="button" class="dropdown-item" data-bs-toggle="modal"
-                                                            data-bs-target="#addStocksModal">
-                                                            <i class="bi bi-plus-lg me-2"></i> Restock
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <!--Delete Button -->
-                                                        <button type="button" class="dropdown-item text-danger"
-                                                            id="deleteProductBtn<?= $row['id']; ?>">
-                                                            <i class="bi bi-trash me-2"></i> Delete
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="10">No products found.</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+        <!-- PRODUCTS TABLE -->
+        <div class="table-responsive">
+            <table class="table table-container">
+            <thead class="thead">
+            <tr>
+            <th>
+                <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
+            </th>
+            <th>#</th>
+            <th>Image</th>
+            <th>Product Details</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th class="align-middle text-center">
+                <div class="dropdown">
+                <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="tagsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                    Tags
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
+                    <li><a class="dropdown-item" href="#">All</a></li>
+                    <li><a class="dropdown-item" href="#">Uniform</a></li>
+                    <li><a class="dropdown-item" href="#">Supplies</a></li>
+                    <!-- Add more tag options as needed -->
+                </ul>
                 </div>
-                <!-- Pagination -->
-                <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
-                    <ul class="pagination justify-content-center custom-pagination">
-                        <li class="page-item <?= ($page == 1) ? 'disabled' : ''; ?>">
-                            <a class="page-link" href="?page=<?= max(1, $page - 1); ?>"><span
-                                    aria-hidden="true">&lt;</span></a>
-                        </li>
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                            <li class="page-item <?= ($page == $i) ? 'active' : ''; ?>">
-                                <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
-                            </li>
-                        <?php endfor; ?>
-                        <li class="page-item <?= ($page == $total_pages) ? 'disabled' : ''; ?>">
-                            <a class="page-link" href="?page=<?= min($total_pages, $page + 1); ?>"><span
-                                    aria-hidden="true">&gt;</span></a>
-                        </li>
+            </th>
+            <th class="align-middle text-center">Restock History </th>
+            <th class="align-middle text-center">
+                <div class="dropdown">
+                <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="stocksStatusDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
+                    Status
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
+                    <li><a class="dropdown-item" href="#">All</a></li>
+                    <li><a class="dropdown-item" href="#">In Stock</a></li>
+                    <li><a class="dropdown-item" href="#">Out of Stock</a></li>
+                </ul>
+                </div>
+            </th>
+            <th class="align-middle text-start">Action</th>
+            </tr>
+            </thead>
+            <!--table-body-->
+            <tbody class="image-table-body text-center">
+            <?php if ($result->num_rows > 0): ?>
+            <?php $count = $offset + 1; while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                <td>
+                    <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
+                </td>
+                <td><?= $count++; ?></td>
+                <td>
+                <img src="<?= $row['image'] ?: 'default.png'; ?>" class="product-img" alt="Product Image" name="product_image">
+                </td>
+                <td>
+                <strong><?= $row['product_name']; ?></strong><br>
+                <small>D.R. No: <?= $row['dr_number']; ?></small>
+                </td>
+                <td>₱<?= number_format($row['price'], 2); ?></td>
+                <td>
+                <?php if (!empty($row['size_variants'])): ?>
+                    <?= $row['size_variants']; ?><br>
+                    <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
+                <?php else: ?>
+                    <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
+                <?php endif; ?>
+                </td>
+                <td>tags</td>
+                <td><?= $row['type_name']; ?><br><?= $row['date_modified']; ?></td>
+                <td>
+                <!-- Status: In Stock/Out of Stock -->
+                <?php if ($row['total_stock'] > 0): ?>
+                <span class="status active">In Stock</span>
+                <?php else: ?>
+                <span class="status inactive">Out of Stock</span>
+                <?php endif; ?>
+                </td>
+                <td>
+                <div class="dropdown">
+                    <button class="btn btn-link p-0 m-0" type="button" id="actionDropdown<?= $row['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.5rem; color: #333;">
+                    <i class="bi bi-three-dots-vertical fs-5"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="actionDropdown<?= $row['id']; ?>">
+                    <li>
+                    <!--View Button -->
+                        <button 
+                        type="button" 
+                        class="dropdown-item"
+                        data-bs-toggle="modal"
+                        data-bs-target="#productDetailsModal"
+                        data-id="<?= $row['id']; ?>"
+                        data-variant_id="<?= $row['variant_id']; ?>"
+                        data-product_name="<?= htmlspecialchars($row['product_name']); ?>"
+                        data-drnumber="<?= htmlspecialchars($row['dr_number']); ?>"
+                        data-price="<?= $row['price']; ?>"
+                        data-total_stock="<?= $row['total_stock']; ?>"
+                        data-variants="<?= htmlspecialchars($row['size_variants']); ?>"
+                        data-type="<?= $row['type']; ?>"
+                        data-image="<?= htmlspecialchars($row['image']); ?>"
+                        >
+                        <i class="bi bi-file-text me-2"></i>View Details
+                        </button>
+                    </li>
+                    <li>
+                    <!--Restock Button -->
+                        <button 
+                        type="button" 
+                        class="dropdown-item"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#addStocksModal"
+                        >
+                        <i class="bi bi-plus-lg me-2"></i> Restock
+                        </button>
+                    </li>
+                    <li>
+                        <!--Delete Button -->
+                        <button 
+                        type="button" 
+                        class="dropdown-item text-danger"
+                        id="deleteProductBtn<?= $row['id']; ?>"
+                        >
+                        <i class="bi bi-trash me-2"></i> Delete
+                        </button>
+                    </li>
                     </ul>
-                </nav>
-            </main>
+                </div>
+                </td>
+                </tr>
+            <?php endwhile; ?>
+            <?php else: ?>
+            <tr>
+                <td colspan="10">No products found.</td>
+            </tr>
+            <?php endif; ?>
+            </tbody>
+            </table>
         </div>
+        <!-- Pagination -->
+            <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
+                <ul class="pagination justify-content-center custom-pagination">
+                    <li class="page-item <?= ($page == 1) ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?= max(1, $page - 1); ?>"><span aria-hidden="true">&lt;</span></a>
+                    </li>
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= ($page == $i) ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?= $i; ?>"><?= $i; ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <li class="page-item <?= ($page == $total_pages) ? 'disabled' : ''; ?>">
+                        <a class="page-link" href="?page=<?= min($total_pages, $page + 1); ?>"><span aria-hidden="true">&gt;</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </main>
     </div>
+</div>
 
     <!-- PRODUCT DETAILS MODAL-->
     <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel"

@@ -52,14 +52,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket-Home</title>
-    <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <?php include 'links.php'; ?>
     <style>
         .highlight-yellow {
             background-color: #fff4bf;
@@ -135,6 +128,10 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
           transform: translateY(0);
         }
 
+        .margin-top{
+            margin-top: 85px;
+        }
+
         /* Responsive styles */
         @media (max-width: 991.98px) {
         /* Tablet: 3 columns for product cards */
@@ -204,6 +201,16 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         }
         }
         @media (max-width: 575.98px) {
+
+        .margin{
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding: 20px 50px 50px 20px;
+        }
+        .fade-section{
+            opacity: 1;
+            transform: translateY(0);
+        }
         /* Extra small: 1 column for product cards */
         .col-md-4,
         .col-lg-3 {
@@ -253,12 +260,10 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         footer {
             font-size: 1rem;
         }
-        }
-
+    }
     </style>
 </head>
 <body>
-
     <!-- Navbar -->
     <nav class="navbar navbar-custom shadow-sm fixed-top">
         <div class="container-fluid d-flex align-items-center">
@@ -340,7 +345,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
     </div>
 
     <!-- HERO SECTION / CAROUSEL -->
-    <div id="heroCarousel" class="carousel slide fade-section" data-bs-ride="carousel" style="margin-top: 85px;">
+    <div id="heroCarousel" class="carousel slide fade-section margin-top" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
@@ -369,8 +374,8 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
 
     <!-- SHOP BY YEAR-LEVEL -->
-    <div class="container text-start p-5 fade-section">
-        <h2 class="mt-4 mb-5">
+    <div class="container text-start p-md-5 margin fade-section">
+        <h2 class="mb-5">
             <span class="highlight-pink">Shop By Year-level</span>
         </h2>
         <div class="year-level row g-4 justify-content-center">
@@ -392,7 +397,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
     </div>
 
     <!-- FEATURED PRODUCTS -->
-    <div class="container p-5 fade-section">
+    <div class="container p-md-5 fade-section margin">
         <h2 class="mb-5 text-center">
             <span class="highlight-blue">Featured Products</span>
         </h2>
@@ -492,7 +497,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
     
     <!-- FAQ SECTION -->
-    <div class="py-4 fade-section">
+    <div class="py-md-4 fade-section">
         <div class="container p-5">
             <h2 class="mb-5 text-end">
                 <span class="highlight-yellow">Frequently Asked Questions</span>
@@ -706,6 +711,13 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
             </div>
         </div>
     </div>
+
+    <!-- Footer and chat -->
+    <?php include 'footer.php'; ?>
+    <?php include 'chat.php'; ?>
+
+
+    <!-- Animation Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var more = document.getElementById('faqMore');
@@ -728,92 +740,22 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         });
     </script>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container p-5">
-
-            <!-- Logo Row -->
-            <div class="row justify-content-start mb-4">
-            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
-                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
-                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
-            </div>
-            </div>
-
-            <!-- Links & Contacts Row -->
-            <div class="row text-start gy-3">
-
-            <!-- Quick Links -->
-            <div class="col-md-3">
-                <h5 class="fw-bold">Quick Links</h5>
-                <ul class="list-unstyled">
-                <li><a href="#" class="footer-link">Home</a></li>
-                <li><a href="#" class="footer-link">Shop</a></li>
-                </ul>
-            </div>
-
-            <!-- Contacts -->
-            <div class="col-md-7">
-                <h5 class="fw-bold">Contacts</h5>
-                <p class="mb-1">
-                <i class="bi bi-geo-alt-fill"></i>
-                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
-                </p>
-                <p class="mb-1">
-                <i class="bi bi-telephone-fill"></i>
-                +63 2 8929 0856
-                </p>
-                
-                <div class="d-flex gap-3">
-                    <p class="mb-1 fw-medium">Socials Media</p>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
-                </div>
-            </div>
-
-            <!-- Back to top -->
-            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
-                <a href="#" class="footer-link">↑ Back to top</a>
-            </div>
-            </div>
-
-            <!-- Divider -->
-            <hr class="mt-5 mb-3">
-
-            <!-- Copyright -->
-            <div class="sub-footer text-center small">
-            © 2024 Villager’s Montessori College. All rights served.
-            </div>
-        </div>
-    </footer>
-
-
     <!-- Animation Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-        const sections = document.querySelectorAll(".fade-section");
-        const footer = document.querySelector("footer");
+            const sections = document.querySelectorAll(".fade-section");
 
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-            // Stop animation if it's the footer
-            if (entry.target === footer) {
-                observer.unobserve(entry.target);
-                return;
-            }
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    // Add visible class when in viewport
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target); // run once per section
+                    }
+                });
+            }, { threshold: 0.2 });
 
-            // Add visible class when in viewport
-            if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-                observer.unobserve(entry.target); // run once per section
-            }
-            });
-        }, { threshold: 0.2 });
-
-        sections.forEach(section => observer.observe(section));
-        observer.observe(footer); 
+            sections.forEach(section => observer.observe(section));
         });
     </script>
 
@@ -839,7 +781,6 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
             }
         });
     </script>
-
 
 </body>
 </html>

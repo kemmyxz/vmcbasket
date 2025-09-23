@@ -55,14 +55,7 @@ $products = getProducts();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VMC Basket- Order Details</title>
-  <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <?php include 'links.php'; ?>
 
   <style>
     .header-order {
@@ -187,7 +180,7 @@ $products = getProducts();
     .payment-icon{
       height: 50px; 
       width: 50px; 
-      border-radius: 50%;
+      border-radius: 100%;
     }
     .radio-bordered {
       border: 1px solid black !important;
@@ -254,33 +247,35 @@ $products = getProducts();
       .highlight-blue {
           font-size: 1.2rem;
       }
-      .summary-table th,
+      .summary-table th {
+        font-size: 0.7rem;
+      }
       .summary-table td {
+          font-size: 0.6rem;
+      }
+
+      .section, .table-section{
         font-size: 0.65rem;
-    }
+      }
+      .payment-method{
+        display: none;
+        margin-right: 10px;
+      }
 
-    .section, .table-section{
-      font-size: 0.65rem;
-    }
-    .payment-method{
-      display: none;
-      margin-right: 10px;
-    }
+      .payment-icon{
+        width:35px;
+        height:35px;
+      }
 
-    .payment-icon{
-      width:35px;
-      height:35px;
-    }
+      .qr-img {
+        max-width: 300px;
+        max-height: 300px;
+      }
 
-    .qr-img {
-      max-width: 300px;
-      max-height: 300px;
-    }
-
-    .btn-outline-secondary{
-      font-size: 0.8rem;
-      padding: 0.25rem 0.5rem;
-    }
+      .btn-outline-secondary{
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+      }
         
     }
   </style>
@@ -351,7 +346,9 @@ $products = getProducts();
                         alt="Product" />
                       <div>
                         <strong><?php echo htmlspecialchars($product['product_name']); ?></strong><br />
-                        Size: <?php echo htmlspecialchars($product['size']); ?>
+                        <?php if (!empty($order['size']) && $order['size'] !== 'N/A'): ?>
+                            Size: <?php echo htmlspecialchars($order['size']); ?>
+                        <?php endif; ?>
                       </div>
                     </div>
                   </td>
@@ -455,8 +452,8 @@ $products = getProducts();
 
       <hr class="order-line">
       <div class="d-flex justify-content-end mt-2">
-        <button class="btn btn-outline-danger me-2 btn-cancel btn-lg" onclick="window.history.back();">Cancel</button>
-        <a href="order_complete.php"><button class="custom-navy-btn btn-lg" type="submit">Proceed to Order</button></a>
+        <button class="btn btn-outline-danger me-2 btn-cancel " onclick="window.history.back();">Cancel</button>
+        <a href="order_complete.php"><button class="custom-navy-btn " type="submit">Proceed to Order</button></a>
     </div>
   </div>
 

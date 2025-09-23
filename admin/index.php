@@ -103,15 +103,7 @@ $chartData = getBestSellers();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket - Admin/Dashboard</title>
-    <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <?php include 'links.php'; ?>
 
     <style>
          /* Calendar Header */
@@ -163,7 +155,7 @@ $chartData = getBestSellers();
 
         /* Style the day headers (Mon, Tue, Wed, etc.) */
         .fc-col-header-cell {
-            background-color: #00527F; 
+            background-color: #26387D; 
             font-weight: bold;
             font-size: 1rem;
             color: white; 
@@ -187,147 +179,121 @@ $chartData = getBestSellers();
             color: #000; 
         }
 
-        #calendarModal .btn {
-            background-color: #0d6efd; /* Bootstrap primary blue */
-            color: white;
-            border-radius: 10px;
-            font-weight: 600;
-            padding: 8px 16px;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-
-        #calendarModal .btn:hover {
-            background-color: #0b5ed7; /* Darker blue on hover */
-        }
-
-        /* Specific style for 'View This Month' button if you want */
         #viewMonthButton {
-            background-color: #198754; 
+            background-color: #26387D; 
         }
 
-        /* DASHBOARD STYLES */
+       /* Dashboard Card Base */
         .dashboard-card {
-            box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease;
-            background-image: url('./images/active-students.png');
+            border-radius: 15px;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
         }
-
         .dashboard-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.12);
         }
 
-        .card-dark {
-            background-color: #00527F;
-            color: white;
+        /* Gradient Backgrounds */
+        .gradient-dark { background: linear-gradient(286deg, #26387D 1.72%, #4566E3 98.69%);}
+        .gradient-green { background: linear-gradient(104deg, rgba(7, 148, 0, 0.50) 5.15%, rgba(2, 46, 0, 0.50) 102.95%); color: #033900; }
+        .gradient-warning { background: linear-gradient(105deg, rgba(246, 201, 14, 0.50) 3.37%, rgba(225, 168, 0, 0.50) 97.92%); color: #666600; }
+        .gradient-danger { background: linear-gradient(104deg, rgba(255, 77, 77, 0.50) 3.59%, rgba(225, 29, 72, 0.50) 97.4%); color: #B50B00; }
+        .gradient-info { background: linear-gradient(135deg, #56ccf2, #2f80ed); color: #fff; }
+        .gradient-yellow { background: linear-gradient(135deg, #f9f871, #f6c90e); }
+
+        /* Stats */
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-number2 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        .unit-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
-        .card-light {
-            background-color: #f8f9fa;
-            color: #333;
-            border: 1px solid #dee2e6;
+        /* Metric Center Style */
+        .stat-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #fff;
+        }
+        .dashboard-metric {
+            font-size: 2.5rem;
+            font-weight: 700;
         }
 
+        /* Labels & Titles */
+        .dashboard-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #26387d;
+        }
+
+        /* Floating Icon */
         .icon-float {
             position: absolute;
             top: 12px;
             right: 12px;
+            font-size: 20px;
             color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            text-decoration: none;
+            opacity: 0.9;
+        }
+        .icon-float:hover {
+            opacity: 1;
+        }
+        .low-stock-card {
+        border-radius: 15px;
+        overflow: hidden;
         }
 
-        .stat-number {
-            font-size: 64px;
-            font-weight: 700;
-            position: absolute;
-            bottom: 12px;
-            left: 16px;
+        .low-stock-card .card-header {
+        font-size: 1rem;
+        padding: 12px;
         }
 
-        .stat-number2 {
-            font-size: 48px;
-            font-weight: 700;
-            position: absolute;
-            bottom: 0px;
-            left: 16px;
+        .low-stock-card .list-group-item {
+        border: none;
+        border-bottom: 1px solid #f1f1f1;
+        padding: 8px 10px;
+        font-size: 0.95rem;
         }
 
-        .unit-label {
-            font-size: 1rem;
-            font-weight: 400;
-            opacity: 0.85;
+        .low-stock-card .list-group-item:last-child {
+        border-bottom: none;
         }
 
-        .card-highlight {
-            background-color: #f0f2ff;
-            color: #3c4fe0;
+        .low-stock-card img {
+        border-radius: 5px;
         }
 
-        .dashboard-metric {
-            font-size: 48px;
-            font-weight: bold;
+        .low-stock-card .card-footer {
+        font-size: 0.9rem;
+        }
+        .low-stock-card .card-footer a:hover {
+        text-decoration: underline;
+        }
+        .student-messages{
+            background-color: #26387d;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
         }
 
-        /* Title text inside card */
-        .dashboard-label {
-            font-size: 20px;
-        }
-
-        .bottom-label{
-            background-color: #00527F;
-            color: white;
-            font-size: 20px;
-            font-weight: 500;
-            padding: 10px;
-        }
-
-        /* Chart container */
-        .chart-title {
-            color: #00527F;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        /* Bottom grid styling */
-        .stocks-card{
-            background-color: #E8261A;
-            background-image: url('./images/active-students.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .students-card{
-            background-color: #00527F;
-            background-image: url('./images/active-students.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .message-card{
-            background-color: #A9CEEA;
-            background-image: url('./images/active-students.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .ratings-card{
-            background-color: #FBF4BC;
-            background-image: url('./images/active-students.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-
-        .sidebar a:hover img.receipt-icon {
-            content: url('../Images/receipt-nav-clicked.png');
-        }
 
         @media (max-width: 576px) {
             .stat-number {
@@ -336,6 +302,9 @@ $chartData = getBestSellers();
             }
              .dashboard-label {
                 font-size: 15px;
+             }
+             .chart-container{
+                height: 200px;
              }
 
         }
@@ -358,7 +327,7 @@ $chartData = getBestSellers();
         <div class="row">
         <!-- Sidebar Toggle Button -->
         <!-- Top Navbar (visible only on small devices) -->
-            <nav class="navbar navbar-light bg-light d-lg-none">
+            <nav class="navbar navbar-light bg-light d-md-none">
                 <div class="container-fluid d-flex justify-content-between align-items-center">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -368,72 +337,81 @@ $chartData = getBestSellers();
             </nav>
 
         <!-- Sidebar -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-                <div class="text-center py-3 d-none d-md-block">
-                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-                </div>
+            <div class="text-center py-3 d-none d-md-block">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            </div>
 
-                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                <li class="nav-item">
+                    <a href="index.php" class="nav-link active">
+                        <i class="bi bi-house-door me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php" class="nav-link">
+                        <i class="bi bi-bag-check me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="prod.php" class="nav-link">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cus.php" class="nav-link">
+                        <i class="bi bi-people me-2"></i> Students
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="chat.php" class="nav-link">
+                        <i class="bi bi-chat-dots me-2"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ratings.php" class="nav-link">
+                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounting.php" class="nav-link">
+                        <i class="bi bi-receipt me-2"></i> Receipt Form
+                    </a>
+                </li>
+                <!-- Logout for small screens (visible only on xs/sm) -->
+                <li class="nav-item d-block d-md-none">
+                    <a href="logout.php" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+            <!-- Logout at the bottom for md/lg screens -->
+            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                <ul class="nav flex-column px-2">
                     <li class="nav-item">
-                        <a href="index.php" class="nav-link active">
-                            <i class="bi bi-house-door me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="orders.php" class="nav-link">
-                            <i class="bi bi-bag-check me-2"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="prod.php" class="nav-link">
-                            <i class="bi bi-box-seam me-2"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="cus.php" class="nav-link">
-                            <i class="bi bi-people me-2"></i> Students
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="inquiries.php" class="nav-link">
-                            <i class="bi bi-chat-dots me-2"></i> Messages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="ratings.php" class="nav-link">
-                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="accounting.php" class="nav-link">
-                            <i class="bi bi-receipt me-2"></i> Receipt Form
-                        </a>
-                    </li>
-                    <li class="nav-item justify-content-end mt-lg-5">
                         <a href="logout.php" class="nav-link text-danger fw-semibold">
                             <i class="bi bi-box-arrow-right me-2"></i> Log Out
                         </a>
                     </li>
                 </ul>
-            </nav>
-            
+            </div>
+        </nav>
             <!-- Content Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
-                        <input type="text" class="form-control" placeholder="">
-                        <button><img src="./images/search-icon.png" alt="Search"></button>
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <button><i class="bi bi-search"></i></button>
                     </div>
                 </div>
-                <div class="mt-2 d-flex flex-row align-items-center">
-                    <img src="./images/Admin Nav/dashboard.png" alt="VMC Dashboard" class="img-fluid" style="max-width: 40px; margin-right: 10px;">
-                    <h2 class="mb-0">Dashboard</h2>
+                <div class="mt-2 mb-4">
+                    <h2>Dashboard</h2>
                 </div>
 
                 <!-- Calendar Button -->
                 <div class="d-flex justify-content-end mb-3"> 
-                    <button id="calendarButton" type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#calendarModal">
+                    <button id="calendarButton" type="button" class="admin-btn d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#calendarModal">
                     </button>
                 </div>
                 
@@ -455,159 +433,142 @@ $chartData = getBestSellers();
                         </div>
                     </div>
                 
-                <!--dashboard content-->
-                 <div class="row g-3">
-                    <!-- Top Row: 4 Stats + Chart -->
+                <!-- Dashboard Content -->
+                <div class="row g-3">
+                    <!-- Top Row: Stats -->
                     <div class="col-md-7">
-                    <div class="row g-3 h-100">
-                        <!-- Total Orders -->
-                        <div class="col-12 col-md-6">
-                            <div class="dashboard-card rounded shadow-sm card-stat card-dark text-white p-3 rounded position-relative h-100 mb-3 mb-md-0 ">
-                                <!-- Top Text -->
-                                <div class="mb-5">
-                                    <h6 class="fw-semibold dashboard-label">Total Orders for<br>this month</h6>
-                                </div>
-
-                                <!-- Floating Icon -->
-                                <a href="orders.php" class="icon-float">
-                                    <i class="bi bi-box-arrow-up-right"></i>
-                                </a>
-
-                                <!-- Bottom Number -->
-                                <div class="stat-number">
-                                    <?php echo $dashboardStats['total_orders']; ?> <span class="unit-label">orders</span>
+                        <div class="row g-3 h-100">
+                            <!-- Total Orders -->
+                            <div class="col-12 col-md-6">
+                                <div class="dashboard-card stat-card gradient-dark h-100">
+                                    <div class="text-center">
+                                        <div class="stat-number"><?php echo $dashboardStats['total_orders']; ?></div>
+                                        <p class="fw-semibold text-white mt-2">Total Orders</p>
+                                    </div>
+                                    <a href="orders.php" class="icon-float"><i class="bi bi-box-arrow-up-right"></i></a>
                                 </div>
                             </div>
-                        </div>
 
                             <!-- New Orders -->
                             <div class="col-md-6">
-                                <div class="dashboard-card card shadow-sm rounded overflow-hidden h-100 d-flex flex-column justify-content-between" style="height: 110px;">
-                                    <!-- Top Section -->
-                                    <div class="bg-white text-center py-3 flex-grow-1 d-flex align-items-center justify-content-center">
-                                        <div class="dashboard-metric text-primary-dark"><?php echo $dashboardStats['new_orders']; ?></div>
-                                    </div>
-                                    <!-- Bottom Label Section -->
-                                    <div class="bottom-label text-center py-2">
-                                        <div class="fw-semibold">New Orders</div>
+                                <div class="dashboard-card stat-card gradient-green h-100">
+                                    <div class="text-center">
+                                        <div class="dashboard-metric"><?php echo $dashboardStats['new_orders']; ?></div>
+                                        <p class="fw-semibold mt-2">New Orders</p>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Return Orders -->
-                            <div class="col-md-6">
-                                <div class=" dashboard-card card shadow-sm rounded overflow-hidden h-100 d-flex flex-column justify-content-between mt-lg-3" style="height: 110px;">
-                                    <!-- Top Section -->
-                                    <div class="bg-white text-center py-3 flex-grow-1 d-flex align-items-center justify-content-center">
-                                        <div class="dashboard-metric text-warning"><?php echo $dashboardStats['return_orders']; ?></div>
-                                    </div>
-                                    <!-- Bottom Label Section -->
-                                    <div class="bottom-label text-center py-2">
-                                        <div class="fw-semibold">Return Order</div>
-                                    </div>
-                                </div>
-                            </div>
+
                             <!-- Cancelled Orders -->
-                             <div class="col-md-6">
-                                <div class="dashboard-card card shadow-sm rounded overflow-hidden h-100 d-flex flex-column justify-content-between mt-lg-3" style="height: 110px;">
-                                    <!-- Top Section -->
-                                    <div class="bg-white text-center py-3 flex-grow-1 d-flex align-items-center justify-content-center">
-                                        <div class="dashboard-metric text-danger"><?php echo $dashboardStats['cancelled_orders']; ?></div>
+                            <div class="col-md-6">
+                                <div class="dashboard-card stat-card gradient-danger h-100">
+                                    <div class="text-center">
+                                        <div class="dashboard-metric"><?php echo $dashboardStats['cancelled_orders']; ?></div>
+                                        <p class="fw-semibold mt-2">Cancelled Orders</p>
                                     </div>
-                                    <!-- Bottom Label Section -->
-                                    <div class="bottom-label text-center py-2">
-                                        <div class="fw-semibold">Cancelled Order</div>
+                                </div>
+                            </div>
+
+                             <!-- Return Orders -->
+                            <div class="col-md-6">
+                                <div class="dashboard-card stat-card gradient-warning h-100">
+                                    <div class="text-center">
+                                        <div class="dashboard-metric"><?php echo $dashboardStats['return_orders']; ?></div>
+                                        <p class="fw-semibold mt-2">Return Orders</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Chart beside the stats -->
-                    <div class="col-md-5">
-                        <div class="dashboard-card bg-white p-3 rounded shadow-sm border h-100">
-                            <h5 class="mb-3 chart-title">Best Seller of the Month</h5>
-                            <div style="position: relative; height: 250px; font-size: 5px;">
-                                <canvas id="bestSellerChart" ></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- Bottom Row -->
-                    <div class="row g-2 mt-lg-4">
                     <!-- Low in Stocks -->
-                    <div class="col-md-3">
-                        <div class="dashboard-card stocks-card p-3 rounded shadow-sm text-start position-relative h-100 mb-3 mb-md-0">
-                            <!-- Top Text -->
-                            <div class="mb-5">
-                                <h6 class="fw-semibold dashboard-label text-white">Low in Stocks</h6>
+                    <div class="col-md-5">
+                        <div class="dashboard-card card low-stock-card shadow-sm h-100">
+                            <div class="card-header bg-danger text-white fw-semibold text-center">
+                                Low in Stocks
                             </div>
-
-                            <!-- Bottom Number -->
-                            <div class="stat-number2 text-white">
-                                <?php echo $lowStock['stock']; ?> <span class="unit-label">pcs left of <strong><?php echo $lowStock['product_name']; ?></strong></span><br>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                        <img src="images/pencil.png" alt="Pencil" width="35" class="me-2">
+                                            <div>
+                                                <span class="fw-semibold text-danger">Pencil</span><br>
+                                                <small class="text-muted">D.R. No: DR1234677</small>
+                                            </div>
+                                        </div>
+                                        <span class="text-danger fw-semibold">10pc</span>
+                                    </li>
+                                </ul>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Active Students -->
-                    <div class="col-md-3">
-                        <div class="dashboard-card students-card p-3 rounded shadow-sm text-start position-relative h-100 mb-3 mb-md-0">
-                            <!-- Top Text -->
-                            <div class="mb-5">
-                                <h6 class="fw-semibold dashboard-label text-white">Active Students</h6>
-                            </div>
-
-                            <!-- Bottom Number -->
-                            <div class="stat-number2 text-white">
-                                <?php echo $dashboardStats['active_students']; ?> <span class="unit-label"><strong>Students</strong></span><br>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Student Messages -->
-                    <div class="col-md-3">
-                        <div class="dashboard-card message-card p-3 shadow-sm rounded position-relative h-100 mb-3 mb-md-0">
-                            <!-- Top Text -->
-                            <div class="mb-5">
-                                <h6 class="fw-semibold dashboard-label">Student Messages</h6>
-                            </div>
-
-                            <!-- Floating Icon -->
-                            <a href="message.php" class="icon-float text-dark">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-
-                            <!-- Bottom Number -->
-                            <div class="stat-number2">
-                                <?php echo $dashboardStats['new_messages']; ?> <span class="unit-label">new messages</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rate and Reviews -->
-                    <div class="col-md-3">
-                        <div class="dashboard-card ratings-card p-3 shadow-sm rounded position-relative h-100 mb-3 mb-md-0">
-                            <!-- Top Text -->
-                            <div class="mb-5">
-                                <h6 class="fw-semibold dashboard-label">Rating and Reviews</h6>
-                            </div>
-
-                            <!-- Floating Icon -->
-                            <a href="ratings.php" class="icon-float text-dark">
-                                <i class="bi bi-box-arrow-up-right"></i>
-                            </a>
-
-                            <!-- Bottom Number -->
-                            <div class="stat-number2">
-                                <?php echo $dashboardStats['new_reviews']; ?> <span class="unit-label">new rate and reviews</span>
+                            <div class="card-footer text-center bg-white">
+                                <a href="#" class="text-danger fw-semibold text-decoration-none small">See All <i class="bi bi-chevron-right"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
-    </div>
+
+                <!-- Bottom Row -->
+                <div class="row g-3 mt-3">
+                    <!-- Chart beside stats -->
+                    <div class="col-md-7">
+                        <div class="dashboard-card bg-white p-3 rounded shadow-sm h-100">
+                            <h5 class="mb-3 chart-title">Best Seller of the Month</h5>
+                            <div class="chart-container">
+                                <canvas id="bestSellerChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Students 
+                    <div class="col-md-3">
+                        <div class="dashboard-card gradient-dark text-white p-3 h-100">
+                            <h6 class="fw-semibold">Active Students</h6>
+                            <h2 class="stat-number2">
+                                <?php echo $dashboardStats['active_students']; ?> 
+                                <span class="unit-label"><strong>Students</strong></span>
+                            </h2>
+                        </div>
+                    </div>-->
+
+                    <!-- Student Messages -->
+                     <div class="col-md-5">
+                        <div class="dashboard-card card low-stock-card shadow-sm h-100">
+                            <div class="card-header student-messages text-white fw-semibold text-center">
+                                Student Messages
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <div class="me-2">
+                                            <img src="images/profile_pic.png" class="chat-avatar" alt="Profile Picture">
+                                        </div>
+                                        <div>
+                                            <strong>Name</strong>
+                                            <div class="small text-muted">Subject: Complain</div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-footer text-center bg-white">
+                                <a href="chat.php" class="fw-semibold text-decoration-none small">See All <i class="bi bi-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ratings & Reviews
+                    <div class="col-md-3">
+                        <div class="dashboard-card gradient-yellow p-3 h-100 position-relative">
+                            <h6 class="fw-semibold">Rating & Reviews</h6>
+                            <h2 class="stat-number2">
+                                <?php echo $dashboardStats['new_reviews']; ?> 
+                                <span class="unit-label">new reviews</span>
+                            </h2>
+                            <a href="ratings.php" class="icon-float"><i class="bi bi-star"></i></a>
+                        </div>
+                    </div> -->
+                </div>
+
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -666,7 +627,7 @@ $chartData = getBestSellers();
         datasets: [{
             label: 'Units Sold',
             data: <?php echo json_encode($chartData['data']); ?>,
-            backgroundColor: '#00527F',
+            backgroundColor: '#26387d',
             barPercentage: 0.6,
             categoryPercentage: 0.7
         }]
@@ -677,20 +638,30 @@ $chartData = getBestSellers();
         data: chartData,
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: {
-                    display: false
+                title: { display: false },
+                tooltip: {
+                    backgroundColor: '#B0B8D7',
+                    titleColor: '#26387d',
+                    bodyColor: '#26387d',
+                    borderColor: '#26387d',
+                    borderWidth: 1,
+                    padding: 12
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     grid: {
+                        color: '#f0f0f0',
+                        borderColor: '#e0e0e0',
                         drawBorder: false
                     },
                     ticks: {
+                        color: '#26387d',
+                        font: { size: 13, weight: 'bold' },
                         maxTicksLimit: 5,
                         callback: function(value) {
                             return value + ' units';
@@ -698,29 +669,21 @@ $chartData = getBestSellers();
                     }
                 },
                 x: {
-                    grid: {
-                        display: false
-                    },
+                    grid: { display: false },
                     ticks: {
-                        maxRotation: 45,
-                        minRotation: 45,
-                        font: {
-                            size: 11
-                        }
+                        color: '#26387d',
+                        font: { size: 12, weight: 'bold' },
+                        maxRotation: 0,
+                        minRotation: 0
                     }
                 }
             },
             layout: {
-                padding: {
-                    left: 10,
-                    right: 10,
-                    top: 0,
-                    bottom: 20
-                }
+                padding: { left: 10, right: 10, top: 10, bottom: 10 }
             }
         }
     });
-    </script>
+</script>
 
 </body>
 </html>
