@@ -82,176 +82,8 @@ while ($row = $result->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket-My Purchase</title>
-    <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <?php include 'links.php';?>
     <style>
-        /* General Card Styling */
-        .card {
-            background-color: #E8EDEF;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-            border: 1px solid black;
-        }
-
-        .card hr{
-            border: 1px solid black;
-        }
-
-        /* Status Section */
-        .card .d-flex.align-items-center img:first-child {
-            margin-right: 8px;
-        }
-
-        .card strong {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        /* Product Image and Info */
-        .card img {
-            border-radius: 8px;
-        }
-
-        .card .d-flex.align-items-center.mb-2 img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-        }
-
-        /* Text Info */
-        .card p {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .card small {
-            font-size: 13px;
-            color: #666;
-        }
-
-        /* Buttons */
-        .card button {
-            font-size: 13px;
-            padding: 8px 24px;
-            font-weight: 500;
-        }
-
-        /* Totals */
-        .card .text-end {
-            font-size: 14px;
-            font-weight: 600;
-            color: #222;
-        }
-
-        /* Border Styling for Special Statuses */
-        .border-danger {
-            border-left: 5px solid #dc3545 !important;
-        }
-
-        .border-info {
-            border-left: 5px solid #0dcaf0 !important;
-        }
-
-        .tab-card{
-            border: 1px solid black;
-        }
-        .tab-button {
-            border: none;
-            background-color: #E8EDEF;
-            font-weight: 400;
-            padding: 20px 30px;
-            color: #000000;
-            text-align: center;
-        }
-        .tab-button.active {
-            border: 1px solid #3D87F5;
-            color: #00527F;
-            background-color: #A9CEEA;
-        }
-        .tab-button:hover {
-            background-color: #D1E7F5;
-            color: #00527F;
-            cursor: pointer;
-        }
-
-        /* Modal Styling */
-        .rate-review-modal {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* Left side panel */
-        .product-info {
-            width: 40%;
-            background-color: #D5E9F3;
-        }
-
-        /* Star rating */
-        .star-rating i {
-            font-size: 1.5rem;
-            color: #000;
-            cursor: pointer;
-        }
-
-        /* Upload photo button */
-        .photo-upload-btn {
-            width: 120px;
-            height: 90px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        #photoPreview .btn {
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.85);
-            border: none;
-            color: #333;
-            z-index: 10;
-        }
-
-        #photoArea img {
-            border-radius: 6px;
-        }
-
-        .modal-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid #e9ecef;
-        }
-
-        #previewContainer img {
-            display: block;
-            margin: 0 auto;
-            border: 1px solid #ddd;
-            padding: 5px;
-            background-color: #fff;
-        }
-
-        .upload-box.bg-light {
-            background-color: #f8f9fa;
-        }
-
-        .custom-outline-black {
-            border: 1px solid black;
-            background-color: transparent;
-            color: black;
-            border-radius: 6px;
-            padding: 8px 18px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .custom-outline-black:hover {
-            background-color: black;
-            color: #fff;
-        }
-
         /* Navy button for "Buy Again" */
         .custom-navy-btn {
             background-color: #0d1b52; /* dark navy */
@@ -266,21 +98,64 @@ while ($row = $result->fetch_assoc()) {
         .custom-navy-btn:hover {
             background-color: #142674;
         }
-
-        /* Blue button for "Request for Refund" */
-        .custom-blue-btn {
-            background-color: #007bff; /* bootstrap blue */
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 20px;
-            font-weight: 500;
-            margin-left: 8px;
-            transition: 0.2s;
+        /* Modal Styling */
+        .rate-review-modal {
+        border-radius: 12px;
+        overflow: hidden;
         }
-        .custom-blue-btn:hover {
-            background-color: #0069d9;
-            color: #fff;
+
+        /* Left side panel */
+        .product-info {
+        width: 40%;
+        background-color: #d5e9f3;
+        }
+
+        /* Star rating */
+        .star-rating i {
+        font-size: 1.5rem;
+        color: #000;
+        cursor: pointer;
+        }
+
+        /* Upload photo button */
+        .photo-upload-btn {
+        width: 120px;
+        height: 90px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        }
+        #photoPreview .btn {
+        font-weight: bold;
+        background-color: rgba(255, 255, 255, 0.85);
+        border: none;
+        color: #333;
+        z-index: 10;
+        }
+
+        #photoArea img {
+        border-radius: 6px;
+        }
+
+        .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e9ecef;
+        }
+
+        #previewContainer img {
+        display: block;
+        margin: 0 auto;
+        border: 1px solid #ddd;
+        padding: 5px;
+        background-color: #fff;
+        }
+
+        .upload-box.bg-light {
+        background-color: #f8f9fa;
+        }
+        .margin-top {
+            margin-top: 80px;
         }
           /* Tablet styles */
     @media (max-width: 991.98px) {
@@ -327,8 +202,8 @@ while ($row = $result->fetch_assoc()) {
         }
     }
     @media (max-width: 575.98px) {
-        .custom-navy-btn, .custom-blue-btn, .custom-outline-black .btn-danger{
-            font-size: 0.85rem;
+        .margin-top {
+            margin-top: 20px;
         }
         .text-title{
             font-size: 0.9rem;
@@ -525,7 +400,7 @@ while ($row = $result->fetch_assoc()) {
     </div>
 
     <!-- My Profile Side-bar-->
-    <div class="d-flex" style="margin-top: 80px;">
+    <div class="d-flex margin-top">
      <!-- Purchase History -->
      <div class="purchase-history container mb-5 p-5">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
@@ -961,69 +836,9 @@ while ($row = $result->fetch_assoc()) {
 </div>
 
 
-
-<!------------------------ FOOTER ----------------------------------------------------------->
-<!-- Footer -->
-    <footer class="footer">
-        <div class="container p-5">
-
-            <!-- Logo Row -->
-            <div class="row justify-content-start mb-4">
-            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
-                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
-                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
-            </div>
-            </div>
-
-            <!-- Links & Contacts Row -->
-            <div class="row text-start gy-3">
-
-            <!-- Quick Links -->
-            <div class="col-md-3">
-                <h5 class="fw-bold">Quick Links</h5>
-                <ul class="list-unstyled">
-                <li><a href="#" class="footer-link">Home</a></li>
-                <li><a href="#" class="footer-link">Shop</a></li>
-                </ul>
-            </div>
-
-            <!-- Contacts -->
-            <div class="col-md-7">
-                <h5 class="fw-bold">Contacts</h5>
-                <p class="mb-1">
-                <i class="bi bi-geo-alt-fill"></i>
-                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
-                </p>
-                <p class="mb-1">
-                <i class="bi bi-telephone-fill"></i>
-                +63 2 8929 0856
-                </p>
-                
-                <div class="d-flex gap-3">
-                    <p class="mb-1 fw-medium">Socials Media</p>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
-                </div>
-            </div>
-
-            <!-- Back to top -->
-            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
-                <a href="#" class="footer-link">↑ Back to top</a>
-            </div>
-            </div>
-
-            <!-- Divider -->
-            <hr class="mt-5 mb-3">
-
-            <!-- Copyright -->
-            <div class="sub-footer text-center small">
-            © 2024 Villager’s Montessori College. All rights served.
-            </div>
-        </div>
-    </footer>
-
+<!-- Footer and chat-->
+    <?php include 'footer.php'; ?>
+    <?php include 'chat.php'; ?>
 
 
 
@@ -1682,6 +1497,26 @@ function updateRatingDisplay(element, rating) {
     html += `<span class="ms-1">(${rating.toFixed(1)})</span>`;
     element.innerHTML = html;
 }
+//Collapse Search for small device Script
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('mobileSearchToggle');
+            const searchBar = document.getElementById('mobileSearchBar');
+            if (toggleBtn && searchBar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchBar.classList.toggle('d-none');
+                    if (!searchBar.classList.contains('d-none')) {
+                        searchBar.querySelector('input').focus();
+                    }
+                });
+                // Optional: Hide search bar when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                        searchBar.classList.add('d-none');
+                    }
+                });
+            }
+        });
 </script>
 </body>
 </html>

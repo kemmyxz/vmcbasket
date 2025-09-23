@@ -127,15 +127,7 @@ $total_pages = ceil($total_records / $limit);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket - Admin/Products</title>
-    <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <?php include 'links.php'; ?>
     <style>
         .variant-options {
             max-height: 200px;
@@ -166,55 +158,66 @@ $total_pages = ceil($total_records / $limit);
             </nav>
 
         <!-- Sidebar -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-                <div class="text-center py-3 d-none d-md-block">
-                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-                </div>
+            <div class="text-center py-3 d-none d-md-block">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            </div>
 
-                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                <li class="nav-item">
+                    <a href="index.php" class="nav-link">
+                        <i class="bi bi-house-door me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php" class="nav-link">
+                        <i class="bi bi-bag-check me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="prod.php" class="nav-link active">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cus.php" class="nav-link">
+                        <i class="bi bi-people me-2"></i> Students
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="chat.php" class="nav-link">
+                        <i class="bi bi-chat-dots me-2"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ratings.php" class="nav-link">
+                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounting.php" class="nav-link">
+                        <i class="bi bi-receipt me-2"></i> Receipt Form
+                    </a>
+                </li>
+                <!-- Logout for small screens (visible only on xs/sm) -->
+                <li class="nav-item d-block d-md-none">
+                    <a href="logout.php" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+            <!-- Logout at the bottom for md/lg screens -->
+            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                <ul class="nav flex-column px-2">
                     <li class="nav-item">
-                        <a href="index.php" class="nav-link">
-                            <i class="bi bi-house-door me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="orders.php" class="nav-link">
-                            <i class="bi bi-bag-check me-2"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="prod.php" class="nav-link active">
-                            <i class="bi bi-box-seam me-2"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="cus.php" class="nav-link">
-                            <i class="bi bi-people me-2"></i> Students
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="inquiries.php" class="nav-link">
-                            <i class="bi bi-chat-dots me-2"></i> Messages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="ratings.php" class="nav-link">
-                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="accounting.php" class="nav-link">
-                            <i class="bi bi-receipt me-2"></i> Receipt Form
-                        </a>
-                    </li>
-                    <li class="nav-item justify-content-end mt-lg-5">
                         <a href="logout.php" class="nav-link text-danger fw-semibold">
                             <i class="bi bi-box-arrow-right me-2"></i> Log Out
                         </a>
                     </li>
                 </ul>
-            </nav>
+            </div>
+        </nav>
 
         <!-- Title Page and Search -->
         <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
@@ -233,13 +236,7 @@ $total_pages = ceil($total_records / $limit);
                 <div>
                 <strong>Total Products: 100</strong>
                 </div>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                <!-- Bulk Delete Button (hidden by default) -->
-                <div id="bulkDeleteContainer" style="display:none;">
-                    <button id="bulkDeleteBtn" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Delete Selected
-                    </button>
-                </div>
+                <div class="d-flex align-items-center mb-2">
                 <!-- BUTTON FOR ADD NEW PRODUCTS FORM -->
                 <button type="button" class="admin-btn" data-bs-toggle="modal" data-bs-target="#addProductModal">
                     Add <i class="bi bi-plus-circle ms-1"></i>
@@ -247,7 +244,12 @@ $total_pages = ceil($total_records / $limit);
                 </div>
             </div>
 
-        
+            <!-- Bulk Delete Button (hidden by default) -->
+            <div id="bulkDeleteContainer" style="display:none; margin-bottom: 16px;">
+                <button id="bulkDeleteBtn" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete Selected
+                </button>
+            </div>
 
             <!-- ADD NEW PRODUCTS FORM -->
             <div class="modal fade" id="addProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -465,7 +467,7 @@ $total_pages = ceil($total_records / $limit);
             <th class="align-middle text-center">
                 <div class="dropdown">
                 <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="tagsDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
-                    Tags
+                    Type
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
                     <li><a class="dropdown-item" href="#">All</a></li>
@@ -492,7 +494,7 @@ $total_pages = ceil($total_records / $limit);
             </tr>
             </thead>
             <!--table-body-->
-            <tbody class="image-table-body text-center">
+            <tbody class="image-table-body text-center align-middle">
             <?php if ($result->num_rows > 0): ?>
             <?php $count = $offset + 1; while ($row = $result->fetch_assoc()): ?>
                 <tr>
@@ -501,7 +503,7 @@ $total_pages = ceil($total_records / $limit);
                 </td>
                 <td><?= $count++; ?></td>
                 <td>
-                <img src="<?= $row['image'] ?: 'default.png'; ?>" class="product-img" alt="Product Image" name="product_image">
+                    <img src="<?= $row['image'] ?: 'default.png'; ?>" class="product-img" alt="Product Image" name="product_image" style="width: 100px; height: 100px; object-fit: cover;">
                 </td>
                 <td>
                 <strong><?= $row['product_name']; ?></strong><br>

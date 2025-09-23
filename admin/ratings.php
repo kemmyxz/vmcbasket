@@ -10,15 +10,7 @@ require 'inc/config.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket - Admin/Ratings</title>
-    <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <?php include 'links.php'; ?>
     <style>
         .thumbnail-img {
             width: 60px;
@@ -64,9 +56,8 @@ require 'inc/config.php';
 <body>
     <div class="container-fluid">
         <div class="row">
-           <!-- Sidebar Toggle Button -->
-            <!-- Top Navbar (visible only on small devices) -->
-            <nav class="navbar navbar-light bg-light d-lg-none">
+          <!-- Top Navbar (visible only on small devices) -->
+            <nav class="navbar navbar-light bg-light d-md-none">
                 <div class="container-fluid d-flex justify-content-between align-items-center">
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -76,95 +67,153 @@ require 'inc/config.php';
             </nav>
 
         <!-- Sidebar -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-                <div class="text-center py-3 d-none d-md-block">
-                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-                </div>
+            <div class="text-center py-3 d-none d-md-block">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            </div>
 
-                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                <li class="nav-item">
+                    <a href="index.php" class="nav-link">
+                        <i class="bi bi-house-door me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php" class="nav-link">
+                        <i class="bi bi-bag-check me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="prod.php" class="nav-link">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cus.php" class="nav-link">
+                        <i class="bi bi-people me-2"></i> Students
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="chat.php" class="nav-link">
+                        <i class="bi bi-chat-dots me-2"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ratings.php" class="nav-link active">
+                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounting.php" class="nav-link">
+                        <i class="bi bi-receipt me-2"></i> Receipt Form
+                    </a>
+                </li>
+                <!-- Logout for small screens (visible only on xs/sm) -->
+                <li class="nav-item d-block d-md-none">
+                    <a href="logout.php" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+            <!-- Logout at the bottom for md/lg screens -->
+            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                <ul class="nav flex-column px-2">
                     <li class="nav-item">
-                        <a href="index.php" class="nav-link">
-                            <i class="bi bi-house-door me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="orders.php" class="nav-link">
-                            <i class="bi bi-bag-check me-2"></i> Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="prod.php" class="nav-link">
-                            <i class="bi bi-box-seam me-2"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="cus.php" class="nav-link">
-                            <i class="bi bi-people me-2"></i> Students
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="inquiries.php" class="nav-link">
-                            <i class="bi bi-chat-dots me-2"></i> Messages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="ratings.php" class="nav-link active">
-                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="accounting.php" class="nav-link">
-                            <i class="bi bi-receipt me-2"></i> Receipt Form
-                        </a>
-                    </li>
-                    <li class="nav-item justify-content-end mt-lg-5">
                         <a href="logout.php" class="nav-link text-danger fw-semibold">
                             <i class="bi bi-box-arrow-right me-2"></i> Log Out
                         </a>
                     </li>
                 </ul>
-            </nav>
+            </div>
+        </nav>
 
             <!-- Content Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content">
+             <!-- Title Page and Search -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
-                        <input type="text" class="form-control" placeholder="">
-                        <button><img src="./images/search-icon.png" alt="Search"></button>
+                        <input type="text" class="form-control" placeholder="Search...">
+                        <button><i class="bi bi-search"></i></button>
                     </div>
                 </div>
-                <div class="mt-2 d-flex flex-row align-items-center mb-5">
-                    <img src="./images/Admin Nav/rating.png" alt="VMC Dashboard" class="img-fluid" style="max-width: 40px; margin-right: 10px;">
+                <div class="row mb-3 g-2 align-items-center flex-column flex-md-row">
+                <div class="mt-2 mb-3">
                     <h2>Ratings & Reviews</h2>
                 </div>
-                <div class="d-flex justify-content-end mb-3"> 
-                    <!-- BUTTON FOR READ ALL AND DELETE -->
-                    <button type="button" id="markAllReadBtn" class="btn btn-primary me-2">
-                        <img src="./images/read.png" alt="Add" style="max-width: 20px;">
-                        Mark all read
-                    </button>
-                    <button type="button" class="btn btn-danger" id="deleteAllBtn">
-                        <i class="bi bi-trash text-light" style="margin-right: 5px;"></i>Delete All
+                <div class="col-12 col-md mb-3">
+                    <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="cus.php" style="gap: 8px;">
+                    <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
+                        <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1" style="font-size: 15px;"><strong>From</strong></label>
+                        <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+                        <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1" style="font-size: 15px;"><strong>To</strong></label>
+                        <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+                        <button type="submit" class="admin-btn ms-sm-2">Filter</button>
+                    </div>
+                    </form>
+                </div>
+                <div class="col-12 col-md-auto d-flex justify-content-end" style="gap: 10px;"> 
+                    <!-- Reviews & Ratings Stats -->
+                    <div class="stats-container d-flex flex-wrap gap-4">
+                
+                        <!-- Total Reviews -->
+                        <div class="stat-box text-center">
+                        <p class="stat-title">Total Reviews</p>
+                        <div class="d-flex flex-row gap-2 justify-content-center align-items-center">
+                            <h2 class="stat-number mb-1">90</h2>
+                            <span class="growth">10.1% ⬈</span>
+                        </div>
+                        <p class="growth-label">Growth in Reviews</p>
+                        </div>
+
+                        <!-- Total Ratings -->
+                        <div class="stat-box text-center">
+                        <p class="stat-title">Total Ratings</p>
+                        <div class="d-flex flex-row gap-2 justify-content-center align-items-center">
+                            <h2 class="stat-number mb-1">90</h2>
+                            <span class="growth">10.1% ⬈</span>
+                        </div>
+                        <p class="growth-label">Growth in Ratings</p>
+                        </div>
+
+                        <!-- Ratings Breakdown -->
+                        <div class="ratings-breakdown">
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 5</span><div class="bar bg-success" style="width:60%"></div><span>30</span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 4</span><div class="bar bg-warning" style="width:50%"></div><span>25</span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 3</span><div class="bar bg-primary" style="width:40%"></div><span>20</span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 2</span><div class="bar bg-orange" style="width:20%"></div><span>10</span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 1</span><div class="bar bg-danger" style="width:10%"></div><span>5</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-md-3 mb-3">
+                    <strong>Total Ratings & Reviews: 100</strong>
+                </div>
+
+                 <!-- Bulk Delete Button (hidden by default) -->
+                <div id="bulkDeleteContainer" style="display:none; margin-bottom: 16px;">
+                    <button id="bulkDeleteBtn" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete Selected
                     </button>
                 </div>
-                
+
                 <!-- TABLE -->
-                <div class="table-container table-responsive-lg">
-                    <table class="table table-bordered table-striped">
+                <div class="table-responsive">
+                    <table class="table table-container text-center">
                         <thead>
                             <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
+                                </th>
                                 <th>#</th>
                                 <th>Product Name</th>
-                                <th>Name</th>
-                                <th>Rating</th>
-                                <th>Review</th>
+                                <th>Student Name</th>
+                                <th>Ratings & Reviews</th>
                                 <th>Photos</th>
-                                <th>Date Posted</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="align-middle">
                             <?php
 
                             
@@ -185,11 +234,19 @@ require 'inc/config.php';
                                 $images = $row['review_images'] ? explode(',', $row['review_images']) : [];
                                 ?>
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
+                                    </td>
                                     <td><?php echo $counter++; ?></td>
                                     <td class="text-start"><?php echo htmlspecialchars($row['product_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['student_name']); ?></td>
-                                    <td><?php echo $row['rating']; ?></td>
                                     <td style="max-width: 200px;">
+                                        <?php
+                                            $rating = (int)$row['rating'];
+                                            $stars = str_repeat('⭐', $rating);
+                                            echo $stars . " ($rating)";
+                                        ?>
+                                         <small class="text-muted"><?php echo date('m-d-Y', strtotime($row['created_at'])); ?></small>
                                         <div style="word-break: break-word; white-space: normal;">
                                             <?php echo htmlspecialchars($row['review_text']); ?>
                                         </div>
@@ -199,22 +256,16 @@ require 'inc/config.php';
                                             <?php 
                                             foreach($images as $index => $image) {
                                                 echo "<img src='../" . htmlspecialchars($image) . "' 
-                 class='thumbnail-img' alt='Review Photo' data-index='$index'>";
+                                                class='thumbnail-img' alt='Review Photo' data-index='$index'>";
                                             }
                                             ?>
                                         </div>
                                     </td>
-                                    <td><?php echo date('m-d-Y', strtotime($row['created_at'])); ?></td>
                                     <td>
-                                        <div class="d-flex flex-column gap-1 justify-content-center align-items-center">
-                                            <button type="button" class="btn btn-primary mb-1 read-btn" style="width: 100px;">
-                                                <img src="./images/read.png" alt="Read" style="max-width: 20px;">
-                                                READ
-                                            </button>
+                                        <div class="d-flex justify-content-center align-items-center">
                                             <button type="button" class="btn btn-danger delete-review" 
-                                                    data-review-id="<?php echo $row['id']; ?>" style="width: 100px;">
+                                                    data-review-id="<?php echo $row['id']; ?>">
                                                 <i class="bi bi-trash text-light"></i>
-                                                DELETE
                                             </button>
                                         </div>
                                     </td>
@@ -223,13 +274,13 @@ require 'inc/config.php';
                         </tbody>
                     </table>
                 </div>
-                <nav class="d-flex justify-content-end mt-3">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
+                    <ul class="pagination justify-content-center custom-pagination">
+                        <li class="page-item disabled"><a class="page-link" href="#"><span aria-hidden="true">&lt;</span></a></li>
                         <li class="page-item active"><a class="page-link" href="#">1</a></li>
                         <li class="page-item"><a class="page-link" href="#">2</a></li>
                         <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        <li class="page-item"><a class="page-link" href="#"><span aria-hidden="true">&gt;</span></a></li>
                     </ul>
                 </nav>
             </main>
@@ -238,72 +289,22 @@ require 'inc/config.php';
 
     <!-- Photo Viewer Modal -->
     <div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 bg-transparent">
-        <div class="modal-body text-center position-relative p-0">
-            <!-- Custom Navigation Buttons -->
-            <button type="button" id="prevBtn" class="custom-nav-btn start-0">&lsaquo;</button>
-            <img id="modalImage" src="" class="modal-img rounded" alt="Full Size">
-            <button type="button" id="nextBtn" class="custom-nav-btn end-0">&rsaquo;</button>
-            <!-- Close Button -->
-            <button type="button" class="btn-close position-absolute top-0 end-0 m-4" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 bg-transparent">
+                <div class="modal-body text-center position-relative p-0">
+                    <!-- Close Button (top-right corner) -->
+                    <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <!-- Custom Navigation Buttons -->
+                    <button type="button" id="prevBtn" class="custom-nav-btn start-0" style="display:none;">&lsaquo;</button>
+                    <img id="modalImage" src="" class="modal-img rounded" alt="Full Size">
+                    <button type="button" id="nextBtn" class="custom-nav-btn end-0" style="display:none;">&rsaquo;</button>
+                </div>
+            </div>
         </div>
-        </div>
-    </div>
     </div>
 
 
 <script>
-    // Hide individual read button when clicked
-    document.querySelectorAll('.read-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            this.style.display = 'none';
-        });
-    });
-
-    // Hide all read buttons when "Mark All as Read" is clicked
-    document.getElementById('markAllReadBtn').addEventListener('click', function () {
-        document.querySelectorAll('.read-btn').forEach(button => {
-            button.style.display = 'none';
-        });
-    });
-
-     // Photo Viewer Modal
-    document.addEventListener('DOMContentLoaded', function () {
-    let currentImages = [];
-    let currentIndex = 0;
-    const modal = new bootstrap.Modal(document.getElementById('photoModal'));
-    const modalImage = document.getElementById('modalImage');
-
-    // On thumbnail click
-    document.querySelectorAll('.photos-cell').forEach(cell => {
-        const thumbnails = cell.querySelectorAll('.thumbnail-img');
-        const images = Array.from(thumbnails).map(img => img.src);
-
-        thumbnails.forEach((thumb, index) => {
-            thumb.addEventListener('click', () => {
-                currentImages = images;
-                currentIndex = index;
-                modalImage.src = currentImages[currentIndex];
-                modal.show();
-            });
-        });
-    });
-
-    // Navigation
-    document.getElementById('nextBtn').addEventListener('click', () => {
-        if (currentImages.length === 0) return;
-        currentIndex = (currentIndex + 1) % currentImages.length;
-        modalImage.src = currentImages[currentIndex];
-    });
-
-    document.getElementById('prevBtn').addEventListener('click', () => {
-        if (currentImages.length === 0) return;
-        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
-        modalImage.src = currentImages[currentIndex];
-    });
-});
-
 // Delete review functionality
 document.querySelectorAll('.delete-review').forEach(button => {
     button.addEventListener('click', function() {
@@ -323,6 +324,12 @@ document.querySelectorAll('.delete-review').forEach(button => {
                 if(data.status === 'success') {
                     row.remove();
                     alert('Review deleted successfully');
+                    // Renumber table rows
+                    const rows = document.querySelectorAll('table tbody tr');
+                    rows.forEach((tr, idx) => {
+                        const numCell = tr.querySelector('td:nth-child(2)');
+                        if(numCell) numCell.textContent = idx + 1;
+                    });
                 } else {
                     alert(data.message || 'Error deleting review');
                 }
@@ -361,6 +368,98 @@ document.getElementById('deleteAllBtn').addEventListener('click', function() {
         });
     }
 });
+</script>
+
+<script>
+//Multiple delete functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllProducts');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+        // Select/Deselect all checkboxes
+        selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        toggleBulkDelete();
+        });
+
+        // If any checkbox is changed, update selectAll and bulk delete button
+        checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+            toggleBulkDelete();
+        });
+        });
+
+        function toggleBulkDelete() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
+        }
+
+        // Example: Bulk delete action (replace with your AJAX or form submit)
+        bulkDeleteBtn.addEventListener('click', function() {
+        const selectedIds = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+        if (selectedIds.length === 0) return;
+        if (confirm('Are you sure you want to delete the selected products?')) {
+            // TODO: Send selectedIds to server for deletion (AJAX or form)
+            alert('Selected IDs: ' + selectedIds.join(', '));
+        }
+        });
+    });
+
+    // Photo Viewer Modal (single initialization)
+    let currentImages = [];
+    let currentIndex = 0;
+    const modalElement = document.getElementById('photoModal');
+    const modal = new bootstrap.Modal(modalElement);
+    const modalImage = document.getElementById('modalImage');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    // On thumbnail click
+    document.querySelectorAll('.photos-cell').forEach(cell => {
+        const thumbnails = cell.querySelectorAll('.thumbnail-img');
+        const images = Array.from(thumbnails).map(img => img.src);
+
+        thumbnails.forEach((thumb, index) => {
+            thumb.addEventListener('click', () => {
+                currentImages = images;
+                currentIndex = index;
+                modalImage.src = currentImages[currentIndex];
+                // Show/hide navigation buttons
+                if (currentImages.length > 1) {
+                    prevBtn.style.display = '';
+                    nextBtn.style.display = '';
+                } else {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'none';
+                }
+                modal.show();
+            });
+        });
+    });
+
+    // Navigation
+    nextBtn.addEventListener('click', () => {
+        if (currentImages.length <= 1) return;
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        modalImage.src = currentImages[currentIndex];
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentImages.length <= 1) return;
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        modalImage.src = currentImages[currentIndex];
+    });
+
+    // Ensure modal backdrop is removed on close
+    modalElement.addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    });
 </script>
 </body>
 </html>

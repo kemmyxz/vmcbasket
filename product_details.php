@@ -182,15 +182,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VMC Basket-Product Details</title>
-  <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <?php include 'links.php'; ?>
 
   <style>
 
@@ -362,6 +354,9 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
       border-radius: 0.5rem;
       object-fit: cover;
     }
+    .margin-top{
+        margin-top: 100px;
+    }
     @media (max-width: 991.98px) {
          .uniform-image {
             max-height: 350px;
@@ -395,6 +390,11 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
           footer {
             font-size: 1rem;
+          }
+        }
+      @media (max-width: 575.98px) {
+          .margin-top{
+            margin-top: 70px;
           }
         }
   </style>
@@ -480,7 +480,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
         </div>
     </div>
  
-  <div class="container p-4" style="margin-top: 100px;">
+  <div class="container p-4 margin-top">
     <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
       <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -986,20 +986,52 @@ quantityInput.addEventListener('input', () => {
                   $img_stmt->bind_param("i", $review['id']);
                   $img_stmt->execute();
                   $images_result = $img_stmt->get_result();
-                  
+
                   if ($images_result->num_rows > 0): ?>
-                      <div class="d-flex flex-wrap gap-2">
-                          <?php while ($image = $images_result->fetch_assoc()): ?>
-                              <img src="<?= htmlspecialchars($image['image_path']) ?>" 
-                                    class="img-thumbnail" 
-                                    alt="review" 
-                                    width="100"
-                                    style="height: 100px; object-fit: cover;">
-                          <?php endwhile; ?>
-                      </div>
+                    <div class="d-flex flex-wrap gap-2">
+                      <?php while ($image = $images_result->fetch_assoc()): ?>
+                        <img src="<?= htmlspecialchars($image['image_path']) ?>"
+                           class="img-thumbnail review-photo"
+                           alt="review"
+                           width="100"
+                           style="height: 100px; object-fit: cover; cursor: pointer;"
+                           data-bs-toggle="modal"
+                           data-bs-target="#photoModal"
+                           data-img="<?= htmlspecialchars($image['image_path']) ?>">
+                      <?php endwhile; ?>
+                    </div>
                   <?php endif; ?>
-              </div>
-          <?php endwhile; ?>
+                  </div>
+                  <?php endwhile; ?>
+
+                    <!-- Modal for viewing review photos -->
+                    <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-lg">
+                          <div class="modal-content position-relative">
+                          <div class="modal-body p-0">
+                            <!-- Close button with X icon at top-right -->
+                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <img src="" id="modalPhoto" class="w-100" style="object-fit: contain; max-height: 80vh;" alt="Review Photo">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                    const photoModal = document.getElementById('photoModal');
+                    const modalPhoto = document.getElementById('modalPhoto');
+                    document.querySelectorAll('.review-photo').forEach(img => {
+                      img.addEventListener('click', function () {
+                        modalPhoto.src = this.getAttribute('data-img');
+                      });
+                    });
+                    // Clear modal image on close
+                    photoModal.addEventListener('hidden.bs.modal', function () {
+                      modalPhoto.src = '';
+                    });
+                  });
+                  </script>
 
           <a href="#" class="text-primary">
               See all reviews (<?= $review_count ?>)
@@ -1020,65 +1052,10 @@ quantityInput.addEventListener('input', () => {
       <?php endif; ?>
   </div>
 
-<footer class="footer">
-    <div class="container p-5">
+<!-- Footer and chat -->
+ <?php include 'footer.php'; ?>
+ <?php include 'chat.php'; ?>
 
-        <!-- Logo Row -->
-        <div class="row justify-content-start mb-4">
-        <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
-            <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
-            <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
-        </div>
-        </div>
-
-        <!-- Links & Contacts Row -->
-        <div class="row text-start gy-3">
-
-        <!-- Quick Links -->
-        <div class="col-md-3">
-            <h5 class="fw-bold">Quick Links</h5>
-            <ul class="list-unstyled">
-            <li><a href="#" class="footer-link">Home</a></li>
-            <li><a href="#" class="footer-link">Shop</a></li>
-            </ul>
-        </div>
-
-        <!-- Contacts -->
-        <div class="col-md-7">
-            <h5 class="fw-bold">Contacts</h5>
-            <p class="mb-1">
-            <i class="bi bi-geo-alt-fill"></i>
-            18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
-            </p>
-            <p class="mb-1">
-            <i class="bi bi-telephone-fill"></i>
-            +63 2 8929 0856
-            </p>
-            
-            <div class="d-flex gap-3">
-                <p class="mb-1 fw-medium">Socials Media</p>
-                <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
-                <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
-            </div>
-        </div>
-
-        <!-- Back to top -->
-        <div class="col-md-2 d-flex align-items-end justify-content-md-end">
-            <a href="#" class="footer-link">↑ Back to top</a>
-        </div>
-        </div>
-
-        <!-- Divider -->
-        <hr class="mt-5 mb-3">
-
-        <!-- Copyright -->
-        <div class="sub-footer text-center small">
-        © 2024 Villager’s Montessori College. All rights served.
-        </div>
-    </div>
-</footer>
 
  <!-- Collapse Search for small device Script -->
   <script>

@@ -144,6 +144,9 @@ header {
 .profile-section img {
   width: 100px;
   height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
 }
 .profile-section h6 {
   margin-top: 0.7rem;
@@ -357,87 +360,120 @@ header {
   transform: scale(1.1);
 }
 
-/*Contact Us*/
-
-.contact-container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 50px 20px;
-}
-
-/* Contact Section */
-.contact-title {
-  font-family: "Ubuntu", sans-serif;
-  font-weight: bold;
-  color: #00527f;
-}
-
-/* Contact Info & Form Layout */
-.contact-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-/* Contact Cards */
-.contact-card {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  padding: 15px;
+/* Purchase History */
+.card {
+  background-color: #e8edef;
   border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid black;
 }
 
-.contact-card:hover {
-  transform: scale(1.03);
-  background-color: #f0f4f8;
+.card hr {
+  border: 1px solid black;
 }
 
-/* Icon Styling */
-.contact-icon {
-  width: 50px;
-  height: 50px;
-  background: #00527f;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-size: 30px;
-  margin-right: 25px;
-}
-/* Contact Text */
-.contact-text h5 {
-  margin: 0;
-  font-weight: bold;
-  color: #00527f;
+/* Status Section */
+.card .d-flex.align-items-center img:first-child {
+  margin-right: 8px;
 }
 
-.contact-text p {
-  margin: 0;
+.card strong {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Product Image and Info */
+.card img {
+  border-radius: 8px;
+}
+
+.card .d-flex.align-items-center.mb-2 img {
+  object-fit: cover;
+}
+
+/* Text Info */
+.card p {
   font-size: 14px;
-  color: #555;
+  font-weight: 500;
 }
 
-/* Form Styling */
-.contact-form {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+.card small {
+  font-size: 13px;
+  color: #666;
 }
 
-.contact-form:hover {
-  transform: scale(1.03);
-  background-color: #f0f4f8;
+/* Buttons */
+.card button {
+  font-size: 13px;
+  padding: 8px 24px;
+  font-weight: 500;
 }
 
-.contact-form:hover .contact-form:focus {
-  transform: scale(1.03);
-  background-color: #f0f4f8;
+/* Totals */
+.card .text-end {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Border Styling for Special Statuses */
+.border-danger {
+  border-left: 5px solid #dc3545 !important;
+}
+
+.border-info {
+  border-left: 5px solid #0dcaf0 !important;
+}
+
+.tab-card {
+  border: 1px solid black;
+}
+.tab-button {
+  border: none;
+  background-color: #e8edef;
+  font-weight: 400;
+  padding: 20px 30px;
+  color: #000000;
+  text-align: center;
+}
+.tab-button.active {
+  border: 1px solid #3d87f5;
+  color: #00527f;
+  background-color: #a9ceea;
+}
+.tab-button:hover {
+  background-color: #d1e7f5;
+  color: #00527f;
+  cursor: pointer;
+}
+
+.custom-outline-black {
+  border: 1px solid black;
+  background-color: transparent;
+  color: black;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.custom-outline-black:hover {
+  background-color: black;
+  color: #fff;
+}
+/* Blue button for "Request for Refund" */
+.custom-blue-btn {
+  background-color: #007bff; /* bootstrap blue */
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-weight: 500;
+  margin-left: 8px;
+  transition: 0.2s;
+}
+.custom-blue-btn:hover {
+  background-color: #0069d9;
+  color: #fff;
 }
 
 .form-control {
@@ -463,18 +499,6 @@ header {
 
 .btn-primary:hover {
   background-color: #02206f;
-}
-
-/* Map Section */
-.map-container {
-  margin-top: 30px;
-}
-
-.map-container iframe {
-  border-radius: 10px;
-  width: 100%;
-  height: 300px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /*Footer*/
@@ -715,6 +739,149 @@ footer {
 .art_badge {
   background-color: #ecbfff;
   color: #000;
+}
+
+/* Floating button */
+.chat-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #2c3e91;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2),
+    0px 8px 24px rgba(44, 62, 145, 0.25);
+  transition: transform 0.2s;
+}
+.chat-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Chat Box */
+.chat-box {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 400px;
+  height: 550px;
+  background: #fff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+
+  /* Hidden by default */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Active (visible) */
+.chat-box.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Chat Header */
+.chat-header {
+  background: #2c3e91;
+  color: white;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(44, 62, 145, 0.12);
+}
+
+/* Avatar */
+.chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(44, 62, 145, 0.12);
+}
+
+/* Chat Body */
+.chat-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  background: #fdfdfd;
+  max-height: calc(100% - 100px); /* leaves space for header + footer */
+}
+
+/* Chat Bubbles */
+.chat-bubble {
+  text-align: start;
+  padding: 10px 15px;
+  max-width: 350px;
+}
+.chat-bubble.admin {
+  border-radius: 10px 10px 10px 0;
+  background-color: #e5e5e5;
+}
+.chat-bubble.user {
+  border-radius: 10px 10px 0px 10px;
+  background-color: #2c3e91;
+  color: white;
+}
+
+/* chat Footer */
+.chat-footer {
+  background: #fff;
+}
+.chat-footer .text-area {
+  resize: none;
+  border: none;
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.send-button {
+  background-color: white;
+  border: none;
+  color: #2c3e91;
+  padding: 8px 12px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Responsive for chat box below 575.98px */
+@media (max-width: 575.98px) {
+  .chat-box {
+    width: 100vw;
+    height: 100vh;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    max-width: 100vw;
+    max-height: 100vh;
+    z-index: 1050; /* Ensure chat-box is above navbar */
+  }
+  .chat-bubble {
+    max-width: 90vw;
+    font-size: 15px;
+    padding: 8px 10px;
+  }
+  .chat-header {
+    padding: 8px;
+    font-size: 16px;
+  }
+  .chat-footer .text-area {
+    font-size: 15px;
+  }
+  .navbar-custom {
+    z-index: 1000; /* Lower than chat-box */
+  }
 }
 
 @media (max-width: 991.98px) {

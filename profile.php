@@ -67,15 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VMC Basket-Profile</title>
-    <link rel="icon" href="admin/images/vmc_basket_logo.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <?php include 'links.php'; ?>
+    <!-- Custom CSS for Profile Page -->
 
     <style>
     .highlight-orange {
@@ -111,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         border-right: solid 1px #CED4DA;
         border-bottom: solid 1px #CED4DA;
         border-left:0px;
+        border-radius: 0px 10px 10px 0px;
         background-color: white;
         color: #0066FF;
     }
@@ -309,14 +303,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label class="form-label">Email</label>
                 <div class="input-group">
                 <input type="email" name="email" id="email" class="form-control" value="<?php echo $user['email']; ?>" required>
-                    <button class="btn changebtn" type="button" onclick="enableEdit('email', this)">Change</button>
+                    <button class="changebtn" type="button" onclick="enableEdit('email', this)">Change</button>
                 </div>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Phone Number</label>
                 <div class="input-group">     
                     <input type="text" id="phone" name="phone" class="form-control" value="<?php echo $user['phone_number']; ?>" required >
-                    <button class="btn changebtn" type="button" onclick="enableEdit('phone', this)">Change</button>
+                    <button class="changebtn" type="button" onclick="enableEdit('phone', this)">Change</button>
                 </div>
             </div>
         </div>
@@ -326,14 +320,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label class="form-label">Date of Birth</label>
                 <div class="input-group">
                     <input type="date" name="birthday" class="form-control" value="<?php echo $user['birthday']; ?>" required>
-                    <button class="btn changebtn" type="button" onclick="enableEdit('dob', this)">Change</button>
+                    <button class="changebtn" type="button" onclick="enableEdit('dob', this)">Change</button>
                 </div>
             </div>
             <div class="col-md-6 mb-2">
                 <label class="form-label">Year-level</label>
                 <div class="input-group">
                     <input type="text" id="year" name="year_level" class="form-control" value="<?php echo $user['year_level']; ?>" required>
-                    <button class="btn changebtn" type="button" onclick="enableEdit('year', this)">Change</button>
+                    <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button>
                 </div>
             </div>
         </div>
@@ -350,66 +344,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
      </div>
 </div>
 
-   <!-- Footer -->
-    <footer class="footer">
-        <div class="container p-5">
-
-            <!-- Logo Row -->
-            <div class="row justify-content-start mb-4">
-            <div class="col-auto d-flex justify-content-center align-items-center gap-3 footer-logo">
-                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket Logo" class="footer-logo" >
-                <img src="admin/images/VMC School logo.png" alt="School Logo" class="footer-logo">
-            </div>
-            </div>
-
-            <!-- Links & Contacts Row -->
-            <div class="row text-start gy-3">
-
-            <!-- Quick Links -->
-            <div class="col-md-3">
-                <h5 class="fw-bold">Quick Links</h5>
-                <ul class="list-unstyled">
-                <li><a href="#" class="footer-link">Home</a></li>
-                <li><a href="#" class="footer-link">Shop</a></li>
-                </ul>
-            </div>
-
-            <!-- Contacts -->
-            <div class="col-md-7">
-                <h5 class="fw-bold">Contacts</h5>
-                <p class="mb-1">
-                <i class="bi bi-geo-alt-fill"></i>
-                18 Dalsol Rd. GSIS Village, Sangandaan, Quezon City, 1116 Metro Manila, Philippines
-                </p>
-                <p class="mb-1">
-                <i class="bi bi-telephone-fill"></i>
-                +63 2 8929 0856
-                </p>
-                
-                <div class="d-flex gap-3">
-                    <p class="mb-1 fw-medium">Socials Media</p>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-globe"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="footer-icon fs-5"><i class="bi bi-youtube"></i></a>
-                </div>
-            </div>
-
-            <!-- Back to top -->
-            <div class="col-md-2 d-flex align-items-end justify-content-md-end">
-                <a href="#" class="footer-link">↑ Back to top</a>
-            </div>
-            </div>
-
-            <!-- Divider -->
-            <hr class="mt-5 mb-3">
-
-            <!-- Copyright -->
-            <div class="sub-footer text-center small">
-            © 2024 Villager’s Montessori College. All rights served.
-            </div>
-        </div>
-    </footer>
+   <!-- Footer and chat -->
+    <?php include 'footer.php'; ?>
+    <?php include 'chat.php'; ?>
 
 <!-- Javascript -->
 <script>
@@ -561,7 +498,27 @@ function previewImage(event) {
     };
     reader.readAsDataURL(event.target.files[0]);
 }
+//Collapse Search for small device Script 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById('mobileSearchToggle');
+    const searchBar = document.getElementById('mobileSearchBar');
+    if (toggleBtn && searchBar) {
+        toggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            searchBar.classList.toggle('d-none');
+            if (!searchBar.classList.contains('d-none')) {
+                searchBar.querySelector('input').focus();
+            }
+        });
+        // Optional: Hide search bar when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                searchBar.classList.add('d-none');
+            }
+        });
+    }
+});
 
 </script>
 </body>

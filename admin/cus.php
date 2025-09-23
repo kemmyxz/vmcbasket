@@ -146,15 +146,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VMC Basket - Admin/Students</title>
-  <link rel="icon" href="images/vmc_basket_logo.png" type="image/x-icon">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kulim+Park:ital,wght@0,200;0,300;0,400;0,600;0,700;1,200;1,300;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="css/style.css">
+  <?php include 'links.php'; ?>
   <style>
     .note {
       background-color: #C8D9E6; 
@@ -177,70 +169,79 @@ for ($i = 1; $i <= $total_pages; $i++) {
 <body>
   <div class="container-fluid">
     <div class="row">
-     <!-- Sidebar Toggle Button -->
-      <!-- Top Navbar (visible only on small devices) -->
-      <nav class="navbar navbar-light bg-light d-md-none">
-          <div class="container-fluid d-flex justify-content-between align-items-center">
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-              </button>
-              <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-          </div>
-      </nav>
+    <!-- Top Navbar (visible only on small devices) -->
+            <nav class="navbar navbar-light bg-light d-md-none">
+                <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
+            </nav>
 
-    <!-- Sidebar -->
-      <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-          <div class="text-center py-3 d-none d-md-block">
-              <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-          </div>
+            <div class="text-center py-3 d-none d-md-block">
+                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+            </div>
 
-          <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
-              <li class="nav-item">
-                  <a href="index.php" class="nav-link">
-                      <i class="bi bi-house-door me-2"></i> Dashboard
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="orders.php" class="nav-link">
-                      <i class="bi bi-bag-check me-2"></i> Orders
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="prod.php" class="nav-link">
-                      <i class="bi bi-box-seam me-2"></i> Products
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="cus.php" class="nav-link active">
-                      <i class="bi bi-people me-2"></i> Students
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="inquiries.php" class="nav-link">
-                      <i class="bi bi-chat-dots me-2"></i> Messages
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="ratings.php" class="nav-link">
-                      <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                  </a>
-              </li>
-              <li class="nav-item">
-                  <a href="accounting.php" class="nav-link">
-                      <i class="bi bi-receipt me-2"></i> Receipt Form
-                  </a>
-              </li>
-              <li class="nav-item justify-content-end mt-lg-5">
-                  <a href="logout.php" class="nav-link text-danger fw-semibold">
-                      <i class="bi bi-box-arrow-right me-2"></i> Log Out
-                  </a>
-              </li>
-          </ul>
-      </nav>
-      
+            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
+                <li class="nav-item">
+                    <a href="index.php" class="nav-link">
+                        <i class="bi bi-house-door me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="orders.php" class="nav-link">
+                        <i class="bi bi-bag-check me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="prod.php" class="nav-link">
+                        <i class="bi bi-box-seam me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="cus.php" class="nav-link active">
+                        <i class="bi bi-people me-2"></i> Students
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="chat.php" class="nav-link">
+                        <i class="bi bi-chat-dots me-2"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="ratings.php" class="nav-link">
+                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="accounting.php" class="nav-link">
+                        <i class="bi bi-receipt me-2"></i> Receipt Form
+                    </a>
+                </li>
+                <!-- Logout for small screens (visible only on xs/sm) -->
+                <li class="nav-item d-block d-md-none">
+                    <a href="logout.php" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                    </a>
+                </li>
+            </ul>
+            <!-- Logout at the bottom for md/lg screens -->
+            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                <ul class="nav flex-column px-2">
+                    <li class="nav-item">
+                        <a href="logout.php" class="nav-link text-danger fw-semibold">
+                            <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
       <!-- Content Area -->
-       <!-- Title Page and Search -->
+      <!-- Title Page and Search -->
       <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
         <div class="d-flex justify-content-end mb-5">
           <div class="search-container">
@@ -394,7 +395,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
         
         <!-- CUSTOMER TABLE -->
         <div class="table-responsive">
-          <table class="table table-container">
+          <table class="table table-container text-center">
             <thead>
               <tr>
                 <th>
@@ -420,7 +421,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="align-middle">
               <?php $count = $start + 1; while ($row = $result->fetch_assoc()): ?>
                 <?php 
                   // Check last_active timestamp to set active status.
@@ -439,7 +440,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                     <div class="d-flex align-items-center">
                       <img src="<?php echo $photoPath; ?>" alt="User" class="user-img me-2" style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
                       <div>
-                        <span><?php echo $row['student_fname'] . " " . $row['student_lname']; ?></span><br>
+                        <strong><?php echo $row['student_fname'] . " " . $row['student_lname']; ?></strong><br>
                         <small class="text-muted"><?php echo $row['email']; ?></small>
                       </div>
                     </div>
