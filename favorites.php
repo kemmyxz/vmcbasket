@@ -69,10 +69,23 @@ $recommendations = "SELECT p.*,
                    WHERE p.type='uniform' OR p.type='supplies'
                    GROUP BY p.id, p.product_name, p.price, p.image, p.type";
 $rec_result = $conn->query($recommendations);
+
+
+
+$student_no = $_SESSION['student_no'];
+$sql = "SELECT * FROM users WHERE student_no = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $student_no);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+// Profile image fallback and full name
+$profilePic = $user['photo'] ?? 'profile_pic.png';
+$fullName = $user['student_fname'] . " " . $user['student_lname'];
+
+
 ?>
-
-
-
 
 
 
@@ -268,8 +281,8 @@ $rec_result = $conn->query($recommendations);
                 <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="profile-section">
-                <img src="admin/images/profile_pic.png">
-                <h4 class="mt-2">Janella Clare Gomez</h4>
+                <img src="admin/uploads/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture">
+                <h4 class="mt-2"><?php echo htmlspecialchars($fullName); ?></h4>
             </div>
 
             <div class="px-3">

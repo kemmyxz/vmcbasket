@@ -105,7 +105,10 @@ CREATE TABLE products (
     type ENUM('Uniform', 'Supplies') NOT NULL,
     date_modified DATE NOT NULL,
     image VARCHAR(255) DEFAULT NULL,
-    rating float
+    rating float,
+    tags JSON null,
+    max_quantity int
+
 );
 
 CREATE TABLE product_variants (
@@ -115,7 +118,8 @@ CREATE TABLE product_variants (
     gender ENUM('Male', 'Female', 'Unisex') NULL,
     stock INT NOT NULL DEFAULT 0,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_variant (product_id, size, gender)
+    UNIQUE KEY unique_variant (product_id, size, gender),
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE favorites (
@@ -146,4 +150,16 @@ CREATE TABLE order_receipts_images (
     image_path VARCHAR(255) NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (receipt_id) REFERENCES order_receipt(receipt_id)
+);
+
+CREATE TABLE restock_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    dr_number VARCHAR(50) NOT NULL,
+    added_stock INT NOT NULL,
+    updated_by VARCHAR(100) NOT NULL,
+    restock_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    variant_details VARCHAR(255)
+
 );
