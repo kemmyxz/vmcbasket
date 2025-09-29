@@ -310,12 +310,12 @@ for ($i = 1; $i <= $total_pages; $i++) {
               <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
                 <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1"
                   style="font-size: 15px;"><strong>From S.Y.</strong></label>
-                <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date"
-                  value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+                <input type="number" class="form-control date-filter mb-2 mb-sm-0 ms-2" id="from_date" name="from_date"
+                  min="1900" max="<?= date('Y') ?>" placeholder="Year" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
                 <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1"
                   style="font-size: 15px;"><strong>To</strong></label>
-                <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date"
-                  value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+                <input type="number" class="form-control date-filter mb-2 mb-sm-0 ms-2" id="to_date" name="to_date"
+                  min="1900" max="<?= date('Y') ?>" placeholder="Year" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
                 <button type="submit" class="admin-btn ms-sm-2">Filter</button>
               </div>
             </form>
