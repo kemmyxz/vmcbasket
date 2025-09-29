@@ -165,6 +165,9 @@ $total_records = $total_records_result->fetch_assoc()['total'];
 $total_pages = ceil($total_records / $limit);
 
 
+$total_products_sql = "SELECT COUNT(*) as total FROM products";
+$total_products_result = $conn->query($total_products_sql);
+$total_products = $total_products_result->fetch_assoc()['total'];
 ?>
 
 
@@ -282,12 +285,14 @@ $total_pages = ceil($total_records / $limit);
 
             <!-- Title Page and Search -->
             <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+                               
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
-                        <input type="text" class="form-control" placeholder="Search...">
-                        <button><i class="bi bi-search"></i></button>
+                        <input type="text" class="form-control" id="productSearch" placeholder="Search products...">
+                        <button type="button"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
+
                 <div class="mt-2 d-flex flex-row align-items-center">
                     <h2 class="mb-0">Product</h2>
                 </div>
@@ -295,7 +300,7 @@ $total_pages = ceil($total_records / $limit);
                 <!--Total Products, Add Products Button, and Modal-->
                 <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
                     <div>
-                        <strong>Total Products: 100</strong>
+                         <strong>Total Products: <?= number_format($total_products); ?></strong>
                     </div>
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <!-- Bulk Delete Button (hidden by default) -->
@@ -555,6 +560,7 @@ $total_pages = ceil($total_records / $limit);
                                 <th>Product Details</th>
                                 <th>Price</th>
                                 <th>Stock</th>
+                            
                                 <th class="align-middle text-center">
                                     <div class="dropdown">
                                         <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle"
@@ -563,14 +569,13 @@ $total_pages = ceil($total_records / $limit);
                                             Types
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
-                                            <li><a class="dropdown-item" href="#">All</a></li>
-                                            <li><a class="dropdown-item" href="#">Uniform</a></li>
-                                            <li><a class="dropdown-item" href="#">Supplies</a></li>
-                                            <!-- Add more tag options as needed -->
+                                            <li><a class="dropdown-item filter-type" href="#" data-type="all">All</a></li>
+                                            <li><a class="dropdown-item filter-type" href="#" data-type="Uniform">Uniform</a></li>
+                                            <li><a class="dropdown-item filter-type" href="#" data-type="Supplies">Supplies</a></li>
                                         </ul>
                                     </div>
                                 </th>
-                                <th class="align-middle text-center">Restock History </th>
+                                <th class="align-middle text-center">Restock History</th>
                                 <th class="align-middle text-center">
                                     <div class="dropdown">
                                         <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle"
@@ -579,9 +584,9 @@ $total_pages = ceil($total_records / $limit);
                                             Status
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
-                                            <li><a class="dropdown-item" href="#">All</a></li>
-                                            <li><a class="dropdown-item" href="#">In Stock</a></li>
-                                            <li><a class="dropdown-item" href="#">Out of Stock</a></li>
+                                            <li><a class="dropdown-item filter-status" href="#" data-status="all">All</a></li>
+                                            <li><a class="dropdown-item filter-status" href="#" data-status="in-stock">In Stock</a></li>
+                                            <li><a class="dropdown-item filter-status" href="#" data-status="out-of-stock">Out of Stock</a></li>
                                         </ul>
                                     </div>
                                 </th>
@@ -627,7 +632,27 @@ $total_pages = ceil($total_records / $limit);
                                             <?php endif; ?>
                                         </td>
 
-                                        <td>restock by<br><?= $row['date_modified']; ?></td>
+                                        <td>
+    <?php
+    // Get the latest restock history for this product
+    $restock_sql = "SELECT updated_by, restock_date 
+                    FROM restock_history 
+                    WHERE product_id = ? 
+                    ORDER BY restock_date DESC 
+                    LIMIT 1";
+    $restock_stmt = $conn->prepare($restock_sql);
+    $restock_stmt->bind_param("i", $row['id']);
+    $restock_stmt->execute();
+    $restock_result = $restock_stmt->get_result();
+    
+    if ($restock = $restock_result->fetch_assoc()) {
+        echo "Restocked by: " . htmlspecialchars($restock['updated_by']) . "<br>";
+        echo "<small class='text-muted'>" . date('M d, Y', strtotime($restock['restock_date'])) . "</small>";
+    } else {
+        echo "<span class='text-muted'>No restock history</span>";
+    }
+    ?>
+</td>
                                         <td>
                                             <!-- Status: In Stock/Out of Stock -->
                                             <?php if ($row['total_stock'] > 0): ?>
@@ -1012,93 +1037,209 @@ $total_pages = ceil($total_records / $limit);
                     });
                 });
 
-                //Showing Product Details to Modal
+                // Product Details Modal Handler
                 document.addEventListener('DOMContentLoaded', function () {
-                    // Listen for modal show event
-                    var productDetailsModal = document.getElementById('productDetailsModal');
+                    const productDetailsModal = document.getElementById('productDetailsModal');
+                    
                     productDetailsModal.addEventListener('show.bs.modal', function (event) {
-                        var button = event.relatedTarget;
-
-                        // Get data from button attributes
-                        var productId = button.getAttribute('data-id');
-                        var productName = button.getAttribute('data-product_name');
-                        var productType = button.getAttribute('data-type');
-                        var drNumber = button.getAttribute('data-drnumber');
-                        var productPrice = button.getAttribute('data-price');
-                        var totalStock = button.getAttribute('data-total_stock');
-                        var variants = button.getAttribute('data-variants');
-                        var productImage = button.getAttribute('data-image');
-                        var variantId = button.getAttribute('data-variant_id');
-
-                        // Set values in the modal
-                        document.getElementById('productNameView').textContent = productName;
-                        document.getElementById('productTypesView').textContent = productType === '1' ? 'Uniform' : 'Supplies';
-                        document.getElementById('drNumberView').textContent = drNumber;
-                        document.getElementById('productPriceView').textContent = '₱' + parseFloat(productPrice).toFixed(2);
-
-                        // Stock/variant info
-                        var variantsContainer = document.getElementById('productVariants');
-                        if (variants) {
-                            variantsContainer.innerHTML = variants + '<br><strong>Total: ' + totalStock + ' pcs</strong>';
-                        } else {
-                            variantsContainer.innerHTML = '<strong>Total: ' + totalStock + ' pcs</strong>';
-                        }
-
-                        // Image
-                        var productImagesContainer = document.getElementById('productImages');
-                        productImagesContainer.innerHTML = '';
-                        if (productImage) {
-                            var img = document.createElement('img');
-                            img.src = productImage;
-                            img.alt = productName;
-                            img.className = 'img-fluid';
-                            img.style.maxHeight = '150px';
-                            img.style.width = 'auto';
-                            productImagesContainer.appendChild(img);
-                        } else {
-                            productImagesContainer.innerHTML = '<p class="text-muted">No image available</p>';
-                        }
+                        // Get the button that triggered the modal
+                        const button = event.relatedTarget;
+                        
+                        // Extract data from button attributes
+                        const data = {
+                            id: button.getAttribute('data-id'),
+                            productName: button.getAttribute('data-product_name'),
+                            type: button.getAttribute('data-type'),
+                            drNumber: button.getAttribute('data-drnumber'), 
+                            price: parseFloat(button.getAttribute('data-price')),
+                            totalStock: button.getAttribute('data-total_stock'),
+                            variants: button.getAttribute('data-variants'),
+                            image: button.getAttribute('data-image')
+                        };
+                
+                        // Fetch additional product details from server
+                        fetch(`get_product_details.php?id=${data.id}`)
+                            .then(response => response.json())
+                            .then(productData => {
+                                // Update modal content
+                                document.getElementById('productNameView').textContent = data.productName;
+                                document.getElementById('productTypesView').textContent = data.type === '1' ? 'Uniform' : 'Supplies';
+                                document.getElementById('drNumberView').textContent = data.drNumber;
+                                document.getElementById('productPriceView').textContent = '₱' + data.price.toFixed(2);
+                
+                                // Stock/variant information
+                                const variantsContainer = document.getElementById('productVariants');
+                                if (data.variants) {
+                                    variantsContainer.innerHTML = `${data.variants}<br><strong>Total: ${data.totalStock} pcs</strong>`;
+                                } else {
+                                    variantsContainer.innerHTML = `<strong>Total: ${data.totalStock} pcs</strong>`;
+                                }
+                
+                                // Display tags
+                                const tagsContainer = document.getElementById('productTagsView');
+                                if (productData.tags && productData.tags.length > 0) {
+                                    const tagsHTML = productData.tags.map(tag => {
+                                        let badgeClass = '';
+                                        // Assign badge classes based on tag type
+                                        if (data.type === '1') { // Uniform
+                                            badgeClass = getBadgeClassForUniform(tag);
+                                        } else { // Supplies
+                                            badgeClass = getBadgeClassForSupplies(tag);
+                                        }
+                                        return `<span class="badge ${badgeClass} me-1">${tag}</span>`;
+                                    }).join('');
+                                    tagsContainer.innerHTML = tagsHTML;
+                                } else {
+                                    tagsContainer.innerHTML = '<span class="text-muted">No tags available</span>';
+                                }
+                
+                                // Display max quantity
+                                const maxQtyContainer = document.getElementById('productMaxQtyView');
+                                if (productData.max_quantity) {
+                                    maxQtyContainer.textContent = `${productData.max_quantity} pcs`;
+                                } else {
+                                    maxQtyContainer.innerHTML = '<span class="text-muted">Not set</span>';
+                                }
+                
+                                // Display product image
+                                const productImagesContainer = document.getElementById('productImages');
+                                if (data.image) {
+                                    productImagesContainer.innerHTML = `
+                                        <img src="${data.image}" 
+                                             alt="${data.productName}" 
+                                             class="img-fluid" 
+                                             style="max-height: 150px; width: auto;">`;
+                                } else {
+                                    productImagesContainer.innerHTML = '<p class="text-muted">No image available</p>';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching product details:', error);
+                                alert('Error loading product details');
+                            });
                     });
                 });
+                
+                // Helper function for uniform badge classes
+                function getBadgeClassForUniform(tag) {
+                    const badgeMap = {
+                        'Pre-school': 'preschool_badge',
+                        'Kindergarten': 'kinder_badge',
+                        'Elementary': 'elementary_badge',
+                        'Junior High School': 'jhs_badge',
+                        'Senior High School': 'shs_badge',
+                        'BS Tourism Management': 'bstm_badge',
+                        'BS Information System': 'bsis_badge',
+                        'BS Hotel and Restaurant Management': 'bhrm_badge',
+                        'BS Secondary Education': 'secondary_badge',
+                        'BS Elementary Education': 'educ_badge',
+                        'Criminology': 'crim_badge'
+                    };
+                    return badgeMap[tag] || 'badge-secondary';
+                }
+                
+                // Helper function for supplies badge classes
+                function getBadgeClassForSupplies(tag) {
+                    const badgeMap = {
+                        'Writing Tools': 'writing_badge',
+                        'Paper Products': 'paper_badge',
+                        'Art Supplies': 'art_badge'
+                    };
+                    return badgeMap[tag] || 'badge-secondary';
+                }
+
                 // For Bulk Delete
-                document.addEventListener('DOMContentLoaded', function () {
+                                document.addEventListener('DOMContentLoaded', function() {
                     const selectAll = document.getElementById('selectAllProducts');
                     const checkboxes = document.querySelectorAll('.product-checkbox');
                     const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
                     const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-
+                
                     // Select/Deselect all checkboxes
-                    selectAll.addEventListener('change', function () {
+                    selectAll.addEventListener('change', function() {
                         checkboxes.forEach(cb => cb.checked = selectAll.checked);
                         toggleBulkDelete();
                     });
-
-                    // If any checkbox is changed, update selectAll and bulk delete button
+                
+                    // Individual checkbox change
                     checkboxes.forEach(cb => {
-                        cb.addEventListener('change', function () {
+                        cb.addEventListener('change', function() {
                             selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
                             toggleBulkDelete();
                         });
                     });
-
+                
+                    // Toggle bulk delete button visibility
                     function toggleBulkDelete() {
                         const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
                         bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
                     }
-
-                    // Example: Bulk delete action (replace with your AJAX or form submit)
-                    bulkDeleteBtn.addEventListener('click', function () {
+                
+                    // Bulk delete functionality
+                    bulkDeleteBtn.addEventListener('click', function() {
                         const selectedIds = Array.from(checkboxes)
                             .filter(cb => cb.checked)
                             .map(cb => cb.value);
+                
                         if (selectedIds.length === 0) return;
+                
                         if (confirm('Are you sure you want to delete the selected products?')) {
-                            // TODO: Send selectedIds to server for deletion (AJAX or form)
-                            alert('Selected IDs: ' + selectedIds.join(', '));
+                            // Send delete request
+                            fetch('delete_product.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ ids: selectedIds })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Products deleted successfully!');
+                                    location.reload();
+                                } else {
+                                    alert('Error deleting products: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while deleting products');
+                            });
                         }
+                    });
+                
+                    // Single product delete functionality
+                    document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = this.id.replace('deleteProductBtn', '');
+                            
+                            if (confirm('Are you sure you want to delete this product?')) {
+                                fetch('delete_product.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ id: productId })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        alert('Product deleted successfully!');
+                                        location.reload();
+                                    } else {
+                                        alert('Error deleting product: ' + data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('An error occurred while deleting the product');
+                                });
+                            }
+                        });
                     });
                 });
 
+                // Add Product Form Validation
                 document.addEventListener('DOMContentLoaded', function () {
                     const addProductForm = document.querySelector('#addProductModal form');
 
@@ -1178,51 +1319,58 @@ $total_pages = ceil($total_records / $limit);
                 });
 
 
+                //  restock modal event listener code 
+                
                 document.addEventListener('DOMContentLoaded', function () {
                     const restockModal = document.getElementById('addStocksModal');
                     const restockForm = document.getElementById('restockForm');
-
+                
                     restockModal.addEventListener('show.bs.modal', function (event) {
                         const button = event.relatedTarget;
                         const tr = button.closest('tr');
                         const productId = tr.querySelector('.product-checkbox').value;
                         const productType = tr.querySelector('.badge').textContent.trim();
                         const variantsText = tr.querySelector('td:nth-child(6)').innerHTML;
-
+                
                         // Reset form
                         restockForm.reset();
-
+                
                         document.getElementById('restockProductId').value = productId;
                         document.getElementById('restockProductType').value = productType;
-
+                
                         const variantStockInputs = document.getElementById('variantStockInputs');
                         variantStockInputs.innerHTML = ''; // Clear existing inputs
-
+                
                         if (productType === 'Uniform') {
                             const variants = variantsText.split('<br>');
                             variants.forEach(variant => {
                                 if (!variant.includes('Total:')) {
-                                    const match = variant.match(/(.*?)\s*\((.*?)\):\s*(\d+)\s*pcs/);
+                                    // Updated regex pattern to handle spaces and capture groups properly
+                                    const match = variant.match(/([^(]+)\s*\(([^)]+)\):\s*(\d+)\s*pcs/);
                                     if (match) {
-                                        const [_, size, gender, currentStock] = match;
+                                        const size = match[1].trim();
+                                        const gender = match[2].trim();
+                                        const currentStock = match[3];
+                                        
                                         const div = document.createElement('div');
                                         div.className = 'mb-3';
                                         div.innerHTML = `
-                            <label class="form-label">Add Stock for ${size} (${gender})</label>
-                            <div class="input-group">
-                                <input type="number" 
-                                       class="form-control stock-input" 
-                                       name="variant_stock[${size}][${gender}]" 
-                                       min="0"
-                                       placeholder="Enter quantity to add">
-                                <span class="input-group-text">Current: ${currentStock} pcs</span>
-                            </div>
-                        `;
+                                            <label class="form-label">Add Stock for ${size} (${gender})</label>
+                                            <div class="input-group">
+                                                <input type="number" 
+                                                       class="form-control stock-input" 
+                                                       name="variant_stock[${size}][${gender}]" 
+                                                       min="0"
+                                                       
+                                                       placeholder="Enter quantity to add">
+                                                <span class="input-group-text">Current: ${currentStock} pcs</span>
+                                            </div>
+                                        `;
                                         variantStockInputs.appendChild(div);
-
+                
                                         // Add event listener to ensure valid number input
                                         const input = div.querySelector('input');
-                                        input.addEventListener('input', function () {
+                                        input.addEventListener('input', function() {
                                             if (this.value < 0) this.value = 0;
                                             if (this.value === '') this.value = 0;
                                         });
@@ -1234,39 +1382,38 @@ $total_pages = ceil($total_records / $limit);
                             const match = variantsText.match(/Total:\s*(\d+)\s*pcs/);
                             const currentStock = match ? match[1] : '0';
                             variantStockInputs.innerHTML = `
-                <label class="form-label">Stock to Add</label>
-                <div class="input-group">
-                    <input type="number" 
-                           class="form-control stock-input" 
-                           name="add_stock" 
-                           min="0"
-                           placeholder="Enter quantity to add"
-                           value="0"
-                           required>
-                    <span class="input-group-text">Current: ${currentStock} pcs</span>
-                </div>
-            `;
-
-                            // Add event listener to ensure valid number input
+                                <label class="form-label">Stock to Add</label>
+                                <div class="input-group">
+                                    <input type="number" 
+                                           class="form-control stock-input" 
+                                           name="add_stock" 
+                                           min="0"
+                                           
+                                           placeholder="Enter quantity to add"
+                                           required>
+                                    <span class="input-group-text">Current: ${currentStock} pcs</span>
+                                </div>
+                            `;
+                
                             const input = variantStockInputs.querySelector('input');
-                            input.addEventListener('input', function () {
+                            input.addEventListener('input', function() {
                                 if (this.value < 0) this.value = 0;
                                 if (this.value === '') this.value = 0;
                             });
                         }
                     });
-
+                
                     // Form validation before submit
-                    restockForm.addEventListener('submit', function (e) {
+                    restockForm.addEventListener('submit', function(e) {
                         e.preventDefault();
-
+                
                         // Validate DR number
                         const drNumber = this.querySelector('input[name="dr_number"]').value.trim();
                         if (!drNumber) {
                             alert('Please enter a Delivery Receipt Number');
                             return;
                         }
-
+                
                         // Validate stock inputs
                         const stockInputs = this.querySelectorAll('.stock-input');
                         let totalStock = 0;
@@ -1274,24 +1421,149 @@ $total_pages = ceil($total_records / $limit);
                             const value = parseInt(input.value) || 0;
                             totalStock += value;
                         });
-
+                
                         if (totalStock === 0) {
                             alert('Please add stock quantity for at least one variant');
                             return;
                         }
-
+                
                         // Validate updated_by field
                         const updatedBy = this.querySelector('input[name="updated_by"]').value.trim();
                         if (!updatedBy) {
                             alert('Please enter your name in the "Stock Update by" field');
                             return;
                         }
-
+                
                         // If all validations pass, submit the form
                         this.submit();
                     });
                 });
-
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                // Get filter elements
+                const typeFilters = document.querySelectorAll('.filter-type');
+                const statusFilters = document.querySelectorAll('.filter-status');
+                
+                let currentTypeFilter = 'all';
+                let currentStatusFilter = 'all';
+            
+                // Function to filter table rows
+                function filterTable() {
+                    const rows = document.querySelectorAll('tbody tr');
+                    
+                    rows.forEach(row => {
+                        let showRow = true;
+                        
+                        // Type filtering
+                        if (currentTypeFilter !== 'all') {
+                            const typeCell = row.querySelector('.badge').textContent.trim();
+                            if (typeCell !== currentTypeFilter) {
+                                showRow = false;
+                            }
+                        }
+                        
+                        // Status filtering
+                        if (currentStatusFilter !== 'all' && showRow) {
+                            const stockCell = row.querySelector('.status');
+                            const isInStock = stockCell.classList.contains('active');
+                            
+                            if (currentStatusFilter === 'in-stock' && !isInStock) {
+                                showRow = false;
+                            }
+                            if (currentStatusFilter === 'out-of-stock' && isInStock) {
+                                showRow = false;
+                            }
+                        }
+                        
+                        // Show/hide row
+                        row.style.display = showRow ? '' : 'none';
+                    });
+                }
+            
+                // Add click event listeners to type filters
+                typeFilters.forEach(filter => {
+                    filter.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentTypeFilter = this.dataset.type;
+                        
+                        // Update dropdown button text
+                        document.getElementById('tagsDropdown').textContent = 
+                            currentTypeFilter === 'all' ? 'Types' : currentTypeFilter;
+                        
+                        filterTable();
+                    });
+                });
+            
+                // Add click event listeners to status filters
+                statusFilters.forEach(filter => {
+                    filter.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentStatusFilter = this.dataset.status;
+                        
+                        // Update dropdown button text
+                        document.getElementById('stocksStatusDropdown').textContent = 
+                            currentStatusFilter === 'all' ? 'Status' : 
+                            (currentStatusFilter === 'in-stock' ? 'In Stock' : 'Out of Stock');
+                        
+                        filterTable();
+                    });
+                });
+            });
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('productSearch');
+                const tableBody = document.querySelector('.image-table-body');
+                let typingTimer;
+                const doneTypingInterval = 300; // Delay in milliseconds
+            
+                // Function to perform the search
+                function searchProducts(searchTerm) {
+                    fetch(`search_products.php?search=${encodeURIComponent(searchTerm)}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            tableBody.innerHTML = html;
+                            // Reinitialize any event listeners for the new content
+                            initializeProductEventListeners();
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            
+                // Initialize event listeners for dynamic content
+                function initializeProductEventListeners() {
+                    // Reinitialize delete buttons
+                    document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = this.id.replace('deleteProductBtn', '');
+                            // Your existing delete logic
+                        });
+                    });
+            
+                    // Reinitialize checkboxes
+                    const checkboxes = document.querySelectorAll('.product-checkbox');
+                    checkboxes.forEach(cb => {
+                        cb.addEventListener('change', function() {
+                            // Your existing checkbox logic
+                        });
+                    });
+                }
+            
+                // Input event listener with debouncing
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(typingTimer);
+                    typingTimer = setTimeout(() => {
+                        const searchTerm = this.value.trim();
+                        searchProducts(searchTerm);
+                    }, doneTypingInterval);
+                });
+            
+                // Clear button functionality
+                const searchButton = searchInput.nextElementSibling;
+                searchButton.addEventListener('click', function() {
+                    searchInput.value = '';
+                    searchProducts('');
+                });
+            });
+            
             </script>
 
 </body>

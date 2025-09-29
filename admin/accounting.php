@@ -30,6 +30,7 @@ while ($row = $result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <title>VMC Basket - Admin/Receipt Form</title>
     <?php include 'links.php'; ?>
     <style>
@@ -221,7 +222,7 @@ while ($row = $result->fetch_assoc()) {
                                 <div class="w-100">
                                     <label class="form-label">Quantity</label>
                                     <div class="input-group">
-                                    <input type="number" class="form-control" name="quantity[]" value="1" min="1">
+                                    <input type="number" class="form-control" name="quantity[]" min="1">
                                     <button type="button" class="btn btn-outline-danger remove-item d-none">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
@@ -277,19 +278,17 @@ while ($row = $result->fetch_assoc()) {
                 <p class="text-muted mb-0" id="currentDateTime"></p>
                 <hr>
             </div>
-            <div id="receiptDetails">
-            <!-- Receipt content will be injected here by JS -->
-            </div>
-            <!-- QR Code Placeholder -->
-            <div id="qrCodePlaceholder" class="text-center my-3">
-                <!-- QR code will be rendered here -->
-                <div style="display:inline-block; width:120px; height:120px; background:#eee; border:2px dashed #bbb; border-radius:8px; line-height:120px; color:#bbb; font-size:18px; font-family:monospace;">
-                    QR Code
+                <div id="receiptDetails">
+                <!-- Receipt content will be injected here by JS -->
                 </div>
-            </div>
-            <div class="modal-footer justify-content-end">
-                <button type="button" class="btn custom-navy-btn btn-lg" id="downloadBtn" onclick="downloadReceipt()">Print</button>
-            </div>
+            <!-- QR Code Placeholder -->
+                              
+                <div id="qrCodePlaceholder" class="text-center my-3">
+                    <div id="qrcode" style="display:inline-block;"></div>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn custom-navy-btn btn-lg" id="downloadBtn" onclick="downloadReceipt()">Print</button>
+                </div>
             </div>
         </div>
     </div>
@@ -300,6 +299,36 @@ while ($row = $result->fetch_assoc()) {
 
 
 <script>
+
+        function generateQRCode(receiptData) {
+        // Clear previous QR code
+        const qrcodeDiv = document.getElementById('qrcode');
+        if (qrcodeDiv) {
+            qrcodeDiv.innerHTML = '';
+            
+            // Format the receipt data for QR code
+            const qrData = {
+                receiptId: receiptData.receiptId,
+                customerName: receiptData.customerName,
+                paymentMode: receiptData.paymentMode,
+                total: receiptData.total,
+                date: receiptData.date,
+                items: receiptData.items
+            };
+            
+            // Create QR code
+            new QRCode(qrcodeDiv, {
+                text: JSON.stringify(qrData),
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } else {
+            console.error('QR code container not found');
+        }
+    }
     
     $(document).ready(function () {
     // Generate Receipt ID
@@ -494,6 +523,9 @@ while ($row = $result->fetch_assoc()) {
         // Get values
         const customerName = $('#customerName').val().trim();
         const paymentMode = $('#paymentMode').val();
+        const currentDate = new Date().toLocaleString();
+        const items = [];
+        
 
         // Validations
         if (!customerName) {
@@ -531,6 +563,7 @@ while ($row = $result->fetch_assoc()) {
             const price = parseFloat($(this).find('input[name="price[]"]').val());
             const quantity = parseInt($(this).find('input[name="quantity[]"]').val(), 10);
             const type = productSelect.data('type');
+            
 
             if (!productName || isNaN(price) || isNaN(quantity) || quantity < 1) {
                 isValid = false;
@@ -539,6 +572,14 @@ while ($row = $result->fetch_assoc()) {
             const subtotal = price * quantity;
             const priceDisplay = isNaN(price) ? '₱ 0.00' : `₱ ${price.toFixed(2)}`;
             const subtotalDisplay = isNaN(subtotal) ? '₱ 0.00' : `₱ ${subtotal.toFixed(2)}`;
+
+            items.push({
+            product: productName,
+            size: size,
+            price: price,
+            quantity: quantity,
+            subtotal: subtotal
+        });
 
             receiptHTML += `
             <tr>
@@ -570,8 +611,19 @@ while ($row = $result->fetch_assoc()) {
             return;
         }
 
+        // Generate QR code with receipt data
+    const receiptData = {
+        receiptId: receiptId,
+        customerName: customerName,
+        paymentMode: paymentMode,
+        date: currentDate,
+        total: computedTotal,
+        items: items
+    };
+
         // Show in modal
         $('#receiptDetails').html(receiptHTML);
+        generateQRCode(receiptData);
         $('#receiptModal').modal('show');
     });
 
@@ -665,6 +717,10 @@ function updateDateTime() {
 // Update immediately and then every second
 updateDateTime();
 setInterval(updateDateTime, 1000);
+
+
+
+
 </script>
 </body>
 </html>
