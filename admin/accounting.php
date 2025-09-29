@@ -269,27 +269,27 @@ while ($row = $result->fetch_assoc()) {
                     <h5 class="modal-title" id="receiptModalLabel">VMC Basket - Receipt Preview</h5>
                     <button type="button" class="btn-close" id="resetFormBtn" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            <div class="modal-body" id="receiptContent">
-                <div class="text-center mb-4">
-                <img src="images/vmc_basket_logo.png" alt="VMC Logo" style="max-width: 100px;">
-                <h4 class="mt-2 LogoName mb-0">VMC Basket</h4>
-                <p class="mb-2">Official Receipt</p>
-                <p class="text-muted mb-0" id="currentDateTime"></p>
-                <hr>
-            </div>
-            <div id="receiptDetails">
-            <!-- Receipt content will be injected here by JS -->
-            </div>
-            <!-- QR Code Placeholder -->
-            <div id="qrCodePlaceholder" class="text-center my-3">
-                <!-- QR code will be rendered here -->
-                <div style="display:inline-block; width:120px; height:120px; background:#eee; border:2px dashed #bbb; border-radius:8px; line-height:120px; color:#bbb; font-size:18px; font-family:monospace;">
-                    QR Code
+                <div class="modal-body" id="receiptContent">
+                    <div class="text-center mb-4">
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" style="max-width: 100px;">
+                    <h4 class="mt-2 LogoName mb-0">VMC Basket</h4>
+                    <p class="mb-2">Official Receipt</p>
+                    <p class="text-muted mb-0" id="currentDateTime"></p>
+                    <hr>
+                    <div id="receiptDetails">
+                    <!-- Receipt content will be injected here by JS -->
+                    </div>
+                    <!-- QR Code Placeholder -->
+                    <div id="qrCodePlaceholder" class="text-center my-3">
+                        <!-- QR code will be rendered here -->
+                        <div style="display:inline-block; width:120px; height:120px; background:#eee; border:2px dashed #bbb; border-radius:8px; line-height:120px; color:#bbb; font-size:18px; font-family:monospace;">
+                            QR Code
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer justify-content-end">
-                <button type="button" class="btn custom-navy-btn btn-lg" id="downloadBtn" onclick="downloadReceipt()">Print</button>
-            </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn custom-navy-btn btn-lg" id="downloadBtn" onclick="downloadReceipt()">Print</button>
+                </div>
             </div>
         </div>
     </div>
@@ -578,12 +578,11 @@ while ($row = $result->fetch_assoc()) {
     // Input change handlers for calculation
     $(document).on('change', 'input[name="price[]"], input[name="quantity[]"]', calculateTotal);
 });
-
-//Download Receipt as PDF
+// Download Receipt as PDF
 async function downloadReceipt() {
     const receiptId = $('#receiptDetails').find('p:first').text().split(':')[1].trim();
     const customerName = $('#customerName').val().trim();
-    const paymentMethod = $('#paymentMode').val(); // Get payment method
+    const paymentMethod = $('#paymentMode').val();
     const products = [];
 
     try {
@@ -626,8 +625,16 @@ async function downloadReceipt() {
             throw new Error(result.error || 'Failed to save receipt');
         }
 
-        // Generate and download PDF
-        const receiptContent = document.getElementById("receiptContent");
+        // Only convert the modal body to PDF, excluding modal-footer
+        const modalBody = document.querySelector('#receiptModal .modal-body');
+        // Clone modalBody and remove modal-footer if present
+        const clone = modalBody.cloneNode(true);
+        // Remove modal-footer if it exists in the clone (shouldn't, but for safety)
+        const modalFooter = clone.querySelector('.modal-footer');
+        if (modalFooter) {
+            modalFooter.parentNode.removeChild(modalFooter);
+        }
+
         const opt = {
             margin: 0.5,
             filename: `receipt-${receiptId}.pdf`,
@@ -636,7 +643,7 @@ async function downloadReceipt() {
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        await html2pdf().from(receiptContent).set(opt).save();
+        await html2pdf().from(clone).set(opt).save();
         
         // Close modal and reset form
         $('#receiptModal').modal('hide');
@@ -648,7 +655,6 @@ async function downloadReceipt() {
     }
 }
 
-// Add this JavaScript before the closing </body> tag
 function updateDateTime() {
     const now = new Date();
     const options = { 
