@@ -630,7 +630,7 @@ while ($row = $result->fetch_assoc()) {
     // Input change handlers for calculation
     $(document).on('change', 'input[name="price[]"], input[name="quantity[]"]', calculateTotal);
 });
-// Download Receipt as PDF
+ // Download Receipt as PDF
 async function downloadReceipt() {
     const receiptId = $('#receiptDetails').find('p:first').text().split(':')[1].trim();
     const customerName = $('#customerName').val().trim();
@@ -679,13 +679,16 @@ async function downloadReceipt() {
 
         // Only convert the modal body to PDF, excluding modal-footer
         const modalBody = document.querySelector('#receiptModal .modal-body');
-        // Clone modalBody and remove modal-footer if present
+        // Clone modalBody
         const clone = modalBody.cloneNode(true);
-        // Remove modal-footer if it exists in the clone (shouldn't, but for safety)
+        // Remove modal-footer from the clone if present
         const modalFooter = clone.querySelector('.modal-footer');
         if (modalFooter) {
-            modalFooter.parentNode.removeChild(modalFooter);
+            modalFooter.remove();
         }
+
+        // Remove the modal-footer from the original modalBody (if you want to hide it visually during PDF generation)
+        // modalBody.querySelector('.modal-footer')?.remove();
 
         const opt = {
             margin: 0.5,
