@@ -1,5 +1,7 @@
 <?php 
 require('admin/inc/config.php');
+session_start();
+
 // If user is not logged in, redirect to login
 
 
@@ -7,6 +9,25 @@ require('admin/inc/config.php');
 header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1
 header("Pragma: no-cache"); // HTTP 1.0
 header("Expires: 0"); // Proxies
+
+
+if (!isset($_SESSION['student_no'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get user info
+$student_no = $_SESSION['student_no'];
+$sql = "SELECT * FROM users WHERE student_no = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $student_no);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+// Profile image fallback and full name
+$profilePic = $user['photo'] ?? 'profile_pic.png';
+$fullName = $user['student_fname'] . " " . $user['student_lname'];
 
 // Set number of items per page
 $items_per_page = 8;
@@ -218,8 +239,8 @@ $search = $_GET['search'] ?? '';
                 <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="profile-section">
-                <img src="admin/images/profile_pic.png">
-                <h4 class="mt-2">Janella Clare Gomez</h4>
+                <img src="admin/uploads/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture">
+                <h4 class="mt-2"><?php echo htmlspecialchars($fullName);?></h4>
             </div>
 
             <div class="px-3">

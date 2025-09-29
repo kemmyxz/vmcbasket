@@ -17,7 +17,7 @@ $user = $result->fetch_assoc();
 
 // Profile image fallback
 $profilePic = $user['photo'];
-$fullName = $user['student_fname'] . ' ' . $user['student_mname'] . ' ' . $user['student_lname'];
+$fullName = $user['student_fname'] . " " . $user['student_lname'];
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
@@ -57,6 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   
     alert('Profile updated successfully!'); window.location.href='profile.php';</script>";
 }
+
+
+
 ?>
 
 
@@ -227,16 +230,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </nav>
 
     <!-- Offcanvas Sidebar -->
+
     <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
         <div class="offcanvas-body p-0">
             <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
                 <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="profile-section">
-                <img src="admin/images/profile_pic.png">
-                <h4 class="mt-2">Janella Clare Gomez</h4>
+                <img src="admin/uploads/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture">
+                <h4 class="mt-2"><?php echo htmlspecialchars($fullName); ?></h4>
             </div>
-
+    
             <div class="px-3">
                 <div class="mb-2">
                     <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
@@ -248,21 +252,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <a href="favorites.php">My Favorites</a>
                     </div>
                 </div>
-
-            <a href="home.php">Home</a>
-
-            <div class="mt-2">
-                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
-                Shop
-                </button>
-                <div class="collapse ps-3" id="shopMenu">
-                <a href="shop_uniforms.php">Uniforms</a>
-                <a href="shop_supplies.php">School Supplies</a>
-                <a href="shop_merch.php">School-related Merchandise</a>
+    
+                <a href="home.php">Home</a>
+    
+                <div class="mt-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                    Shop
+                    </button>
+                    <div class="collapse ps-3" id="shopMenu">
+                    <a href="shop_uniforms.php">Uniforms</a>
+                    <a href="shop_supplies.php">School Supplies</a>
+                    <a href="shop_merch.php">School-related Merchandise</a>
+                    </div>
                 </div>
-            </div>
-
-            <a href="logout.php" class="mt-3 d-block">Log out</a>
+    
+                <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
     </div>

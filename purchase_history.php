@@ -71,6 +71,19 @@ while ($row = $result->fetch_assoc()) {
     $grouped_orders[$receipt_no]['items'][] = $row;
     $grouped_orders[$receipt_no]['total'] += ($row['price'] * $row['quantity']);
 }
+
+// Fetch user information
+$user_id = $_SESSION['user_id'];
+$user_query = "SELECT student_fname, student_lname, photo FROM users WHERE id = ?";
+$stmt = $conn->prepare($user_query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+// Set default profile picture if none exists
+$profile_pic = !empty($user['photo']) ? "admin/uploads/" . $user['photo'] : "admin/images/profile_pic.png";
+$full_name = $user['student_fname'] . " " . $user['student_lname'];
 ?>
 
 
@@ -359,16 +372,17 @@ while ($row = $result->fetch_assoc()) {
     </nav>
 
     <!-- Offcanvas Sidebar -->
+        
     <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
         <div class="offcanvas-body p-0">
             <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
                 <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="profile-section">
-                <img src="admin/images/profile_pic.png">
-                <h4 class="mt-2">Janella Clare Gomez</h4>
+                <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile Picture">
+                <h4 class="mt-2"><?php echo htmlspecialchars($full_name); ?></h4>
             </div>
-
+    
             <div class="px-3">
                 <div class="mb-2">
                     <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
@@ -380,21 +394,21 @@ while ($row = $result->fetch_assoc()) {
                     <a href="favorites.php">My Favorites</a>
                     </div>
                 </div>
-
-            <a href="home.php">Home</a>
-
-            <div class="mt-2">
-                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
-                Shop
-                </button>
-                <div class="collapse ps-3" id="shopMenu">
-                <a href="shop_uniforms.php">Uniforms</a>
-                <a href="shop_supplies.php">School Supplies</a>
-                <a href="shop_merch.php">School-related Merchandise</a>
+    
+                <a href="home.php">Home</a>
+    
+                <div class="mt-2">
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                    Shop
+                    </button>
+                    <div class="collapse ps-3" id="shopMenu">
+                    <a href="shop_uniforms.php">Uniforms</a>
+                    <a href="shop_supplies.php">School Supplies</a>
+                    <a href="shop_merch.php">School-related Merchandise</a>
+                    </div>
                 </div>
-            </div>
-
-            <a href="logout.php" class="mt-3 d-block">Log out</a>
+    
+                <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
     </div>

@@ -230,7 +230,7 @@ input {
             <h2 class="mt-5">Reset Password</h2>
             <p>Please enter your email address and we will send the OTP for you to reset your password.</p>
 
-            <form method="POST" action="">
+            <form name="send_otp" method="POST">
                 <div class="input-group mb-4 mt-5">
                 <input type="email" name="email"  placeholder="Enter your email address" required>
                 </div>
@@ -256,14 +256,14 @@ input {
             <h2 class="mt-5">Enter 6-digit OTP code</h2>
             <p>The OTP code was sent to your email address. Please enter the code.</p>
 
-            <form method="POST" action="">
+            <form name="verify_otp" method="POST">
                 <div class="otp-container mt-3">
-                    <input type="text" maxlength="1" class="otp-input" oninput="moveNext(this, 'otp2')">
-                    <input type="text" maxlength="1" class="otp-input m-1" id="otp2" oninput="moveNext(this, 'otp3')">
-                    <input type="text" maxlength="1" class="otp-input m-1" id="otp3" oninput="moveNext(this, 'otp4')">
-                    <input type="text" maxlength="1" class="otp-input m-1" id="otp4" oninput="moveNext(this, 'otp5')">
-                    <input type="text" maxlength="1" class="otp-input m-1" id="otp5" oninput="moveNext(this, 'otp6')">
-                    <input type="text" maxlength="1" class="otp-input m-1" id="otp6">
+                    <input type="text" name="otp1" class="otp-input" maxlength="1" required>
+                    <input type="text" name="otp2" class="otp-input" maxlength="1" required>
+                    <input type="text" name="otp3" class="otp-input" maxlength="1" required>
+                    <input type="text" name="otp4" class="otp-input" maxlength="1" required>
+                    <input type="text" name="otp5" class="otp-input" maxlength="1" required>
+                    <input type="text" name="otp6" class="otp-input" maxlength="1" required>
                 </div>
                     
                 <p class="mt-5 mb-3" id="timer">05:00</p>
@@ -289,13 +289,13 @@ input {
             <h2 class="mt-5">Create New Password</h2>
             <p>You can create your new password.</p>
 
-            <form method="POST" action="">
+            <form name="reset_password" method="POST">
                 <div class="input-group">
                     <input type="password" name="new_password" placeholder="New Password" required>
                 </div>
 
                 <div class="input-group">
-                    <input type="password" placeholder="Confirm Password" required>
+                    <input type="password" name="confirm_password" placeholder="Confirm Password" required>
                 </div>
 
                 <input type="hidden" name="email" value="<?= isset($_POST['email']) ? $_POST['email'] : ''; ?>">
@@ -325,90 +325,285 @@ input {
         </div>
     </div>
 
+
 <script>
-// For handling the steps and OTP input view
-document.addEventListener("DOMContentLoaded", function () {
-    // Only include the IDs you actually have
-    const steps = ["step1", "step2", "step3", "success"];
-    let currentStep = 0; // Start at step1
-
-    function showStep(stepIndex) {
-        steps.forEach((id, index) => {
-            const el = document.getElementById(id);
-            if (el) el.style.display = (index === stepIndex) ? "flex" : "none";
-        });
-        currentStep = stepIndex;
-    }
-
-    // Show first step on load
+document.addEventListener('DOMContentLoaded', function() {
+    let currentStep = 1;
+    const containers = ['step1', 'step2', 'step3', 'success'].map(id => document.getElementById(id));
+    
+    // Show initial step
     showStep(currentStep);
 
-    // Event delegation for next/back buttons
-    document.body.addEventListener("click", function (e) {
-        if (e.target.matches("[data-next]")) {
-            e.preventDefault(); // Stop form from submitting
-            let nextStep = currentStep + 1;
-            if (nextStep < steps.length) {
-                showStep(nextStep);
+    // Handle Send OTP form
+    document.querySelector('form[name="send_otp"]').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[name="email"]').value;
+        
+        fetch('forgot_password.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `send_otp=1&email=${encodeURIComponent(email)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showStep(2);
+                startOTPTimer();
+            } else {
+                alert(data.message);
             }
-        }
-        if (e.target.matches("[data-prev]")) {
-            e.preventDefault();
-            let prevStep = currentStep - 1;
-            if (prevStep >= 0) {
-                showStep(prevStep);
-            }
-        }
+        });
     });
-});
 
-// Timer countdown logic
-let timeLeft = 5 * 60; // 5 minutes in seconds
-const timerElement = document.getElementById("timer");
-const resendLink = document.getElementById("resend-link");
-const submitButton = document.getElementById("submit-btn");
+    // Handle OTP verification
+    document.querySelector('form[name="verify_otp"]').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.append('verify_otp', '1');
+        
+        fetch('forgot_password.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showStep(3);
+            } else {
+                alert(data.message);
+            }
+        });
+    });
 
-// Update the timer every second
-function updateTimer() {
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
+    // Handle Password Reset
+    document.querySelector('form[name="reset_password"]').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const password = this.querySelector('input[name="new_password"]').value;
+        const confirmPassword = this.querySelector('input[name="confirm_password"]').value;
+        
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            return;
+        }
 
-    // Format minutes and seconds as mm:ss
-    timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        const formData = new FormData(this);
+        formData.append('reset_password', '1');
+        
+        fetch('forgot_password.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showStep(4); // Show success screen
+                setTimeout(() => {
+                    window.location.href = 'login.php';
+                }, 3000);
+            } else {
+                alert(data.message);
+            }
+        });
+    });
 
-    // If time is up
-    if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        resendLink.style.display = 'block'; // Show the resend link
-        submitButton.disabled = true; // Disable submit button after timer ends
-    } else {
-        timeLeft--;
+    // OTP input handling
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('keyup', function(e) {
+            if (e.key >= '0' && e.key <= '9') {
+                if (index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            } else if (e.key === 'Backspace') {
+                if (index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            }
+        });
+    });
+
+    function showStep(step) {
+        containers.forEach((container, index) => {
+            container.style.display = index + 1 === step ? 'flex' : 'none';
+        });
+        currentStep = step;
     }
-}
 
-// Start the timer when the page loads
-const timerInterval = setInterval(updateTimer, 1000);
+    function startOTPTimer() {
+        let timeLeft = 300; // 5 minutes in seconds
+        const timerElement = document.getElementById('timer');
+        const resendLink = document.querySelector('.resend-link');
 
-// When the user clicks on "Re-send", reset the timer and resend OTP
-resendLink.addEventListener('click', function (e) {
-    e.preventDefault();
-    // Reset the timer and hide the resend link
-    timeLeft = 5 * 60; // Reset to 5 minutes
-    resendLink.style.display = 'none';
-    submitButton.disabled = false; // Enable the submit button
-    updateTimer(); // Restart the timer
-    // Add logic here to resend the OTP, e.g., making an AJAX request to the server
-    console.log("Re-sending OTP...");
-});
+        const timer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                resendLink.style.display = 'inline';
+                timerElement.textContent = "OTP Expired";
+            }
+            timeLeft--;
+        }, 1000);
 
-// Move to next OTP input field when one is filled
-function moveNext(current, nextFieldId) {
-    if (current.value.length == current.maxLength) {
-        document.getElementById(nextFieldId).focus();
+        resendLink.style.display = 'none';
     }
-}
-
+});
 </script>
 
+
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
+require 'admin/inc/config.php';
+
+session_start();
+$response = array('status' => '', 'message' => '');
+
+// Step 1: Send OTP
+if (isset($_POST['send_otp'])) {
+    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+
+    // Check if email exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Generate OTP
+        $otp = sprintf("%06d", mt_rand(0, 999999));
+        $otp_hash = password_hash($otp, PASSWORD_BCRYPT);
+        $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
+
+        // Store OTP in database
+        $update_stmt = $conn->prepare("UPDATE users SET otp = ?, otp_expiry = ? WHERE email = ?");
+        $update_stmt->bind_param("sss", $otp_hash, $expiry, $email);
+        
+        if ($update_stmt->execute()) {
+            // Send OTP via Email
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'k.lopanggo14@gmail.com'; // Your email
+                $mail->Password = 'ptik yanf brbo mxkn'; // Your app password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+                
+                $mail->setFrom('k.lopanggo14@gmail.com', 'VMC BASKET');
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = 'Password Reset OTP';
+                $mail->Body = "
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Password Reset Request</h2>
+                        <p>Your OTP for password reset is: <strong style='font-size: 24px;'>{$otp}</strong></p>
+                        <p>This OTP will expire in 5 minutes.</p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                    </div>";
+
+                if ($mail->send()) {
+                    $_SESSION['reset_email'] = $email;
+                    $response['status'] = 'success';
+                    $response['message'] = "OTP sent successfully!";
+                }
+            } catch (Exception $e) {
+                $response['status'] = 'error';
+                $response['message'] = "Failed to send OTP. Mailer Error: {$mail->ErrorInfo}";
+            }
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = "Error storing OTP!";
+        }
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = "Email not found!";
+    }
+    
+    echo json_encode($response);
+    exit;
+}
+
+// Step 2: Verify OTP
+if (isset($_POST['verify_otp'])) {
+    $email = $_SESSION['reset_email'] ?? '';
+    $entered_otp = '';
+    
+    // Combine OTP digits
+    for ($i = 1; $i <= 6; $i++) {
+        $entered_otp .= $_POST["otp$i"];
+    }
+
+    $stmt = $conn->prepare("SELECT otp, otp_expiry FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user && password_verify($entered_otp, $user['otp'])) {
+        if (strtotime($user['otp_expiry']) > time()) {
+            $_SESSION['otp_verified'] = true;
+            $response['status'] = 'success';
+            $response['message'] = "OTP verified successfully!";
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = "OTP has expired!";
+        }
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = "Invalid OTP!";
+    }
+    
+    echo json_encode($response);
+    exit;
+}
+
+// Step 3: Reset Password
+if (isset($_POST['reset_password'])) {
+    if (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_verified']) {
+        $response['status'] = 'error';
+        $response['message'] = "Unauthorized access!";
+        echo json_encode($response);
+        exit;
+    }
+
+    $email = $_SESSION['reset_email'] ?? '';
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if ($new_password !== $confirm_password) {
+        $response['status'] = 'error';
+        $response['message'] = "Passwords do not match!";
+        echo json_encode($response);
+        exit;
+    }
+
+    $password_hash = password_hash($new_password, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("UPDATE users SET student_pass = ?, otp = NULL, otp_expiry = NULL WHERE email = ?");
+    $stmt->bind_param("ss", $password_hash, $email);
+    
+    if ($stmt->execute()) {
+        // Clear session
+        unset($_SESSION['reset_email']);
+        unset($_SESSION['otp_verified']);
+        
+        $response['status'] = 'success';
+        $response['message'] = "Password reset successful!";
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = "Error updating password!";
+    }
+    
+    echo json_encode($response);
+    exit;
+}
+?>
 </body>
 </html>
