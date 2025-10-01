@@ -299,12 +299,12 @@ for ($i = 1; $i <= $total_pages; $i++) {
               <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
                 <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1"
                   style="font-size: 15px;"><strong>From S.Y.</strong></label>
-                <input type="year" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date"
-                  value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+                <input type="number" class="form-control date-filter mb-2 mb-sm-0 ms-2" id="from_date" name="from_date"
+                  min="1900" max="<?= date('Y') ?>" placeholder="Year" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
                 <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1"
                   style="font-size: 15px;"><strong>To</strong></label>
-                <input type="year" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date"
-                  value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+                <input type="number" class="form-control date-filter mb-2 mb-sm-0 ms-2" id="to_date" name="to_date"
+                  min="1900" max="<?= date('Y') ?>" placeholder="Year" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
                 <button type="submit" class="admin-btn ms-sm-2">Filter</button>
               </div>
             </form>
@@ -375,7 +375,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div class="modal-body mt-2 p-4">
+              <div class="modal-body mt-2 p-3">
                 <div class="note">
                   <p class="mt-3">Note: Your student number must match with your school ID for verification.</p>
                 </div>
@@ -440,30 +440,44 @@ for ($i = 1; $i <= $total_pages; $i++) {
                         <option value="Junior High School Grade 10">Junior High School Grade 10</option>
                         <option value="Senior High School Grade 11">Senior High School Grade 11</option>
                         <option value="Senior High School Grade 12">Senior High School Grade 12</option>
-                        <option value="Bachelor of Science in Information System">Bachelor of Science in Information
-                          System</option>
-                        <option value="Bachelor of Science in Business Administration">Bachelor of Science in Business
-                          Administration</option>
-                        <option
-                          value="Bachelor of Science in Elementary Education Major Pre-School and Special Education">
-                          Bachelor of Science in Elementary Education Major Pre-School and Special Education</option>
-                        <option value="Bachelor of Science in Management and Tourism">Bachelor of Science in Management
-                          and Tourism</option>
+                        <option value="Bachelor of Science in Information System">Bachelor of Science in Information System</option>
+                        <option value="Bachelor of Science in Business Administration">Bachelor of Science in Business Administration</option>
+                        <option value="Bachelor of Science in Elementary Education Major Pre-School and Special Education">Bachelor of Science in Elementary Education Major Pre-School and Special Education</option>
+                        <option value="Bachelor of Science in Management and Tourism">Bachelor of Science in Management and Tourism</option>
                         <option value="Bachelor of Science in Criminology">Bachelor of Science in Criminology</option>
-                        <option value="Bachelor of Science in Hotel and Restaurant Management">Bachelor of Science in
-                          Hotel and Restaurant Management</option>
-                        <option value="Bachelor of Science in Secondary Education Major in English and Mathematics">
-                          Bachelor of Science in Secondary Education Major in English and Mathematics</option>
+                        <option value="Bachelor of Science in Hotel and Restaurant Management">Bachelor of Science in Hotel and Restaurant Management</option>
+                        <option value="Bachelor of Science in Secondary Education Major in English and Mathematics">Bachelor of Science in Secondary Education Major in English and Mathematics</option>
                       </select>
+                      <!-- College Year Level Checkboxes (hidden by default) -->
+                      <div id="college-year-levels" class="mt-3" style="display:none;">
+                        <label class="form-label mb-2 me-2">Select Year Level:</label>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="college_year_level" id="year1" value="1st Year">
+                          <label class="form-check-label" for="year1">1st Year</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="college_year_level" id="year2" value="2nd Year">
+                          <label class="form-check-label" for="year2">2nd Year</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="college_year_level" id="year3" value="3rd Year">
+                          <label class="form-check-label" for="year3">3rd Year</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="college_year_level" id="year4" value="4th Year">
+                          <label class="form-check-label" for="year4">4th Year</label>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="row mb-2 mt-3">
-                    <div class="col-md-12">
-                      <label for="dob" class="form-label">Date of Birth</label>
-                      <input type="date" class="form-control" id="dob" name="birthday" required
-                        pattern="\d{4}-\d{2}-\d{2}">
-                    </div>
+
+                <div class="row mb-2 mt-3">
+                  <div class="col-md-12">
+                    <label for="dob" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="dob" name="birthday" required
+                      pattern="\d{4}-\d{2}-\d{2}">
                   </div>
+                </div>
 
                   <div class="modal-footer mt-4">
                     <button type="button" class="btn btn-outline-danger cancel" data-bs-dismiss="modal">Cancel</button>
@@ -473,7 +487,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
               </div>
             </div>
           </div>
-        </div> <!-- End of Modal -->
+        </div><!-- End of Modal -->
 
         <!-- CUSTOMER TABLE -->
         <div class="table-responsive">
@@ -486,6 +500,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                 <th>#</th>
                 <th>Student Details</th>
                 <th>Student ID</th>
+                <th>Year-level</th>
                 <th>Phone Number</th>
                 <th class="align-middle text-center">
                     <div class="dropdown">
@@ -532,6 +547,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                     </div>
                   </td>
                   <td><?php echo $row['student_no']; ?></td>
+                  <td>Year-level</td>
                   <td><?php echo $row['phone_number']; ?></td>
                   <td>
                     <?php
@@ -842,43 +858,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-    const bulkDisableBtn = document.getElementById('bulkDisableBtn');
-    
-    bulkDisableBtn.addEventListener('click', function() {
-        const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
-            .map(checkbox => checkbox.value);
-            
-        if (selectedIds.length === 0) {
-            alert('Please select at least one account to disable');
-            return;
-        }
-        
-        if (confirm('Are you sure you want to disable the selected accounts?')) {
-            fetch('disable_accounts.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ ids: selectedIds })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Selected accounts have been disabled successfully');
-                    location.reload();
-                } else {
-                    alert('Error disabling accounts: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while disabling accounts');
-            });
-        }
-    });
-});
 </script>
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const courseSelect = document.getElementById('course');
+      const collegeLevels = document.getElementById('college-year-levels');
+      // When form is submitted, combine course and year if college
+      const form = courseSelect.closest('form');
+      form.addEventListener('submit', function(e) {
+        // Only for college courses
+        const selectedCourse = courseSelect.value;
+        if (/Bachelor/i.test(selectedCourse)) {
+          const checked = document.querySelector('input[name="college_year_level"]:checked');
+          if (!checked) {
+            alert('Please select a year level for the college course.');
+            e.preventDefault();
+            return false;
+          }
+          // Set the select value to course + year (for backend)
+          courseSelect.value = selectedCourse + ' - ' + checked.value;
+        }
+      });
+      courseSelect.addEventListener('change', function() {
+        if (/Bachelor/i.test(this.value)) {
+          collegeLevels.style.display = 'block';
+        } else {
+          collegeLevels.style.display = 'none';
+          // Uncheck all radios if not college
+          document.querySelectorAll('input[name="college_year_level"]').forEach(r => r.checked = false);
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -173,25 +173,17 @@ if (empty($orders)) {
       margin-top: 20px;
     }
 
-    .banner {
-      background: url('./admin/images/Order_Success.png') no-repeat center center;
-      background-size: contain;
-      width: 100%;
-      max-width: 850px;
-      height: 200px;
-      border-radius: 8px;
-    }
-
     .order-container {
       max-width: 800px;
       margin: 0 auto;
-      background: white;
+      background: #e8edef;
       padding: 30px;
     }
 
     .table td,
     .table th {
       vertical-align: middle;
+      background-color: #e8edef;
       border-bottom: 1px solid #D9D9D9;
       font-weight: normal;
     }
