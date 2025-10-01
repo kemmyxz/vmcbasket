@@ -303,25 +303,63 @@ for ($i = 1; $i <= $total_pages; $i++) {
           <h2>Students</h2>
         </div>
         <div class="row mb-3 g-2 align-items-center flex-column flex-md-row">
-          <!-- DATE FILTER (Calendar) -->
+          <!-- YEAR-LEVEL FILTER -->
           <div class="col-12 col-md">
             <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get"
               action="cus.php" style="gap: 8px;">
-              <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
-                <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1"
-                  style="font-size: 15px;"><strong>From S.Y.</strong></label>
-                <input type="number" class="form-control date-filter mb-2 mb-sm-0 ms-2" id="from_date" name="from_date"
-                  min="1900" max="<?= date('Y') ?>" placeholder="Year" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
-                <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1"
-                  style="font-size: 15px;"><strong>To</strong></label>
-                <input type="number" class="form-control date-filter mb-2 mb-sm-0 ms-2" id="to_date" name="to_date"
-                  min="1900" max="<?= date('Y') ?>" placeholder="Year" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+              <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center">
+                <label for="year_level_filter" class="form-label mb-1 mb-sm-0"><strong> Filter By Year-Level</strong></label>
+                <select class="form-select mb-2 mb-sm-0" id="year_level_filter" name="year_level_filter" style="padding: 10px 15px;">
+                  <option value="">All</option>
+                  <option value="Pre-School" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Pre-School') ? 'selected' : '' ?>>Pre-School</option>
+                  <option value="Kindergarten" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Kindergarten') ? 'selected' : '' ?>>Kindergarten</option>
+                  <option value="Elementary Grade 1" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Elementary Grade 1') ? 'selected' : '' ?>>Elementary Grade 1</option>
+                  <option value="Elementary Grade 2" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Elementary Grade 2') ? 'selected' : '' ?>>Elementary Grade 2</option>
+                  <option value="Elementary Grade 3" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Elementary Grade 3') ? 'selected' : '' ?>>Elementary Grade 3</option>
+                  <option value="Elementary Grade 4" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Elementary Grade 4') ? 'selected' : '' ?>>Elementary Grade 4</option>
+                  <option value="Elementary Grade 5" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Elementary Grade 5') ? 'selected' : '' ?>>Elementary Grade 5</option>
+                  <option value="Elementary Grade 6" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Elementary Grade 6') ? 'selected' : '' ?>>Elementary Grade 6</option>
+                  <option value="Junior High School Grade 7" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Junior High School Grade 7') ? 'selected' : '' ?>>Junior High School Grade 7</option>
+                  <option value="Junior High School Grade 8" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Junior High School Grade 8') ? 'selected' : '' ?>>Junior High School Grade 8</option>
+                  <option value="Junior High School Grade 9" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Junior High School Grade 9') ? 'selected' : '' ?>>Junior High School Grade 9</option>
+                  <option value="Junior High School Grade 10" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Junior High School Grade 10') ? 'selected' : '' ?>>Junior High School Grade 10</option>
+                  <option value="Senior High School Grade 11" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Senior High School Grade 11') ? 'selected' : '' ?>>Senior High School Grade 11</option>
+                  <option value="Senior High School Grade 12" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Senior High School Grade 12') ? 'selected' : '' ?>>Senior High School Grade 12</option>
+                  <option value="Bachelor of Science in Information System - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Information System - 1st Year') ? 'selected' : '' ?>>BS Information System - 1st Year</option>
+                  <option value="Bachelor of Science in Information System - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Information System - 2nd Year') ? 'selected' : '' ?>>BS Information System - 2nd Year</option>
+                  <option value="Bachelor of Science in Information System - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Information System - 3rd Year') ? 'selected' : '' ?>>BS Information System - 3rd Year</option>
+                  <option value="Bachelor of Science in Information System - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Information System - 4th Year') ? 'selected' : '' ?>>BS Information System - 4th Year</option>
+                  <option value="Bachelor of Science in Business Administration - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Business Administration - 1st Year') ? 'selected' : '' ?>>BS Business Administration - 1st Year</option>
+                  <option value="Bachelor of Science in Business Administration - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Business Administration - 2nd Year') ? 'selected' : '' ?>>BS Business Administration - 2nd Year</option>
+                  <option value="Bachelor of Science in Business Administration - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Business Administration - 3rd Year') ? 'selected' : '' ?>>BS Business Administration - 3rd Year</option>
+                  <option value="Bachelor of Science in Business Administration - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Business Administration - 4th Year') ? 'selected' : '' ?>>BS Business Administration - 4th Year</option>
+                  <option value="Bachelor of Science in Elementary Education Major Pre-School and Special Education - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Elementary Education Major Pre-School and Special Education - 1st Year') ? 'selected' : '' ?>>BSEd Pre-School & Special Ed - 1st Year</option>
+                  <option value="Bachelor of Science in Elementary Education Major Pre-School and Special Education - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Elementary Education Major Pre-School and Special Education - 2nd Year') ? 'selected' : '' ?>>BSEd Pre-School & Special Ed - 2nd Year</option>
+                  <option value="Bachelor of Science in Elementary Education Major Pre-School and Special Education - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Elementary Education Major Pre-School and Special Education - 3rd Year') ? 'selected' : '' ?>>BSEd Pre-School & Special Ed - 3rd Year</option>
+                  <option value="Bachelor of Science in Elementary Education Major Pre-School and Special Education - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Elementary Education Major Pre-School and Special Education - 4th Year') ? 'selected' : '' ?>>BSEd Pre-School & Special Ed - 4th Year</option>
+                  <option value="Bachelor of Science in Management and Tourism - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Management and Tourism - 1st Year') ? 'selected' : '' ?>>BS Management & Tourism - 1st Year</option>
+                  <option value="Bachelor of Science in Management and Tourism - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Management and Tourism - 2nd Year') ? 'selected' : '' ?>>BS Management & Tourism - 2nd Year</option>
+                  <option value="Bachelor of Science in Management and Tourism - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Management and Tourism - 3rd Year') ? 'selected' : '' ?>>BS Management & Tourism - 3rd Year</option>
+                  <option value="Bachelor of Science in Management and Tourism - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Management and Tourism - 4th Year') ? 'selected' : '' ?>>BS Management & Tourism - 4th Year</option>
+                  <option value="Bachelor of Science in Criminology - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Criminology - 1st Year') ? 'selected' : '' ?>>BS Criminology - 1st Year</option>
+                  <option value="Bachelor of Science in Criminology - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Criminology - 2nd Year') ? 'selected' : '' ?>>BS Criminology - 2nd Year</option>
+                  <option value="Bachelor of Science in Criminology - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Criminology - 3rd Year') ? 'selected' : '' ?>>BS Criminology - 3rd Year</option>
+                  <option value="Bachelor of Science in Criminology - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Criminology - 4th Year') ? 'selected' : '' ?>>BS Criminology - 4th Year</option>
+                  <option value="Bachelor of Science in Hotel and Restaurant Management - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Hotel and Restaurant Management - 1st Year') ? 'selected' : '' ?>>BS HRM - 1st Year</option>
+                  <option value="Bachelor of Science in Hotel and Restaurant Management - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Hotel and Restaurant Management - 2nd Year') ? 'selected' : '' ?>>BS HRM - 2nd Year</option>
+                  <option value="Bachelor of Science in Hotel and Restaurant Management - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Hotel and Restaurant Management - 3rd Year') ? 'selected' : '' ?>>BS HRM - 3rd Year</option>
+                  <option value="Bachelor of Science in Hotel and Restaurant Management - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Hotel and Restaurant Management - 4th Year') ? 'selected' : '' ?>>BS HRM - 4th Year</option>
+                  <option value="Bachelor of Science in Secondary Education Major in English and Mathematics - 1st Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Secondary Education Major in English and Mathematics - 1st Year') ? 'selected' : '' ?>>BS Secondary Ed - 1st Year</option>
+                  <option value="Bachelor of Science in Secondary Education Major in English and Mathematics - 2nd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Secondary Education Major in English and Mathematics - 2nd Year') ? 'selected' : '' ?>>BS Secondary Ed - 2nd Year</option>
+                  <option value="Bachelor of Science in Secondary Education Major in English and Mathematics - 3rd Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Secondary Education Major in English and Mathematics - 3rd Year') ? 'selected' : '' ?>>BS Secondary Ed - 3rd Year</option>
+                  <option value="Bachelor of Science in Secondary Education Major in English and Mathematics - 4th Year" <?= (isset($_GET['year_level_filter']) && $_GET['year_level_filter'] == 'Bachelor of Science in Secondary Education Major in English and Mathematics - 4th Year') ? 'selected' : '' ?>>BS Secondary Ed - 4th Year</option>
+                </select>
                 <button type="submit" class="admin-btn ms-sm-2">Filter</button>
               </div>
             </form>
           </div>
           <!-- BUTTONS FOR ADDING CUSTOMER -->
-          <div class="col-12 col-md-auto ms-md-0 mt-2 mt-md-3 d-flex justify-content-lg-end">
+          <div class="col-12 col-md-auto ms-md-0 d-flex justify-content-lg-end">
             <div class="btn-group w-100">
               <button type="button" class="admin-btn dropdown-toggle w-100" data-bs-toggle="dropdown"
                 aria-expanded="false">
