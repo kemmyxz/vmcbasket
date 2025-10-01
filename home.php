@@ -381,17 +381,17 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         <div class="year-level row g-4 justify-content-center">
             <!-- First Row -->
             <div class="col-md-6">
-                <a href="shop.php"><img src="admin/images/Home Page/Pre-School & Elementary.png" class="img-fluid rounded shadow" alt="Pre-School & Elementary"></a>
+                <a href="shop_uniforms.php"><img src="admin/images/Home Page/Pre-School & Elementary.png" class="img-fluid rounded shadow" alt="Pre-School & Elementary"></a>
             </div>
             <div class="col-md-6">
-                <a href="shop.php"><img src="admin/images/Home Page/Junior High School.png" class="img-fluid rounded shadow" alt="Junior High"></a>
+                <a href="shop_uniforms.php"><img src="admin/images/Home Page/Junior High School.png" class="img-fluid rounded shadow" alt="Junior High"></a>
             </div>
             <!-- Second Row -->
             <div class="col-md-6">
-                <a href="shop.php"><img src="admin/images/Home Page/Senior High School.png" class="img-fluid rounded shadow" alt="Senior High"></a>
+                <a href="shop_uniforms.php"><img src="admin/images/Home Page/Senior High School.png" class="img-fluid rounded shadow" alt="Senior High"></a>
             </div>
             <div class="col-md-6">
-                <a href="shop.php"><img src="admin/images/Home Page/College.png" class="img-fluid rounded shadow" alt="College"></a>
+                <a href="shop_uniforms.php"><img src="admin/images/Home Page/College.png" class="img-fluid rounded shadow" alt="College"></a>
             </div>
         </div>
     </div>
