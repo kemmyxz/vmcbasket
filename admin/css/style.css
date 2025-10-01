@@ -404,7 +404,7 @@ hr {
   border: 1px solid #79e37b;
 }
 
-.status.inactive {
+.status.disabled {
   background-color: #ffbbc0;
   color: #d11408;
   border: 1px solid #ff939a;

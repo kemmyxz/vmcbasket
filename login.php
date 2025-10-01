@@ -1,27 +1,7 @@
 <?php
 // Start session
 session_start();
-require 'admin/inc/config.php'; // Include database connection
-
-function updateUserActivityStatus($conn) {
-    // Define the inactivity threshold (24 hours = 86400 seconds)
-    $inactivity_threshold = 86400; 
-
-    // Update all users' status based on their last activity
-    $update_inactive_sql = "UPDATE users 
-                          SET active_status = CASE 
-                              WHEN TIMESTAMPDIFF(SECOND, last_activity, NOW()) > ? THEN 'Inactive'
-                              ELSE 'Active'
-                          END
-                          WHERE last_activity IS NOT NULL";
-    
-    $stmt = $conn->prepare($update_inactive_sql);
-    $stmt->bind_param("i", $inactivity_threshold);
-    $stmt->execute();
-    $stmt->close();
-}
-
-updateUserActivityStatus($conn);
+require 'admin/inc/config.php';
 
 // If user is already logged in, redirect to index.php
 if (isset($_SESSION['user_id'])) {
@@ -39,46 +19,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($student_no) || empty($password)) {
         $error = "Please fill in all fields.";
     } else {
-        // Query to check if student exists
-        $sql = "SELECT id, student_no, student_pass, active_status FROM users WHERE student_no = ?";
-        $stmt = $conn->prepare($sql);
-
-        if ($stmt) {
-            $stmt->bind_param("s", $student_no);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows == 1) {
-                $user = $result->fetch_assoc();
-
-                // Verify password
-                if (password_verify($password, $user['student_pass'])) {
-                    // Set session variables
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['student_no'] = $user['student_no'];
-                    $_SESSION['login'] = true;
-
-                    // Update last activity timestamp and set status as Active
-                    $update_last_activity_sql = "UPDATE users 
-                                                SET last_activity = NOW(), 
-                                                    active_status = 'Active' 
-                                                WHERE student_no = ?";
-                    $update_last_activity_stmt = $conn->prepare($update_last_activity_sql);
-                    $update_last_activity_stmt->bind_param("s", $student_no);
-                    $update_last_activity_stmt->execute();
-                    $update_last_activity_stmt->close();
-
-                    // Redirect to dashboard
-                    header("Location: home.php");
-                    exit();
+        // First check if account is disabled before verifying password
+        $check_status_sql = "SELECT active_status FROM users WHERE student_no = ?";
+        $check_stmt = $conn->prepare($check_status_sql);
+        
+        if ($check_stmt) {
+            $check_stmt->bind_param("s", $student_no);
+            $check_stmt->execute();
+            $status_result = $check_stmt->get_result();
+            
+            if ($status_result->num_rows == 1) {
+                $status_data = $status_result->fetch_assoc();
+                
+                if ($status_data['active_status'] === 'Disabled') {
+                    $error = "This account has been disabled. Please contact the administrator.";
                 } else {
-                    $error = "Incorrect Password!";
+                    // Account is active, proceed with login verification
+                    $sql = "SELECT id, student_no, student_pass FROM users WHERE student_no = ? AND active_status = 'Active'";
+                    $stmt = $conn->prepare($sql);
+                    
+                    if ($stmt) {
+                        $stmt->bind_param("s", $student_no);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
+                        if ($result->num_rows == 1) {
+                            $user = $result->fetch_assoc();
+                            
+                            if (password_verify($password, $user['student_pass'])) {
+                                // Set session variables
+                                $_SESSION['user_id'] = $user['id'];
+                                $_SESSION['student_no'] = $user['student_no'];
+                                $_SESSION['login'] = true;
+
+                                // Update last activity timestamp
+                                $update_sql = "UPDATE users SET last_activity = NOW() WHERE student_no = ?";
+                                $update_stmt = $conn->prepare($update_sql);
+                                $update_stmt->bind_param("s", $student_no);
+                                $update_stmt->execute();
+                                $update_stmt->close();
+
+                                // Redirect to dashboard
+                                header("Location: home.php");
+                                exit();
+                            } else {
+                                $error = "Incorrect Password!";
+                            }
+                        } else {
+                            $error = "Student number not found!";
+                        }
+                        $stmt->close();
+                    } else {
+                        $error = "Database query failed.";
+                    }
                 }
             } else {
                 $error = "Student number not found!";
             }
-
-            $stmt->close();
+            $check_stmt->close();
         } else {
             $error = "Database query failed.";
         }

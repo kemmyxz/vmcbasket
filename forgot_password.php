@@ -1,3 +1,155 @@
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
+require 'admin/inc/config.php';
+
+session_start();
+$response = array('status' => '', 'message' => '');
+
+// Step 1: Send OTP
+if (isset($_POST['send_otp'])) {
+    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+
+    // Check if email exists
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Generate OTP
+        $otp = sprintf("%06d", mt_rand(0, 999999));
+        $otp_hash = password_hash($otp, PASSWORD_BCRYPT);
+        $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
+
+        // Store OTP in database
+        $update_stmt = $conn->prepare("UPDATE users SET otp = ?, otp_expiry = ? WHERE email = ?");
+        $update_stmt->bind_param("sss", $otp_hash, $expiry, $email);
+        
+        if ($update_stmt->execute()) {
+            // Send OTP via Email
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'k.lopanggo14@gmail.com'; // Your email
+                $mail->Password = 'ptik yanf brbo mxkn'; // Your app password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+                
+                $mail->setFrom('k.lopanggo14@gmail.com', 'VMC BASKET');
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = 'Password Reset OTP';
+                $mail->Body = "
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Password Reset Request</h2>
+                        <p>Your OTP for password reset is: <strong style='font-size: 24px;'>{$otp}</strong></p>
+                        <p>This OTP will expire in 5 minutes.</p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                    </div>";
+
+                if ($mail->send()) {
+                    $_SESSION['reset_email'] = $email;
+                    $response['status'] = 'success';
+                    $response['message'] = "OTP sent successfully!";
+                }
+            } catch (Exception $e) {
+                $response['status'] = 'error';
+                $response['message'] = "Failed to send OTP. Mailer Error: {$mail->ErrorInfo}";
+            }
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = "Error storing OTP!";
+        }
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = "Email not found!";
+    }
+    
+    echo json_encode($response);
+    exit;
+}
+
+// Step 2: Verify OTP
+if (isset($_POST['verify_otp'])) {
+    $email = $_SESSION['reset_email'] ?? '';
+    $entered_otp = '';
+    
+    // Combine OTP digits
+    for ($i = 1; $i <= 6; $i++) {
+        $entered_otp .= $_POST["otp$i"];
+    }
+
+    $stmt = $conn->prepare("SELECT otp, otp_expiry FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user && password_verify($entered_otp, $user['otp'])) {
+        if (strtotime($user['otp_expiry']) > time()) {
+            $_SESSION['otp_verified'] = true;
+            $response['status'] = 'success';
+            $response['message'] = "OTP verified successfully!";
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = "OTP has expired!";
+        }
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = "Invalid OTP!";
+    }
+    
+    echo json_encode($response);
+    exit;
+}
+
+// Step 3: Reset Password
+if (isset($_POST['reset_password'])) {
+    if (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_verified']) {
+        $response['status'] = 'error';
+        $response['message'] = "Unauthorized access!";
+        echo json_encode($response);
+        exit;
+    }
+
+    $email = $_SESSION['reset_email'] ?? '';
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if ($new_password !== $confirm_password) {
+        $response['status'] = 'error';
+        $response['message'] = "Passwords do not match!";
+        echo json_encode($response);
+        exit;
+    }
+
+    $password_hash = password_hash($new_password, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("UPDATE users SET student_pass = ?, otp = NULL, otp_expiry = NULL WHERE email = ?");
+    $stmt->bind_param("ss", $password_hash, $email);
+    
+    if ($stmt->execute()) {
+        // Clear session
+        unset($_SESSION['reset_email']);
+        unset($_SESSION['otp_verified']);
+        
+        $response['status'] = 'success';
+        $response['message'] = "Password reset successful!";
+    } else {
+        $response['status'] = 'error';
+        $response['message'] = "Error updating password!";
+    }
+    
+    echo json_encode($response);
+    exit;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -455,155 +607,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-<?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php';
-require 'admin/inc/config.php';
-
-session_start();
-$response = array('status' => '', 'message' => '');
-
-// Step 1: Send OTP
-if (isset($_POST['send_otp'])) {
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-
-    // Check if email exists
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        // Generate OTP
-        $otp = sprintf("%06d", mt_rand(0, 999999));
-        $otp_hash = password_hash($otp, PASSWORD_BCRYPT);
-        $expiry = date("Y-m-d H:i:s", strtotime("+5 minutes"));
-
-        // Store OTP in database
-        $update_stmt = $conn->prepare("UPDATE users SET otp = ?, otp_expiry = ? WHERE email = ?");
-        $update_stmt->bind_param("sss", $otp_hash, $expiry, $email);
-        
-        if ($update_stmt->execute()) {
-            // Send OTP via Email
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';
-                $mail->SMTPAuth = true;
-                $mail->Username = 'k.lopanggo14@gmail.com'; // Your email
-                $mail->Password = 'ptik yanf brbo mxkn'; // Your app password
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-                
-                $mail->setFrom('k.lopanggo14@gmail.com', 'VMC BASKET');
-                $mail->addAddress($email);
-                $mail->isHTML(true);
-                $mail->Subject = 'Password Reset OTP';
-                $mail->Body = "
-                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
-                        <h2>Password Reset Request</h2>
-                        <p>Your OTP for password reset is: <strong style='font-size: 24px;'>{$otp}</strong></p>
-                        <p>This OTP will expire in 5 minutes.</p>
-                        <p>If you didn't request this, please ignore this email.</p>
-                    </div>";
-
-                if ($mail->send()) {
-                    $_SESSION['reset_email'] = $email;
-                    $response['status'] = 'success';
-                    $response['message'] = "OTP sent successfully!";
-                }
-            } catch (Exception $e) {
-                $response['status'] = 'error';
-                $response['message'] = "Failed to send OTP. Mailer Error: {$mail->ErrorInfo}";
-            }
-        } else {
-            $response['status'] = 'error';
-            $response['message'] = "Error storing OTP!";
-        }
-    } else {
-        $response['status'] = 'error';
-        $response['message'] = "Email not found!";
-    }
-    
-    echo json_encode($response);
-    exit;
-}
-
-// Step 2: Verify OTP
-if (isset($_POST['verify_otp'])) {
-    $email = $_SESSION['reset_email'] ?? '';
-    $entered_otp = '';
-    
-    // Combine OTP digits
-    for ($i = 1; $i <= 6; $i++) {
-        $entered_otp .= $_POST["otp$i"];
-    }
-
-    $stmt = $conn->prepare("SELECT otp, otp_expiry FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-
-    if ($user && password_verify($entered_otp, $user['otp'])) {
-        if (strtotime($user['otp_expiry']) > time()) {
-            $_SESSION['otp_verified'] = true;
-            $response['status'] = 'success';
-            $response['message'] = "OTP verified successfully!";
-        } else {
-            $response['status'] = 'error';
-            $response['message'] = "OTP has expired!";
-        }
-    } else {
-        $response['status'] = 'error';
-        $response['message'] = "Invalid OTP!";
-    }
-    
-    echo json_encode($response);
-    exit;
-}
-
-// Step 3: Reset Password
-if (isset($_POST['reset_password'])) {
-    if (!isset($_SESSION['otp_verified']) || !$_SESSION['otp_verified']) {
-        $response['status'] = 'error';
-        $response['message'] = "Unauthorized access!";
-        echo json_encode($response);
-        exit;
-    }
-
-    $email = $_SESSION['reset_email'] ?? '';
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    if ($new_password !== $confirm_password) {
-        $response['status'] = 'error';
-        $response['message'] = "Passwords do not match!";
-        echo json_encode($response);
-        exit;
-    }
-
-    $password_hash = password_hash($new_password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("UPDATE users SET student_pass = ?, otp = NULL, otp_expiry = NULL WHERE email = ?");
-    $stmt->bind_param("ss", $password_hash, $email);
-    
-    if ($stmt->execute()) {
-        // Clear session
-        unset($_SESSION['reset_email']);
-        unset($_SESSION['otp_verified']);
-        
-        $response['status'] = 'success';
-        $response['message'] = "Password reset successful!";
-    } else {
-        $response['status'] = 'error';
-        $response['message'] = "Error updating password!";
-    }
-    
-    echo json_encode($response);
-    exit;
-}
-?>
 </body>
 </html>

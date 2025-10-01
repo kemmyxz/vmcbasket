@@ -15,7 +15,7 @@ CREATE TABLE users (
     otp VARCHAR(100),
     otp_expiry DATETIME,
     last_activity TIMESTAMP NULL DEFAULT NULL,
-    active_status ENUM('Active', 'Inactive') DEFAULT 'Inactive'
+    active_status ENUM('Active', 'Disable') DEFAULT 'Active'
 );
 
 CREATE TABLE admin_login(

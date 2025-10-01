@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Pagination Setup
 
-$limit = 10; // Number of records per page
+$limit =50; // Number of records per page
 $page = isset($_GET['page']) ? $_GET['page'] : 1; // Get current page number from URL parameter
 $start = ($page - 1) * $limit; // Calculate the starting record for the SQL query
 
@@ -168,17 +168,6 @@ for ($i = 1; $i <= $total_pages; $i++) {
 
     #bulkActionsContainer {
       margin: 20px 0;
-    }
-
-    #bulkDeleteBtn {
-      background-color: #dc3545;
-      border-color: #dc3545;
-      color: white;
-    }
-
-    #bulkDeleteBtn:hover {
-      background-color: #bb2d3b;
-      border-color: #b02a37;
     }
 
     #bulkDisableBtn {
@@ -310,11 +299,11 @@ for ($i = 1; $i <= $total_pages; $i++) {
               <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
                 <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1"
                   style="font-size: 15px;"><strong>From S.Y.</strong></label>
-                <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date"
+                <input type="year" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date"
                   value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
                 <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1"
                   style="font-size: 15px;"><strong>To</strong></label>
-                <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date"
+                <input type="year" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date"
                   value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
                 <button type="submit" class="admin-btn ms-sm-2">Filter</button>
               </div>
@@ -351,14 +340,14 @@ for ($i = 1; $i <= $total_pages; $i++) {
           $count_query = "SELECT 
                 COUNT(*) as total,
                 SUM(CASE WHEN active_status = 'Active' THEN 1 ELSE 0 END) as active_count,
-                SUM(CASE WHEN active_status = 'Inactive' THEN 1 ELSE 0 END) as inactive_count
+                SUM(CASE WHEN active_status = 'Disabled' THEN 1 ELSE 0 END) as disabled_count
             FROM users";
           $count_result = $conn->query($count_query);
           $counts = $count_result->fetch_assoc();
           ?>
           <strong>Total Students: <?php echo $counts['total']; ?></strong>
           <span class="text-success">Active: <?php echo $counts['active_count']; ?></span>
-          <span class="text-danger">Disabled: <?php echo $counts['inactive_count']; ?></span>
+          <span class="text-danger">Disabled: <?php echo $counts['disabled_count']; ?></span>
         </div>
         <!-- Bulk Disable Button (hidden by default) -->
         <div id="bulkDisableContainer" style="display:none; margin-top: 20px; margin-bottom: 20px;">
@@ -371,9 +360,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
           <button id="bulkDisableBtn" class="btn btn-warning me-2">
             <i class="bi bi-slash-circle"></i> Disable Account Selected
           </button>
-          <button id="bulkDeleteBtn" class="btn btn-danger">
-            <i class="bi bi-trash"></i> Delete Selected
-          </button>
+    
         </div>
 
         <!-- ADD CUSTOMER MODAL -->
@@ -510,7 +497,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                       <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
                           <li><a class="dropdown-item status-filter" href="#" data-status="all">All</a></li>
                           <li><a class="dropdown-item status-filter" href="#" data-status="Active">Active</a></li>
-                          <li><a class="dropdown-item status-filter" href="#" data-status="Inactive">Inactive</a></li>
+                          <li><a class="dropdown-item status-filter" href="#" data-status="Disabled">Disabled</a></li>
                       </ul>
                   </div>
                 </th>
@@ -523,7 +510,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
               while ($row = $result->fetch_assoc()): ?>
                 <?php
                 // Check last_active timestamp to set active status.
-                $activeStatus = "Inactive";
+                $activeStatus = "Disable";
                 if (!empty($row['last_activity']) && strtotime($row['last_activity']) >= strtotime("-10 minutes")) {
                   $activeStatus = "Active";
                 }
@@ -706,80 +693,31 @@ for ($i = 1; $i <= $total_pages; $i++) {
 
   <script>
 
-    document.addEventListener('DOMContentLoaded', function () {
-      const selectAll = document.getElementById('selectAllProducts');
-      const checkboxes = document.querySelectorAll('.product-checkbox');
-      const bulkActionsContainer = document.getElementById('bulkActionsContainer');
-      const bulkDisableBtn = document.getElementById('bulkDisableBtn');
-      const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-
-      // Select/Deselect all checkboxes
-      selectAll.addEventListener('change', function () {
-        checkboxes.forEach(cb => cb.checked = selectAll.checked);
-        toggleBulkActions();
-      });
-
-      // Individual checkbox changes
-      checkboxes.forEach(cb => {
-        cb.addEventListener('change', function () {
-          selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
-          toggleBulkActions();
+        document.addEventListener('DOMContentLoaded', function () {
+        const selectAll = document.getElementById('selectAllProducts');
+        const checkboxes = document.querySelectorAll('.product-checkbox');
+        const bulkDisableContainer = document.getElementById('bulkDisableContainer');
+        const bulkDisableBtn = document.getElementById('bulkDisableBtn');
+    
+        // Select/Deselect all checkboxes
+        selectAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            toggleBulkActions();
         });
-      });
-
-      function toggleBulkActions() {
-        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        bulkActionsContainer.style.display = anyChecked ? 'block' : 'none';
-      }
-
-      // Bulk delete action
-      bulkDeleteBtn.addEventListener('click', function () {
-        const selectedIds = Array.from(checkboxes)
-          .filter(cb => cb.checked)
-          .map(cb => cb.value);
-
-        if (selectedIds.length === 0) return;
-
-        const confirmMessage = selectedIds.length === 1
-          ? 'Are you sure you want to delete this user? This action cannot be undone.'
-          : `Are you sure you want to delete ${selectedIds.length} users? This action cannot be undone.`;
-
-        if (confirm(confirmMessage)) {
-          // Show loading state
-          bulkDeleteBtn.disabled = true;
-          bulkDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
-
-          // Send delete request
-          fetch('bulk_delete.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ ids: selectedIds })
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                alert(data.message);
-                window.location.reload(); // Refresh the page
-              } else {
-                alert('Error: ' + (data.message || 'Failed to delete users'));
-              }
-            })
-            .catch(error => {
-              console.error('Error:', error);
-              alert('An error occurred while deleting users');
-            })
-            .finally(() => {
-              // Reset button state
-              bulkDeleteBtn.disabled = false;
-              bulkDeleteBtn.innerHTML = '<i class="bi bi-trash"></i> Delete Selected';
+    
+        // Individual checkbox changes
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+                toggleBulkActions();
             });
+        });
+    
+        function toggleBulkActions() {
+            const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+            bulkDisableContainer.style.display = anyChecked ? 'block' : 'none';
         }
-      });
     });
-
-
 
     document.addEventListener('DOMContentLoaded', function () {
       let currentStudentId = null;
@@ -863,10 +801,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
           .catch(error => console.error('Error:', error));
       }
     });
-  </script>
-  </script>
 
-<script>
 document.addEventListener('DOMContentLoaded', function() {
     // Get all status filter links
     const statusFilters = document.querySelectorAll('.status-filter');
@@ -904,6 +839,43 @@ document.addEventListener('DOMContentLoaded', function() {
         if (filter.getAttribute('data-status') === currentStatus) {
             filter.classList.add('active');
             document.getElementById('stocksStatusDropdown').textContent = filter.textContent;
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const bulkDisableBtn = document.getElementById('bulkDisableBtn');
+    
+    bulkDisableBtn.addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+            .map(checkbox => checkbox.value);
+            
+        if (selectedIds.length === 0) {
+            alert('Please select at least one account to disable');
+            return;
+        }
+        
+        if (confirm('Are you sure you want to disable the selected accounts?')) {
+            fetch('disable_accounts.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Selected accounts have been disabled successfully');
+                    location.reload();
+                } else {
+                    alert('Error disabling accounts: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while disabling accounts');
+            });
         }
     });
 });
