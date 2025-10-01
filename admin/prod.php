@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Search and pagination logic
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-$limit = 5;
+$limit = 50;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
