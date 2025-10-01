@@ -90,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $date_modified,
             $image_path,
             $tags,  // Now storing as plain text
-            $max_quantity        );
+            $max_quantity
+        );
         $stmt->execute();
 
         $product_id = $conn->insert_id;
@@ -146,7 +147,19 @@ $sql = "SELECT p.*, pv.id as variant_id,
             WHEN p.type = 'Uniform' THEN 'Uniform'
             WHEN p.type = 'Supplies' THEN 'Supplies'
             ELSE 'Unknown'
-        END as type_name
+        END as type_name,
+        CASE
+            WHEN p.type = 'Uniform' AND EXISTS (
+                SELECT 1 FROM product_variants pv2 
+                WHERE pv2.product_id = p.id AND pv2.stock <= 5
+            ) THEN 'Out of Stock'
+            WHEN p.type = 'Supplies' AND (
+                SELECT SUM(pv2.stock) 
+                FROM product_variants pv2 
+                WHERE pv2.product_id = p.id
+            ) <= 5 THEN 'Out of Stock'
+            ELSE 'In Stock'
+        END as stock_status
         FROM products p
         LEFT JOIN product_variants pv ON p.id = pv.product_id
         WHERE p.product_name LIKE ?
@@ -224,68 +237,68 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             <!-- Sidebar -->
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
 
-            <div class="text-center py-3 d-none d-md-block">
-                <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
-            </div>
+                <div class="text-center py-3 d-none d-md-block">
+                    <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
+                </div>
 
-            <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
-                <li class="nav-item">
-                    <a href="index.php" class="nav-link">
-                        <i class="bi bi-house-door me-2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="orders.php" class="nav-link">
-                        <i class="bi bi-bag-check me-2"></i> Orders
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="prod.php" class="nav-link active">
-                        <i class="bi bi-box-seam me-2"></i> Products
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="cus.php" class="nav-link">
-                        <i class="bi bi-people me-2"></i> Students
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="chat.php" class="nav-link">
-                        <i class="bi bi-chat-dots me-2"></i> Chat
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="ratings.php" class="nav-link">
-                        <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="accounting.php" class="nav-link">
-                        <i class="bi bi-receipt me-2"></i> Receipt Form
-                    </a>
-                </li>
-                <!-- Logout for small screens (visible only on xs/sm) -->
-                <li class="nav-item d-block d-md-none">
-                    <a href="logout.php" class="nav-link text-danger fw-semibold">
-                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
-                    </a>
-                </li>
-            </ul>
-            <!-- Logout at the bottom for md/lg screens -->
-            <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
-                <ul class="nav flex-column px-2">
+                <ul class="nav flex-column px-2 mb-3 mt-4 mt-md-0">
                     <li class="nav-item">
+                        <a href="index.php" class="nav-link">
+                            <i class="bi bi-house-door me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="orders.php" class="nav-link">
+                            <i class="bi bi-bag-check me-2"></i> Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="prod.php" class="nav-link active">
+                            <i class="bi bi-box-seam me-2"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="cus.php" class="nav-link">
+                            <i class="bi bi-people me-2"></i> Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="chat.php" class="nav-link">
+                            <i class="bi bi-chat-dots me-2"></i> Chat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="ratings.php" class="nav-link">
+                            <i class="bi bi-list-stars me-2"></i> Ratings & Reviews
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="accounting.php" class="nav-link">
+                            <i class="bi bi-receipt me-2"></i> Receipt Form
+                        </a>
+                    </li>
+                    <!-- Logout for small screens (visible only on xs/sm) -->
+                    <li class="nav-item d-block d-md-none">
                         <a href="logout.php" class="nav-link text-danger fw-semibold">
                             <i class="bi bi-box-arrow-right me-2"></i> Log Out
                         </a>
                     </li>
                 </ul>
-            </div>
-        </nav>
+                <!-- Logout at the bottom for md/lg screens -->
+                <div class="position-absolute w-100 d-none d-md-block" style="bottom: 30px; left: 0;">
+                    <ul class="nav flex-column px-2">
+                        <li class="nav-item">
+                            <a href="logout.php" class="nav-link text-danger fw-semibold">
+                                <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
             <!-- Title Page and Search -->
             <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
-                               
+
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
                         <input type="text" class="form-control" id="productSearch" placeholder="Search products...">
@@ -300,7 +313,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                 <!--Total Products, Add Products Button, and Modal-->
                 <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
                     <div>
-                         <strong>Total Products: <?= number_format($total_products); ?></strong>
+                        <strong>Total Products: <?= number_format($total_products); ?></strong>
                     </div>
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <!-- Bulk Delete Button (hidden by default) -->
@@ -560,7 +573,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                 <th>Product Details</th>
                                 <th>Price</th>
                                 <th>Stock</th>
-                            
+
                                 <th class="align-middle text-center">
                                     <div class="dropdown">
                                         <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle"
@@ -569,9 +582,12 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                             Types
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="tagsDropdown">
-                                            <li><a class="dropdown-item filter-type" href="#" data-type="all">All</a></li>
-                                            <li><a class="dropdown-item filter-type" href="#" data-type="Uniform">Uniform</a></li>
-                                            <li><a class="dropdown-item filter-type" href="#" data-type="Supplies">Supplies</a></li>
+                                            <li><a class="dropdown-item filter-type" href="#" data-type="all">All</a>
+                                            </li>
+                                            <li><a class="dropdown-item filter-type" href="#"
+                                                    data-type="Uniform">Uniform</a></li>
+                                            <li><a class="dropdown-item filter-type" href="#"
+                                                    data-type="Supplies">Supplies</a></li>
                                         </ul>
                                     </div>
                                 </th>
@@ -584,9 +600,12 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                             Status
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="stocksStatusDropdown">
-                                            <li><a class="dropdown-item filter-status" href="#" data-status="all">All</a></li>
-                                            <li><a class="dropdown-item filter-status" href="#" data-status="in-stock">In Stock</a></li>
-                                            <li><a class="dropdown-item filter-status" href="#" data-status="out-of-stock">Out of Stock</a></li>
+                                            <li><a class="dropdown-item filter-status" href="#"
+                                                    data-status="all">All</a></li>
+                                            <li><a class="dropdown-item filter-status" href="#"
+                                                    data-status="in-stock">In Stock</a></li>
+                                            <li><a class="dropdown-item filter-status" href="#"
+                                                    data-status="out-of-stock">Out of Stock</a></li>
                                         </ul>
                                     </div>
                                 </th>
@@ -633,29 +652,29 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                         </td>
 
                                         <td>
-    <?php
-    // Get the latest restock history for this product
-    $restock_sql = "SELECT updated_by, restock_date 
-                    FROM restock_history 
-                    WHERE product_id = ? 
-                    ORDER BY restock_date DESC 
-                    LIMIT 1";
-    $restock_stmt = $conn->prepare($restock_sql);
-    $restock_stmt->bind_param("i", $row['id']);
-    $restock_stmt->execute();
-    $restock_result = $restock_stmt->get_result();
-    
-    if ($restock = $restock_result->fetch_assoc()) {
-        echo "Restocked by: " . htmlspecialchars($restock['updated_by']) . "<br>";
-        echo "<small class='text-muted'>" . date('M d, Y', strtotime($restock['restock_date'])) . "</small>";
-    } else {
-        echo "<span class='text-muted'>No restock history</span>";
-    }
-    ?>
-</td>
+                                            <?php
+                                            // Get the latest restock history for this product
+                                            $restock_sql = "SELECT updated_by, restock_date 
+                                                            FROM restock_history 
+                                                            WHERE product_id = ? 
+                                                            ORDER BY restock_date DESC 
+                                                            LIMIT 1";
+                                            $restock_stmt = $conn->prepare($restock_sql);
+                                            $restock_stmt->bind_param("i", $row['id']);
+                                            $restock_stmt->execute();
+                                            $restock_result = $restock_stmt->get_result();
+
+                                            if ($restock = $restock_result->fetch_assoc()) {
+                                                echo "Restocked by: " . htmlspecialchars($restock['updated_by']) . "<br>";
+                                                echo "<small class='text-muted'>" . date('M d, Y', strtotime($restock['restock_date'])) . "</small>";
+                                            } else {
+                                                echo "<span class='text-muted'>No restock history</span>";
+                                            }
+                                            ?>
+                                        </td>
+
                                         <td>
-                                            <!-- Status: In Stock/Out of Stock -->
-                                            <?php if ($row['total_stock'] > 0): ?>
+                                            <?php if ($row['stock_status'] === 'In Stock'): ?>
                                                 <span class="status active">In Stock</span>
                                             <?php else: ?>
                                                 <span class="status inactive">Out of Stock</span>
@@ -858,27 +877,27 @@ $total_products = $total_products_result->fetch_assoc()['total'];
         </div>
     </div>
 
-            <script>
-                // Stock input logic for Uniforms and Supplies
-                document.addEventListener('DOMContentLoaded', function () {
-                    const typeSelect = document.getElementById('productType');
-                    const sizesSection = document.getElementById('sizesContainer') ? document.getElementById('sizesContainer').closest('.col-12.mb-3.mt-2') : null;
-                    const gendersSection = document.getElementById('gendersContainer') ? document.getElementById('gendersContainer').closest('.col-12.mb-3.mt-2') : null;
-                    const stocksContainer = document.getElementById('stocksContainer');
+    <script>
+        // Stock input logic for Uniforms and Supplies
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeSelect = document.getElementById('productType');
+            const sizesSection = document.getElementById('sizesContainer') ? document.getElementById('sizesContainer').closest('.col-12.mb-3.mt-2') : null;
+            const gendersSection = document.getElementById('gendersContainer') ? document.getElementById('gendersContainer').closest('.col-12.mb-3.mt-2') : null;
+            const stocksContainer = document.getElementById('stocksContainer');
 
-                    function updateStockInputs() {
-                        if (typeSelect.value === '1') { // Uniform
-                            const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
-                            const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
+            function updateStockInputs() {
+                if (typeSelect.value === '1') { // Uniform
+                    const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
+                    const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
 
-                            stocksContainer.innerHTML = '';
+                    stocksContainer.innerHTML = '';
 
-                            if (selectedSizes.length && selectedGenders.length) {
-                                selectedSizes.forEach(size => {
-                                    selectedGenders.forEach(gender => {
-                                        const div = document.createElement('div');
-                                        div.className = 'col-md-4 mb-3';
-                                        div.innerHTML = `
+                    if (selectedSizes.length && selectedGenders.length) {
+                        selectedSizes.forEach(size => {
+                            selectedGenders.forEach(gender => {
+                                const div = document.createElement('div');
+                                div.className = 'col-md-4 mb-3';
+                                div.innerHTML = `
                             <label class="form-label">Stock for ${size} - ${gender}</label>
                             <input type="number" 
                                    class="form-control" 
@@ -887,36 +906,36 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                    placeholder="Enter stock quantity" 
                                    required>
                         `;
-                                        stocksContainer.appendChild(div);
-                                    });
-                                });
-                            }
-                        } else {
-                            // Hide stocks container for supplies
-                            stocksContainer.innerHTML = '';
-                        }
+                                stocksContainer.appendChild(div);
+                            });
+                        });
                     }
+                } else {
+                    // Hide stocks container for supplies
+                    stocksContainer.innerHTML = '';
+                }
+            }
 
-                    // Add event listeners to size and gender checkboxes for uniforms
+            // Add event listeners to size and gender checkboxes for uniforms
+            document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateStockInputs);
+            });
+
+            typeSelect.addEventListener('change', function () {
+                const isSupplies = this.value === '2';
+
+                // Hide/show size and gender sections
+                if (sizesSection) sizesSection.style.display = isSupplies ? 'none' : '';
+                if (gendersSection) gendersSection.style.display = isSupplies ? 'none' : '';
+
+                if (isSupplies) {
+                    // Clear all checkboxes
                     document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
-                        checkbox.addEventListener('change', updateStockInputs);
+                        checkbox.checked = false;
                     });
 
-                    typeSelect.addEventListener('change', function () {
-                        const isSupplies = this.value === '2';
-
-                        // Hide/show size and gender sections
-                        if (sizesSection) sizesSection.style.display = isSupplies ? 'none' : '';
-                        if (gendersSection) gendersSection.style.display = isSupplies ? 'none' : '';
-
-                        if (isSupplies) {
-                            // Clear all checkboxes
-                            document.querySelectorAll('input[name="sizes[]"], input[name="genders[]"]').forEach(checkbox => {
-                                checkbox.checked = false;
-                            });
-
-                            // Show single stock input for supplies
-                            stocksContainer.innerHTML = `
+                    // Show single stock input for supplies
+                    stocksContainer.innerHTML = `
                 <div class="col-12">
                     <label class="form-label">Stock Quantity</label>
                     <input type="number" 
@@ -926,15 +945,15 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                            placeholder="Enter total stock quantity" 
                            required>
                 </div>`;
-                        } else {
-                            stocksContainer.innerHTML = '';
-                            updateStockInputs();
-                        }
-                    });
+                } else {
+                    stocksContainer.innerHTML = '';
+                    updateStockInputs();
+                }
+            });
 
-                    // Initial call to set up the correct stock inputs on page load
-                    if (typeSelect.value === '2') {
-                        stocksContainer.innerHTML = `
+            // Initial call to set up the correct stock inputs on page load
+            if (typeSelect.value === '2') {
+                stocksContainer.innerHTML = `
             <div class="col-12">
                 <label class="form-label">Stock Quantity</label>
                 <input type="number" 
@@ -944,417 +963,416 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                        placeholder="Enter total stock quantity" 
                        required>
             </div>`;
-                        if (sizesSection) sizesSection.style.display = 'none';
-                        if (gendersSection) gendersSection.style.display = 'none';
-                    } else {
-                        updateStockInputs();
-                    }
+                if (sizesSection) sizesSection.style.display = 'none';
+                if (gendersSection) gendersSection.style.display = 'none';
+            } else {
+                updateStockInputs();
+            }
 
-                    // Stock validation on form submit
-                    document.querySelector('form').addEventListener('submit', function (e) {
-                        let hasValidStock = false;
-                        if (typeSelect.value === '2') {
-                            const stockInput = document.querySelector('input[name="stocks[total]"]');
-                            hasValidStock = stockInput && parseInt(stockInput.value) > 0;
-                        } else {
-                            const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
-                            stockInputs.forEach(input => {
-                                if (parseInt(input.value) > 0) {
-                                    hasValidStock = true;
-                                }
-                            });
-                        }
-                        if (!hasValidStock) {
-                            alert('Stock quantity must be greater than 0');
-                            e.preventDefault();
+            // Stock validation on form submit
+            document.querySelector('form').addEventListener('submit', function (e) {
+                let hasValidStock = false;
+                if (typeSelect.value === '2') {
+                    const stockInput = document.querySelector('input[name="stocks[total]"]');
+                    hasValidStock = stockInput && parseInt(stockInput.value) > 0;
+                } else {
+                    const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
+                    stockInputs.forEach(input => {
+                        if (parseInt(input.value) > 0) {
+                            hasValidStock = true;
                         }
                     });
-                });
+                }
+                if (!hasValidStock) {
+                    alert('Stock quantity must be greater than 0');
+                    e.preventDefault();
+                }
+            });
+        });
 
-                /* --- The rest of your scripts remain unchanged --- */
 
-                //For Tags Section
-                document.addEventListener('DOMContentLoaded', function () {
-                    const typeSelect = document.getElementById('productType');
-                    const uniformTagsSection = document.getElementById('uniformTagsSection');
-                    const suppliesTagsSection = document.getElementById('suppliesTagsSection');
 
-                    function updateTagsSection() {
-                        if (typeSelect.value === '1') { // Uniform
-                            uniformTagsSection.style.display = '';
-                            suppliesTagsSection.style.display = 'none';
-                        } else if (typeSelect.value === '2') { // Supplies
-                            uniformTagsSection.style.display = 'none';
-                            suppliesTagsSection.style.display = '';
-                        } else {
-                            uniformTagsSection.style.display = 'none';
-                            suppliesTagsSection.style.display = 'none';
-                        }
-                    }
+        //For Tags Section
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeSelect = document.getElementById('productType');
+            const uniformTagsSection = document.getElementById('uniformTagsSection');
+            const suppliesTagsSection = document.getElementById('suppliesTagsSection');
 
-                    typeSelect.addEventListener('change', updateTagsSection);
-                    updateTagsSection(); // Initial call on page load
-                });
+            function updateTagsSection() {
+                if (typeSelect.value === '1') { // Uniform
+                    uniformTagsSection.style.display = '';
+                    suppliesTagsSection.style.display = 'none';
+                } else if (typeSelect.value === '2') { // Supplies
+                    uniformTagsSection.style.display = 'none';
+                    suppliesTagsSection.style.display = '';
+                } else {
+                    uniformTagsSection.style.display = 'none';
+                    suppliesTagsSection.style.display = 'none';
+                }
+            }
 
-                //Hide the Stocks Label for Uniforms when it's supplies
-                document.addEventListener('DOMContentLoaded', function () {
-                    const typeSelect = document.getElementById('productType');
-                    const stocksLabel = document.getElementById('stocksLabel');
+            typeSelect.addEventListener('change', updateTagsSection);
+            updateTagsSection(); // Initial call on page load
+        });
 
-                    function updateStocksLabel() {
-                        if (typeSelect.value === '2') { // Supplies
-                            stocksLabel.style.display = 'none';
-                        } else {
-                            stocksLabel.style.display = '';
-                        }
-                    }
+        //Hide the Stocks Label for Uniforms when it's supplies
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeSelect = document.getElementById('productType');
+            const stocksLabel = document.getElementById('stocksLabel');
 
-                    typeSelect.addEventListener('change', updateStocksLabel);
-                    updateStocksLabel(); // Initial call on page load
-                });
+            function updateStocksLabel() {
+                if (typeSelect.value === '2') { // Supplies
+                    stocksLabel.style.display = 'none';
+                } else {
+                    stocksLabel.style.display = '';
+                }
+            }
 
-                // For checkbox
-                document.addEventListener('DOMContentLoaded', function () {
-                    // Only one checkbox for uniform tags
-                    document.querySelectorAll('.uniform-tag-checkbox').forEach(function (checkbox) {
-                        checkbox.addEventListener('change', function () {
-                            if (this.checked) {
-                                document.querySelectorAll('.uniform-tag-checkbox').forEach(function (box) {
-                                    if (box !== checkbox) box.checked = false;
-                                });
-                            }
+            typeSelect.addEventListener('change', updateStocksLabel);
+            updateStocksLabel(); // Initial call on page load
+        });
+
+        // For checkbox
+        document.addEventListener('DOMContentLoaded', function () {
+            // Only one checkbox for uniform tags
+            document.querySelectorAll('.uniform-tag-checkbox').forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        document.querySelectorAll('.uniform-tag-checkbox').forEach(function (box) {
+                            if (box !== checkbox) box.checked = false;
                         });
-                    });
-                    // Only one checkbox for supplies tags
-                    document.querySelectorAll('.supplies-tag-checkbox').forEach(function (checkbox) {
-                        checkbox.addEventListener('change', function () {
-                            if (this.checked) {
-                                document.querySelectorAll('.supplies-tag-checkbox').forEach(function (box) {
-                                    if (box !== checkbox) box.checked = false;
-                                });
-                            }
-                        });
-                    });
+                    }
                 });
+            });
+            // Only one checkbox for supplies tags
+            document.querySelectorAll('.supplies-tag-checkbox').forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        document.querySelectorAll('.supplies-tag-checkbox').forEach(function (box) {
+                            if (box !== checkbox) box.checked = false;
+                        });
+                    }
+                });
+            });
+        });
 
-                // Product Details Modal Handler
-                document.addEventListener('DOMContentLoaded', function () {
-                    const productDetailsModal = document.getElementById('productDetailsModal');
-                    
-                    productDetailsModal.addEventListener('show.bs.modal', function (event) {
-                        // Get the button that triggered the modal
-                        const button = event.relatedTarget;
-                        
-                        // Extract data from button attributes
-                        const data = {
-                            id: button.getAttribute('data-id'),
-                            productName: button.getAttribute('data-product_name'),
-                            type: button.getAttribute('data-type'),
-                            drNumber: button.getAttribute('data-drnumber'), 
-                            price: parseFloat(button.getAttribute('data-price')),
-                            totalStock: button.getAttribute('data-total_stock'),
-                            variants: button.getAttribute('data-variants'),
-                            image: button.getAttribute('data-image')
-                        };
-                
-                        // Fetch additional product details from server
-                        fetch(`get_product_details.php?id=${data.id}`)
-                            .then(response => response.json())
-                            .then(productData => {
-                                // Update modal content
-                                document.getElementById('productNameView').textContent = data.productName;
-                                document.getElementById('productTypesView').textContent = data.type === '1' ? 'Uniform' : 'Supplies';
-                                document.getElementById('drNumberView').textContent = data.drNumber;
-                                document.getElementById('productPriceView').textContent = '₱' + data.price.toFixed(2);
-                
-                                // Stock/variant information
-                                const variantsContainer = document.getElementById('productVariants');
-                                if (data.variants) {
-                                    variantsContainer.innerHTML = `${data.variants}<br><strong>Total: ${data.totalStock} pcs</strong>`;
-                                } else {
-                                    variantsContainer.innerHTML = `<strong>Total: ${data.totalStock} pcs</strong>`;
+        // Product Details Modal Handler
+        document.addEventListener('DOMContentLoaded', function () {
+            const productDetailsModal = document.getElementById('productDetailsModal');
+
+            productDetailsModal.addEventListener('show.bs.modal', function (event) {
+                // Get the button that triggered the modal
+                const button = event.relatedTarget;
+
+                // Extract data from button attributes
+                const data = {
+                    id: button.getAttribute('data-id'),
+                    productName: button.getAttribute('data-product_name'),
+                    type: button.getAttribute('data-type'),
+                    drNumber: button.getAttribute('data-drnumber'),
+                    price: parseFloat(button.getAttribute('data-price')),
+                    totalStock: button.getAttribute('data-total_stock'),
+                    variants: button.getAttribute('data-variants'),
+                    image: button.getAttribute('data-image')
+                };
+
+                // Fetch additional product details from server
+                fetch(`get_product_details.php?id=${data.id}`)
+                    .then(response => response.json())
+                    .then(productData => {
+                        // Update modal content
+                        document.getElementById('productNameView').textContent = data.productName;
+                        document.getElementById('productTypesView').textContent = data.type === '1' ? 'Uniform' : 'Supplies';
+                        document.getElementById('drNumberView').textContent = data.drNumber;
+                        document.getElementById('productPriceView').textContent = '₱' + data.price.toFixed(2);
+
+                        // Stock/variant information
+                        const variantsContainer = document.getElementById('productVariants');
+                        if (data.variants) {
+                            variantsContainer.innerHTML = `${data.variants}<br><strong>Total: ${data.totalStock} pcs</strong>`;
+                        } else {
+                            variantsContainer.innerHTML = `<strong>Total: ${data.totalStock} pcs</strong>`;
+                        }
+
+                        // Display tags
+                        const tagsContainer = document.getElementById('productTagsView');
+                        if (productData.tags && productData.tags.length > 0) {
+                            const tagsHTML = productData.tags.map(tag => {
+                                let badgeClass = '';
+                                // Assign badge classes based on tag type
+                                if (data.type === '1') { // Uniform
+                                    badgeClass = getBadgeClassForUniform(tag);
+                                } else { // Supplies
+                                    badgeClass = getBadgeClassForSupplies(tag);
                                 }
-                
-                                // Display tags
-                                const tagsContainer = document.getElementById('productTagsView');
-                                if (productData.tags && productData.tags.length > 0) {
-                                    const tagsHTML = productData.tags.map(tag => {
-                                        let badgeClass = '';
-                                        // Assign badge classes based on tag type
-                                        if (data.type === '1') { // Uniform
-                                            badgeClass = getBadgeClassForUniform(tag);
-                                        } else { // Supplies
-                                            badgeClass = getBadgeClassForSupplies(tag);
-                                        }
-                                        return `<span class="badge ${badgeClass} me-1">${tag}</span>`;
-                                    }).join('');
-                                    tagsContainer.innerHTML = tagsHTML;
-                                } else {
-                                    tagsContainer.innerHTML = '<span class="text-muted">No tags available</span>';
-                                }
-                
-                                // Display max quantity
-                                const maxQtyContainer = document.getElementById('productMaxQtyView');
-                                if (productData.max_quantity) {
-                                    maxQtyContainer.textContent = `${productData.max_quantity} pcs`;
-                                } else {
-                                    maxQtyContainer.innerHTML = '<span class="text-muted">Not set</span>';
-                                }
-                
-                                // Display product image
-                                const productImagesContainer = document.getElementById('productImages');
-                                if (data.image) {
-                                    productImagesContainer.innerHTML = `
+                                return `<span class="badge ${badgeClass} me-1">${tag}</span>`;
+                            }).join('');
+                            tagsContainer.innerHTML = tagsHTML;
+                        } else {
+                            tagsContainer.innerHTML = '<span class="text-muted">No tags available</span>';
+                        }
+
+                        // Display max quantity
+                        const maxQtyContainer = document.getElementById('productMaxQtyView');
+                        if (productData.max_quantity) {
+                            maxQtyContainer.textContent = `${productData.max_quantity} pcs`;
+                        } else {
+                            maxQtyContainer.innerHTML = '<span class="text-muted">Not set</span>';
+                        }
+
+                        // Display product image
+                        const productImagesContainer = document.getElementById('productImages');
+                        if (data.image) {
+                            productImagesContainer.innerHTML = `
                                         <img src="${data.image}" 
                                              alt="${data.productName}" 
                                              class="img-fluid" 
                                              style="max-height: 150px; width: auto;">`;
-                                } else {
-                                    productImagesContainer.innerHTML = '<p class="text-muted">No image available</p>';
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error fetching product details:', error);
-                                alert('Error loading product details');
-                            });
+                        } else {
+                            productImagesContainer.innerHTML = '<p class="text-muted">No image available</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching product details:', error);
+                        alert('Error loading product details');
                     });
-                });
-                
-                // Helper function for uniform badge classes
-                function getBadgeClassForUniform(tag) {
-                    const badgeMap = {
-                        'Pre-school': 'preschool_badge',
-                        'Kindergarten': 'kinder_badge',
-                        'Elementary': 'elementary_badge',
-                        'Junior High School': 'jhs_badge',
-                        'Senior High School': 'shs_badge',
-                        'BS Tourism Management': 'bstm_badge',
-                        'BS Information System': 'bsis_badge',
-                        'BS Hotel and Restaurant Management': 'bhrm_badge',
-                        'BS Secondary Education': 'secondary_badge',
-                        'BS Elementary Education': 'educ_badge',
-                        'Criminology': 'crim_badge'
-                    };
-                    return badgeMap[tag] || 'badge-secondary';
-                }
-                
-                // Helper function for supplies badge classes
-                function getBadgeClassForSupplies(tag) {
-                    const badgeMap = {
-                        'Writing Tools': 'writing_badge',
-                        'Paper Products': 'paper_badge',
-                        'Art Supplies': 'art_badge'
-                    };
-                    return badgeMap[tag] || 'badge-secondary';
-                }
+            });
+        });
 
-                // For Bulk Delete
-                                document.addEventListener('DOMContentLoaded', function() {
-                    const selectAll = document.getElementById('selectAllProducts');
-                    const checkboxes = document.querySelectorAll('.product-checkbox');
-                    const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
-                    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-                
-                    // Select/Deselect all checkboxes
-                    selectAll.addEventListener('change', function() {
-                        checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                        toggleBulkDelete();
-                    });
-                
-                    // Individual checkbox change
-                    checkboxes.forEach(cb => {
-                        cb.addEventListener('change', function() {
-                            selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
-                            toggleBulkDelete();
+        // Helper function for uniform badge classes
+        function getBadgeClassForUniform(tag) {
+            const badgeMap = {
+                'Pre-school': 'preschool_badge',
+                'Kindergarten': 'kinder_badge',
+                'Elementary': 'elementary_badge',
+                'Junior High School': 'jhs_badge',
+                'Senior High School': 'shs_badge',
+                'BS Tourism Management': 'bstm_badge',
+                'BS Information System': 'bsis_badge',
+                'BS Hotel and Restaurant Management': 'bhrm_badge',
+                'BS Secondary Education': 'secondary_badge',
+                'BS Elementary Education': 'educ_badge',
+                'Criminology': 'crim_badge'
+            };
+            return badgeMap[tag] || 'badge-secondary';
+        }
+
+        // Helper function for supplies badge classes
+        function getBadgeClassForSupplies(tag) {
+            const badgeMap = {
+                'Writing Tools': 'writing_badge',
+                'Paper Products': 'paper_badge',
+                'Art Supplies': 'art_badge'
+            };
+            return badgeMap[tag] || 'badge-secondary';
+        }
+
+        // For Bulk Delete
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAll = document.getElementById('selectAllProducts');
+            const checkboxes = document.querySelectorAll('.product-checkbox');
+            const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+            // Select/Deselect all checkboxes
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                toggleBulkDelete();
+            });
+
+            // Individual checkbox change
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
+                    toggleBulkDelete();
+                });
+            });
+
+            // Toggle bulk delete button visibility
+            function toggleBulkDelete() {
+                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
+            }
+
+            // Bulk delete functionality
+            bulkDeleteBtn.addEventListener('click', function () {
+                const selectedIds = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.value);
+
+                if (selectedIds.length === 0) return;
+
+                if (confirm('Are you sure you want to delete the selected products?')) {
+                    // Send delete request
+                    fetch('delete_product.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ ids: selectedIds })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Products deleted successfully!');
+                                location.reload();
+                            } else {
+                                alert('Error deleting products: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting products');
                         });
-                    });
-                
-                    // Toggle bulk delete button visibility
-                    function toggleBulkDelete() {
-                        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                        bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
-                    }
-                
-                    // Bulk delete functionality
-                    bulkDeleteBtn.addEventListener('click', function() {
-                        const selectedIds = Array.from(checkboxes)
-                            .filter(cb => cb.checked)
-                            .map(cb => cb.value);
-                
-                        if (selectedIds.length === 0) return;
-                
-                        if (confirm('Are you sure you want to delete the selected products?')) {
-                            // Send delete request
-                            fetch('delete_product.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ ids: selectedIds })
-                            })
+                }
+            });
+
+            // Single product delete functionality
+            document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
+                button.addEventListener('click', function () {
+                    const productId = this.id.replace('deleteProductBtn', '');
+
+                    if (confirm('Are you sure you want to delete this product?')) {
+                        fetch('delete_product.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ id: productId })
+                        })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    alert('Products deleted successfully!');
+                                    alert('Product deleted successfully!');
                                     location.reload();
                                 } else {
-                                    alert('Error deleting products: ' + data.message);
+                                    alert('Error deleting product: ' + data.message);
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
-                                alert('An error occurred while deleting products');
+                                alert('An error occurred while deleting the product');
                             });
-                        }
-                    });
-                
-                    // Single product delete functionality
-                    document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const productId = this.id.replace('deleteProductBtn', '');
-                            
-                            if (confirm('Are you sure you want to delete this product?')) {
-                                fetch('delete_product.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ id: productId })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        alert('Product deleted successfully!');
-                                        location.reload();
-                                    } else {
-                                        alert('Error deleting product: ' + data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred while deleting the product');
-                                });
-                            }
-                        });
-                    });
+                    }
+                });
+            });
+        });
+
+        // Add Product Form Validation
+        document.addEventListener('DOMContentLoaded', function () {
+            const addProductForm = document.querySelector('#addProductModal form');
+
+            addProductForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Basic validation
+                const requiredFields = ['product_name', 'dr_number', 'price', 'type', 'max_quantity'];
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    const input = this.querySelector(`[name="${field}"]`);
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add('is-invalid');
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
                 });
 
-                // Add Product Form Validation
-                document.addEventListener('DOMContentLoaded', function () {
-                    const addProductForm = document.querySelector('#addProductModal form');
+                // Validate tags
+                const type = this.querySelector('#productType').value;
+                const uniformTags = document.querySelectorAll('.uniform-tag-checkbox:checked');
+                const suppliesTags = document.querySelectorAll('.supplies-tag-checkbox:checked');
 
-                    addProductForm.addEventListener('submit', function (e) {
-                        e.preventDefault();
+                if (type === '1' && uniformTags.length === 0) {
+                    isValid = false;
+                    alert('Please select at least one uniform tag');
+                    return;
+                }
 
-                        // Basic validation
-                        const requiredFields = ['product_name', 'dr_number', 'price', 'type', 'max_quantity'];
-                        let isValid = true;
+                if (type === '2' && suppliesTags.length === 0) {
+                    isValid = false;
+                    alert('Please select at least one supplies tag');
+                    return;
+                }
 
-                        requiredFields.forEach(field => {
-                            const input = this.querySelector(`[name="${field}"]`);
-                            if (!input.value.trim()) {
-                                isValid = false;
-                                input.classList.add('is-invalid');
-                            } else {
-                                input.classList.remove('is-invalid');
-                            }
-                        });
+                // Validate stocks
+                if (type === '1') {
+                    const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
+                    const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
 
-                        // Validate tags
-                        const type = this.querySelector('#productType').value;
-                        const uniformTags = document.querySelectorAll('.uniform-tag-checkbox:checked');
-                        const suppliesTags = document.querySelectorAll('.supplies-tag-checkbox:checked');
+                    if (selectedSizes.length === 0 || selectedGenders.length === 0) {
+                        isValid = false;
+                        alert('Please select at least one size and gender for uniforms');
+                        return;
+                    }
 
-                        if (type === '1' && uniformTags.length === 0) {
-                            isValid = false;
-                            alert('Please select at least one uniform tag');
-                            return;
-                        }
-
-                        if (type === '2' && suppliesTags.length === 0) {
-                            isValid = false;
-                            alert('Please select at least one supplies tag');
-                            return;
-                        }
-
-                        // Validate stocks
-                        if (type === '1') {
-                            const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
-                            const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
-
-                            if (selectedSizes.length === 0 || selectedGenders.length === 0) {
-                                isValid = false;
-                                alert('Please select at least one size and gender for uniforms');
-                                return;
-                            }
-
-                            // Check if at least one stock quantity is entered
-                            const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
-                            let hasStock = false;
-                            stockInputs.forEach(input => {
-                                if (parseInt(input.value) > 0) {
-                                    hasStock = true;
-                                }
-                            });
-
-                            if (!hasStock) {
-                                isValid = false;
-                                alert('Please enter stock quantity for at least one size-gender combination');
-                                return;
-                            }
-                        } else {
-                            const totalStock = document.querySelector('input[name="stocks[total]"]');
-                            if (!totalStock || parseInt(totalStock.value) <= 0) {
-                                isValid = false;
-                                alert('Please enter a valid stock quantity');
-                                return;
-                            }
-                        }
-
-                        // Submit form if valid
-                        if (isValid) {
-                            this.submit();
+                    // Check if at least one stock quantity is entered
+                    const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
+                    let hasStock = false;
+                    stockInputs.forEach(input => {
+                        if (parseInt(input.value) > 0) {
+                            hasStock = true;
                         }
                     });
-                });
 
+                    if (!hasStock) {
+                        isValid = false;
+                        alert('Please enter stock quantity for at least one size-gender combination');
+                        return;
+                    }
+                } else {
+                    const totalStock = document.querySelector('input[name="stocks[total]"]');
+                    if (!totalStock || parseInt(totalStock.value) <= 0) {
+                        isValid = false;
+                        alert('Please enter a valid stock quantity');
+                        return;
+                    }
+                }
 
-                //  restock modal event listener code 
-                
-                document.addEventListener('DOMContentLoaded', function () {
-                    const restockModal = document.getElementById('addStocksModal');
-                    const restockForm = document.getElementById('restockForm');
-                
-                    restockModal.addEventListener('show.bs.modal', function (event) {
-                        const button = event.relatedTarget;
-                        const tr = button.closest('tr');
-                        const productId = tr.querySelector('.product-checkbox').value;
-                        const productType = tr.querySelector('.badge').textContent.trim();
-                        const variantsText = tr.querySelector('td:nth-child(6)').innerHTML;
-                
-                        // Reset form
-                        restockForm.reset();
-                
-                        document.getElementById('restockProductId').value = productId;
-                        document.getElementById('restockProductType').value = productType;
-                
-                        const variantStockInputs = document.getElementById('variantStockInputs');
-                        variantStockInputs.innerHTML = ''; // Clear existing inputs
-                
-                        if (productType === 'Uniform') {
-                            const variants = variantsText.split('<br>');
-                            variants.forEach(variant => {
-                                if (!variant.includes('Total:')) {
-                                    // Updated regex pattern to handle spaces and capture groups properly
-                                    const match = variant.match(/([^(]+)\s*\(([^)]+)\):\s*(\d+)\s*pcs/);
-                                    if (match) {
-                                        const size = match[1].trim();
-                                        const gender = match[2].trim();
-                                        const currentStock = match[3];
-                                        
-                                        const div = document.createElement('div');
-                                        div.className = 'mb-3';
-                                        div.innerHTML = `
+                // Submit form if valid
+                if (isValid) {
+                    this.submit();
+                }
+            });
+        });
+
+        //  restock modal event listener code 
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const restockModal = document.getElementById('addStocksModal');
+            const restockForm = document.getElementById('restockForm');
+
+            restockModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const tr = button.closest('tr');
+                const productId = tr.querySelector('.product-checkbox').value;
+                const productType = tr.querySelector('.badge').textContent.trim();
+                const variantsText = tr.querySelector('td:nth-child(6)').innerHTML;
+
+                // Reset form
+                restockForm.reset();
+
+                document.getElementById('restockProductId').value = productId;
+                document.getElementById('restockProductType').value = productType;
+
+                const variantStockInputs = document.getElementById('variantStockInputs');
+                variantStockInputs.innerHTML = ''; // Clear existing inputs
+
+                if (productType === 'Uniform') {
+                    const variants = variantsText.split('<br>');
+                    variants.forEach(variant => {
+                        if (!variant.includes('Total:')) {
+                            // Updated regex pattern to handle spaces and capture groups properly
+                            const match = variant.match(/([^(]+)\s*\(([^)]+)\):\s*(\d+)\s*pcs/);
+                            if (match) {
+                                const size = match[1].trim();
+                                const gender = match[2].trim();
+                                const currentStock = match[3];
+
+                                const div = document.createElement('div');
+                                div.className = 'mb-3';
+                                div.innerHTML = `
                                             <label class="form-label">Add Stock for ${size} (${gender})</label>
                                             <div class="input-group">
                                                 <input type="number" 
@@ -1366,22 +1384,22 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                                 <span class="input-group-text">Current: ${currentStock} pcs</span>
                                             </div>
                                         `;
-                                        variantStockInputs.appendChild(div);
-                
-                                        // Add event listener to ensure valid number input
-                                        const input = div.querySelector('input');
-                                        input.addEventListener('input', function() {
-                                            if (this.value < 0) this.value = 0;
-                                            if (this.value === '') this.value = 0;
-                                        });
-                                    }
-                                }
-                            });
-                        } else {
-                            // For supplies - single stock input
-                            const match = variantsText.match(/Total:\s*(\d+)\s*pcs/);
-                            const currentStock = match ? match[1] : '0';
-                            variantStockInputs.innerHTML = `
+                                variantStockInputs.appendChild(div);
+
+                                // Add event listener to ensure valid number input
+                                const input = div.querySelector('input');
+                                input.addEventListener('input', function () {
+                                    if (this.value < 0) this.value = 0;
+                                    if (this.value === '') this.value = 0;
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    // For supplies - single stock input
+                    const match = variantsText.match(/Total:\s*(\d+)\s*pcs/);
+                    const currentStock = match ? match[1] : '0';
+                    variantStockInputs.innerHTML = `
                                 <label class="form-label">Stock to Add</label>
                                 <div class="input-group">
                                     <input type="number" 
@@ -1394,177 +1412,172 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                     <span class="input-group-text">Current: ${currentStock} pcs</span>
                                 </div>
                             `;
-                
-                            const input = variantStockInputs.querySelector('input');
-                            input.addEventListener('input', function() {
-                                if (this.value < 0) this.value = 0;
-                                if (this.value === '') this.value = 0;
-                            });
-                        }
-                    });
-                
-                    // Form validation before submit
-                    restockForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                
-                        // Validate DR number
-                        const drNumber = this.querySelector('input[name="dr_number"]').value.trim();
-                        if (!drNumber) {
-                            alert('Please enter a Delivery Receipt Number');
-                            return;
-                        }
-                
-                        // Validate stock inputs
-                        const stockInputs = this.querySelectorAll('.stock-input');
-                        let totalStock = 0;
-                        stockInputs.forEach(input => {
-                            const value = parseInt(input.value) || 0;
-                            totalStock += value;
-                        });
-                
-                        if (totalStock === 0) {
-                            alert('Please add stock quantity for at least one variant');
-                            return;
-                        }
-                
-                        // Validate updated_by field
-                        const updatedBy = this.querySelector('input[name="updated_by"]').value.trim();
-                        if (!updatedBy) {
-                            alert('Please enter your name in the "Stock Update by" field');
-                            return;
-                        }
-                
-                        // If all validations pass, submit the form
-                        this.submit();
-                    });
-                });
-            
-            document.addEventListener('DOMContentLoaded', function() {
-                // Get filter elements
-                const typeFilters = document.querySelectorAll('.filter-type');
-                const statusFilters = document.querySelectorAll('.filter-status');
-                
-                let currentTypeFilter = 'all';
-                let currentStatusFilter = 'all';
-            
-                // Function to filter table rows
-                function filterTable() {
-                    const rows = document.querySelectorAll('tbody tr');
-                    
-                    rows.forEach(row => {
-                        let showRow = true;
-                        
-                        // Type filtering
-                        if (currentTypeFilter !== 'all') {
-                            const typeCell = row.querySelector('.badge').textContent.trim();
-                            if (typeCell !== currentTypeFilter) {
-                                showRow = false;
-                            }
-                        }
-                        
-                        // Status filtering
-                        if (currentStatusFilter !== 'all' && showRow) {
-                            const stockCell = row.querySelector('.status');
-                            const isInStock = stockCell.classList.contains('active');
-                            
-                            if (currentStatusFilter === 'in-stock' && !isInStock) {
-                                showRow = false;
-                            }
-                            if (currentStatusFilter === 'out-of-stock' && isInStock) {
-                                showRow = false;
-                            }
-                        }
-                        
-                        // Show/hide row
-                        row.style.display = showRow ? '' : 'none';
+
+                    const input = variantStockInputs.querySelector('input');
+                    input.addEventListener('input', function () {
+                        if (this.value < 0) this.value = 0;
+                        if (this.value === '') this.value = 0;
                     });
                 }
-            
-                // Add click event listeners to type filters
-                typeFilters.forEach(filter => {
-                    filter.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        currentTypeFilter = this.dataset.type;
-                        
-                        // Update dropdown button text
-                        document.getElementById('tagsDropdown').textContent = 
-                            currentTypeFilter === 'all' ? 'Types' : currentTypeFilter;
-                        
-                        filterTable();
-                    });
+            });
+
+            // Form validation before submit
+            restockForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Validate DR number
+                const drNumber = this.querySelector('input[name="dr_number"]').value.trim();
+                if (!drNumber) {
+                    alert('Please enter a Delivery Receipt Number');
+                    return;
+                }
+
+                // Validate stock inputs
+                const stockInputs = this.querySelectorAll('.stock-input');
+                let totalStock = 0;
+                stockInputs.forEach(input => {
+                    const value = parseInt(input.value) || 0;
+                    totalStock += value;
                 });
-            
-                // Add click event listeners to status filters
-                statusFilters.forEach(filter => {
-                    filter.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        currentStatusFilter = this.dataset.status;
-                        
-                        // Update dropdown button text
-                        document.getElementById('stocksStatusDropdown').textContent = 
-                            currentStatusFilter === 'all' ? 'Status' : 
+
+                if (totalStock === 0) {
+                    alert('Please add stock quantity for at least one variant');
+                    return;
+                }
+
+                // Validate updated_by field
+                const updatedBy = this.querySelector('input[name="updated_by"]').value.trim();
+                if (!updatedBy) {
+                    alert('Please enter your name in the "Stock Update by" field');
+                    return;
+                }
+
+                // If all validations pass, submit the form
+                this.submit();
+            });
+        });
+
+        //product status filter
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeFilters = document.querySelectorAll('.filter-type');
+            const statusFilters = document.querySelectorAll('.filter-status');
+
+            let currentTypeFilter = 'all';
+            let currentStatusFilter = 'all';
+
+            function filterTable() {
+                const rows = document.querySelectorAll('tbody tr');
+
+                rows.forEach(row => {
+                    let showRow = true;
+
+                    // Type filtering
+                    if (currentTypeFilter !== 'all') {
+                        const typeCell = row.querySelector('.badge').textContent.trim();
+                        if (typeCell !== currentTypeFilter) {
+                            showRow = false;
+                        }
+                    }
+
+                    // Status filtering
+                    if (currentStatusFilter !== 'all' && showRow) {
+                        const stockCell = row.querySelector('.status');
+                        const stockStatus = stockCell.textContent.trim();
+
+                        if (currentStatusFilter === 'in-stock' && stockStatus !== 'In Stock') {
+                            showRow = false;
+                        }
+                        if (currentStatusFilter === 'out-of-stock' && stockStatus !== 'Out of Stock') {
+                            showRow = false;
+                        }
+                    }
+
+                    row.style.display = showRow ? '' : 'none';
+                });
+            }
+
+            // Status filter click handlers
+            statusFilters.forEach(filter => {
+                filter.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    currentStatusFilter = this.dataset.status;
+
+                    // Update dropdown button text
+                    document.getElementById('stocksStatusDropdown').textContent =
+                        currentStatusFilter === 'all' ? 'Status' :
                             (currentStatusFilter === 'in-stock' ? 'In Stock' : 'Out of Stock');
-                        
-                        filterTable();
-                    });
+
+                    filterTable();
                 });
             });
-            
-            document.addEventListener('DOMContentLoaded', function() {
-                const searchInput = document.getElementById('productSearch');
-                const tableBody = document.querySelector('.image-table-body');
-                let typingTimer;
-                const doneTypingInterval = 300; // Delay in milliseconds
-            
-                // Function to perform the search
-                function searchProducts(searchTerm) {
-                    fetch(`search_products.php?search=${encodeURIComponent(searchTerm)}`)
-                        .then(response => response.text())
-                        .then(html => {
-                            tableBody.innerHTML = html;
-                            // Reinitialize any event listeners for the new content
-                            initializeProductEventListeners();
-                        })
-                        .catch(error => console.error('Error:', error));
-                }
-            
-                // Initialize event listeners for dynamic content
-                function initializeProductEventListeners() {
-                    // Reinitialize delete buttons
-                    document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const productId = this.id.replace('deleteProductBtn', '');
-                            // Your existing delete logic
-                        });
-                    });
-            
-                    // Reinitialize checkboxes
-                    const checkboxes = document.querySelectorAll('.product-checkbox');
-                    checkboxes.forEach(cb => {
-                        cb.addEventListener('change', function() {
-                            // Your existing checkbox logic
-                        });
-                    });
-                }
-            
-                // Input event listener with debouncing
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(typingTimer);
-                    typingTimer = setTimeout(() => {
-                        const searchTerm = this.value.trim();
-                        searchProducts(searchTerm);
-                    }, doneTypingInterval);
-                });
-            
-                // Clear button functionality
-                const searchButton = searchInput.nextElementSibling;
-                searchButton.addEventListener('click', function() {
-                    searchInput.value = '';
-                    searchProducts('');
+
+            // Type filter click handlers (keep existing code)
+            typeFilters.forEach(filter => {
+                filter.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    currentTypeFilter = this.dataset.type;
+                    document.getElementById('tagsDropdown').textContent =
+                        currentTypeFilter === 'all' ? 'Types' : currentTypeFilter;
+                    filterTable();
                 });
             });
-            
-            </script>
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('productSearch');
+            const tableBody = document.querySelector('.image-table-body');
+            let typingTimer;
+            const doneTypingInterval = 300; // Delay in milliseconds
+
+            // Function to perform the search
+            function searchProducts(searchTerm) {
+                fetch(`search_products.php?search=${encodeURIComponent(searchTerm)}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        tableBody.innerHTML = html;
+                        // Reinitialize any event listeners for the new content
+                        initializeProductEventListeners();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // Initialize event listeners for dynamic content
+            function initializeProductEventListeners() {
+                // Reinitialize delete buttons
+                document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const productId = this.id.replace('deleteProductBtn', '');
+                        // Your existing delete logic
+                    });
+                });
+
+                // Reinitialize checkboxes
+                const checkboxes = document.querySelectorAll('.product-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        // Your existing checkbox logic
+                    });
+                });
+            }
+
+            // Input event listener with debouncing
+            searchInput.addEventListener('input', function () {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    const searchTerm = this.value.trim();
+                    searchProducts(searchTerm);
+                }, doneTypingInterval);
+            });
+
+            // Clear button functionality
+            const searchButton = searchInput.nextElementSibling;
+            searchButton.addEventListener('click', function () {
+                searchInput.value = '';
+                searchProducts('');
+            });
+        });
+
+    </script>
 
 </body>
 
