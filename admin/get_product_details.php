@@ -1,38 +1,46 @@
-
 <?php
-require 'inc/config.php';
+require 'inc/config.php'; // Database connection
 
-if (isset($_GET['id'])) {
-    $product_id = intval($_GET['id']);
+header('Content-Type: application/json');
+
+if (!isset($_GET['id'])) {
+    echo json_encode([
+        'error' => 'Product ID is required'
+    ]);
+    exit;
+}
+
+try {
+    $product_id = (int)$_GET['id'];
     
+    // Fetch product details including tags and max_quantity
     $stmt = $conn->prepare("SELECT tags, max_quantity FROM products WHERE id = ?");
     $stmt->bind_param("i", $product_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($row = $result->fetch_assoc()) {
-        // Convert tags from JSON if stored as JSON, or from comma-separated string
-        $tags = [];
-        if ($row['tags']) {
-            if (json_decode($row['tags'])) {
-                $tags = json_decode($row['tags']);
-            } else {
-                $tags = array_map('trim', explode(',', $row['tags']));
-            }
-        }
-        
-        $response = [
-            'tags' => $tags,
-            'max_quantity' => $row['max_quantity']
-        ];
-        
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    } else {
-        http_response_code(404);
-        echo json_encode(['error' => 'Product not found']);
+    if ($result->num_rows === 0) {
+        echo json_encode([
+            'error' => 'Product not found'
+        ]);
+        exit;
     }
-} else {
-    http_response_code(400);
-    echo json_encode(['error' => 'Product ID not provided']);
+    
+    $product = $result->fetch_assoc();
+    
+    // Convert tags string back to array
+    $tags = [];
+    if (!empty($product['tags'])) {
+        $tags = array_map('trim', explode(',', $product['tags']));
+    }
+    
+    echo json_encode([
+        'tags' => $tags,
+        'max_quantity' => (int)$product['max_quantity']
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        'error' => 'Database error: ' . $e->getMessage()
+    ]);
 }

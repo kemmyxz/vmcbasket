@@ -18,11 +18,11 @@ CREATE TABLE users (
     active_status ENUM('Active', 'Disable') DEFAULT 'Active'
 );
 
-CREATE TABLE admin_login(
-    admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    admin_name  VARCHAR(100) NOT NULL,
-    admin_pass VARCHAR(100) NOT NULL
-);
+    CREATE TABLE admin_login(
+        admin_id INT AUTO_INCREMENT PRIMARY KEY,
+        admin_name  VARCHAR(100) NOT NULL,
+        admin_pass VARCHAR(100) NOT NULL
+    );
 
 -- ORDERS TABLE
 CREATE TABLE orders (
@@ -65,6 +65,8 @@ CREATE TABLE inquiries (
     user_id INT NOT NULL,
     message TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT FALSE,
+    is_admin BOOLEAN DEFAULT FALSE AFTER message;
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -82,12 +84,13 @@ CREATE TABLE product_reviews (
     FOREIGN KEY (product_id) REFERENCES products(id)
 
 ALTER TABLE product_reviews
-DROP FOREIGN KEY product_reviews_ibfk_2;
+DROP FOREIGN KEY product_reviews_ibfk_1;
 
 ALTER TABLE product_reviews
-ADD CONSTRAINT product_reviews_ibfk_2
-FOREIGN KEY (product_id) REFERENCES products(id)
+ADD CONSTRAINT product_reviews_ibfk_1
+FOREIGN KEY (user_id) REFERENCES users(id)
 ON DELETE CASCADE;
+
 );
 
 CREATE TABLE review_images (
@@ -106,7 +109,7 @@ CREATE TABLE products (
     date_modified DATE NOT NULL,
     image VARCHAR(255) DEFAULT NULL,
     rating float,
-    tags JSON null,
+    tags TEXT null,
     max_quantity int
 
 );
@@ -129,6 +132,15 @@ CREATE TABLE favorites (
   favorite INT DEFAULT 0,  -- 1 for favorited, 0 for not
   FOREIGN KEY (user_id) REFERENCES users(id),  -- Assuming you have a 'users' table
   FOREIGN KEY (product_id) REFERENCES products(id)  -- Assuming you have a 'products' table
+
+
+ALTER TABLE favorites
+DROP FOREIGN KEY favorites_ibfk_1;
+
+ALTER TABLE favorites
+ADD CONSTRAINT favorites_ibfk_1
+FOREIGN KEY (user_id) REFERENCES users(id)
+ON DELETE CASCADE;
 );
 
 
@@ -162,4 +174,22 @@ CREATE TABLE restock_history (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     variant_details VARCHAR(255)
 
+);
+
+CREATE TABLE chat_notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS inquiries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

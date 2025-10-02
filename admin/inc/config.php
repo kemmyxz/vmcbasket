@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root"; // Change if necessary
 $password = ""; // Change if necessary
-$dbname = "vmc_basket";
+$dbname = "vmc_basket1";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

@@ -5,46 +5,57 @@ require('admin/inc/config.php');
 // Ensure content type is JSON and handle any issues with errors/warnings
 header('Content-Type: application/json');
 
-// Assuming the user is logged in and user_id is stored in the session
-$userId = $_SESSION['user_id'] ?? 1;  // Default value if not set
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_id = intval($_POST['product_id'] ?? 0);
-    $size = trim($_POST['size'] ?? '');
-    $quantity = intval($_POST['quantity'] ?? 1);
-
-    // Validation
-    if ($product_id <= 0 || $quantity <= 0) {
-        echo json_encode(['success' => false, 'error' => 'Invalid input']);
-        exit;
-    }
-
-    // Get product details from database
-    $stmt = $conn->prepare("SELECT product_name, price, image FROM products WHERE id = ?");
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $product = $result->fetch_assoc();
-
-    if ($product) {
-        // Insert into basket with corrected param types for price
-        $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, product_name, price, image, size, quantity)
-                                VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iidsssi", $userId, $product_id, $product['product_name'], $product['price'], $product['image'], $size, $quantity);
-
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true]);
-            exit;
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to insert basket']);
-            exit;
-        }
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Product not found']);
-        exit;
-    }
-} else {
-    echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-    exit;
+// Check if user is logged in
+if (!isset($_SESSION['student_no'])) {
+    echo json_encode(['success' => false, 'message' => 'Please login first']);
+    exit();
 }
+
+// Get JSON data from request
+$data = json_decode(file_get_contents('php://input'), true);
+
+if (!$data) {
+    echo json_encode(['success' => false, 'message' => 'Invalid data received']);
+    exit();
+}
+
+// Get user ID from session
+$student_no = $_SESSION['student_no'];
+$sql = "SELECT id FROM users WHERE student_no = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $student_no);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$user_id = $user['id'];
+
+// Check if product already exists in user's basket
+$check_sql = "SELECT id, quantity FROM basket WHERE user_id = ? AND product_id = ?";
+$check_stmt = $conn->prepare($check_sql);
+$check_stmt->bind_param("ii", $user_id, $data['product_id']);
+$check_stmt->execute();
+$existing_item = $check_stmt->get_result()->fetch_assoc();
+
+if ($existing_item) {
+    // Update quantity if product already exists
+    $new_quantity = $existing_item['quantity'] + 1;
+    $update_sql = "UPDATE basket SET quantity = ? WHERE id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("ii", $new_quantity, $existing_item['id']);
+    $success = $update_stmt->execute();
+} else {
+    // Insert new product into basket
+    $insert_sql = "INSERT INTO basket (user_id, product_id, product_name, price, image, quantity) VALUES (?, ?, ?, ?, ?, 1)";
+    $insert_stmt = $conn->prepare($insert_sql);
+    $insert_stmt->bind_param("iisds", $user_id, $data['product_id'], $data['product_name'], $data['price'], $data['image']);
+    $success = $insert_stmt->execute();
+}
+
+if ($success) {
+    echo json_encode(['success' => true, 'message' => 'Product added to basket successfully']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Failed to add product to basket']);
+}
+
+$conn->close();
 ?>
