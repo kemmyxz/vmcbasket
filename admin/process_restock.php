@@ -35,8 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Update specific variant stock
                         $stmt = $conn->prepare("
                             UPDATE product_variants 
-                            SET stock = stock + ?, 
-                                last_updated = CURRENT_TIMESTAMP 
+                            SET stock = stock + ?
                             WHERE product_id = ? 
                             AND size = ? 
                             AND gender = ?
@@ -74,8 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update stock for supplies
             $stmt = $conn->prepare("
                 UPDATE product_variants 
-                SET stock = stock + ?,
-                    last_updated = CURRENT_TIMESTAMP 
+                SET stock = stock + ?
                 WHERE product_id = ? 
                 LIMIT 1
             ");
