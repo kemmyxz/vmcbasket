@@ -727,14 +727,14 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
                                                 foreach ($tags as $tag) {
                                                     $tag = trim($tag); // Remove any whitespace
                                                     if (!empty($tag)) {
-                                                        echo '<span class="badge tag_badge">' . htmlspecialchars($tag) . '</span>';
+                                                        echo '<span class="badge tag_badge">' . htmlspecialchars($tag) . '</span><br>';
                                                     }
                                                 }
                                             }
 
                                             // Display product type
                                             if (!empty($row['type'])) {
-                                                echo '<span class="badge uniform_badge">' . htmlspecialchars($row['type']) . '</span>';
+                                                echo '<span class="badge uniform_badge" style="margin-top: 5px;">' . htmlspecialchars($row['type']) . '</span>';
                                             }
                                             ?>
                                         </div>
@@ -857,31 +857,7 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
 
         // Fixed addToBasket function
         function addToBasket(productId, productName, price, image) {
-            fetch('add_to_basket.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    product_name: productName,
-                    price: price,
-                    image: image,
-                    quantity: 1
-                })
-            })
-                .then(response => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        alert('Product added to basket successfully!');
-                    } else {
-                        alert(data.message || 'Failed to add product to basket');
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    alert('An error occurred while adding to basket');
-                });
+           window.location.href = `product_details.php?id=${productId}`;
         }
 
         // Toggle favorite function

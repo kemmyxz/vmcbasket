@@ -54,14 +54,14 @@ $available_sizes = [];
 $available_genders = [];
 
 while ($variant = $variants_result->fetch_assoc()) {
-    $variants[$variant['size']] = [
-        'stock' => $variant['stock'],
-        'gender' => $variant['gender']
-    ];
-    $available_sizes[] = $variant['size'];
-    if (!in_array($variant['gender'], $available_genders)) {
-        $available_genders[] = $variant['gender'];
-    }
+  $variants[$variant['size']] = [
+    'stock' => $variant['stock'],
+    'gender' => $variant['gender']
+  ];
+  $available_sizes[] = $variant['size'];
+  if (!in_array($variant['gender'], $available_genders)) {
+    $available_genders[] = $variant['gender'];
+  }
 }
 
 // 3. Fetch the product image (if exists)
@@ -78,16 +78,16 @@ $sizes = [];
 $stock_quantity = 0;
 
 while ($variant = $variants_result->fetch_assoc()) {
-    $sizes[] = $variant['size'];
-    $stock_quantity += $variant['stock']; // Sum up total stock across all sizes
+  $sizes[] = $variant['size'];
+  $stock_quantity += $variant['stock']; // Sum up total stock across all sizes
 }
 
 // Add before the reviews query
 $reviews_per_page = 5;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $reviews_per_page;
 
-// After fetching product details, add this query to get reviews
+
 $reviews_sql = "SELECT pr.*, 
                 u.student_fname, 
                 u.student_lname, 
@@ -123,50 +123,50 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;
 
 // Only allow POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_id = intval($_POST['product_id'] ?? 0);
-    $size = trim($_POST['size'] ?? '');
-    $quantity = intval($_POST['quantity'] ?? 1);
+  $product_id = intval($_POST['product_id'] ?? 0);
+  $size = trim($_POST['size'] ?? '');
+  $quantity = intval($_POST['quantity'] ?? 1);
 
-    // Modified validation to handle supplies (no size required)
-    $product_type_query = "SELECT type FROM products WHERE id = ?";
-    $stmt = $conn->prepare($product_type_query);
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $type_result = $stmt->get_result();
-    $product_type = $type_result->fetch_assoc();
+  // Modified validation to handle supplies (no size required)
+  $product_type_query = "SELECT type FROM products WHERE id = ?";
+  $stmt = $conn->prepare($product_type_query);
+  $stmt->bind_param("i", $product_id);
+  $stmt->execute();
+  $type_result = $stmt->get_result();
+  $product_type = $type_result->fetch_assoc();
 
-    $is_uniform = stripos($product_type['type'], 'Uniform') !== false;
+  $is_uniform = stripos($product_type['type'], 'Uniform') !== false;
 
-    // Only validate size for uniforms
-    if ($product_id <= 0 || $quantity <= 0 || ($is_uniform && empty($size))) {
-        echo json_encode(['success' => false, 'error' => 'Invalid input']);
-        exit;
-    }
+  // Only validate size for uniforms
+  if ($product_id <= 0 || $quantity <= 0 || ($is_uniform && empty($size))) {
+    echo json_encode(['success' => false, 'error' => 'Invalid input']);
+    exit;
+  }
 
-    // Get product details
-    $stmt = $conn->prepare("SELECT product_name, price, image FROM products WHERE id = ?");
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $product = $result->fetch_assoc();
+  // Get product details
+  $stmt = $conn->prepare("SELECT product_name, price, image FROM products WHERE id = ?");
+  $stmt->bind_param("i", $product_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $product = $result->fetch_assoc();
 
-    if ($product) {
-        // Insert into basket
-        $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, product_name, price, image, size, quantity)
+  if ($product) {
+    // Insert into basket
+    $stmt = $conn->prepare("INSERT INTO basket (user_id, product_id, product_name, price, image, size, quantity)
                                     VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iisissi", $userId, $product_id, $product['product_name'], $product['price'], $product['image'], $size, $quantity);
+    $stmt->bind_param("iisissi", $userId, $product_id, $product['product_name'], $product['price'], $product['image'], $size, $quantity);
 
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true]);
-            exit;
-        } else {
-            echo json_encode(['success' => false, 'error' => 'Failed to insert basket']);
-            exit;
-        }
+    if ($stmt->execute()) {
+      echo json_encode(['success' => true]);
+      exit;
     } else {
-        echo json_encode(['success' => false, 'error' => 'Product not found']);
-        exit;
+      echo json_encode(['success' => false, 'error' => 'Failed to insert basket']);
+      exit;
     }
+  } else {
+    echo json_encode(['success' => false, 'error' => 'Product not found']);
+    exit;
+  }
 }
 
 // Assuming the $product is already fetched from the database
@@ -185,7 +185,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
   <?php include 'links.php'; ?>
 
   <style>
-
     .carousel-bg {
       background: linear-gradient(180deg, #FFF 0%, rgba(200, 224, 243, 0.50) 100%);
       border-radius: 10px;
@@ -354,139 +353,151 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
       border-radius: 0.5rem;
       object-fit: cover;
     }
-    .margin-top{
-        margin-top: 100px;
+
+    .margin-top {
+      margin-top: 100px;
     }
+
     @media (max-width: 991.98px) {
-         .uniform-image {
-            max-height: 350px;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-          }
-            .navbar-custom {
-            padding: 0.5rem 1rem;
-            flex-direction: column;
-            align-items: flex-start;
-          }
-          .container-fluid.d-flex.align-items-center {
-            justify-content: start;
-          }
-          .vmc-logo {
-            max-width: 90px;
-          }
-          .search-box {
-            width: 100%;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-          }
+      .uniform-image {
+        max-height: 350px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+      }
 
-          .basket-btn {
-            width: 38px;
-            height: 38px;
-            font-size: 1.2rem;
-            margin-right: 5px;
-          }
+      .navbar-custom {
+        padding: 0.5rem 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
 
-          footer {
-            font-size: 1rem;
-          }
-        }
-      @media (max-width: 575.98px) {
-          .margin-top{
-            margin-top: 70px;
-          }
-        }
+      .container-fluid.d-flex.align-items-center {
+        justify-content: start;
+      }
+
+      .vmc-logo {
+        max-width: 90px;
+      }
+
+      .search-box {
+        width: 100%;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+      }
+
+      .basket-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+        margin-right: 5px;
+      }
+
+      footer {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .margin-top {
+        margin-top: 70px;
+      }
+    }
   </style>
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-custom shadow-sm fixed-top">
-        <div class="container-fluid d-flex align-items-center">
-            <!-- Hamburger -->
-            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
-                <i class="fas fa-bars fa-lg"></i>
-            </button>
+  <!-- Navbar -->
+  <nav class="navbar navbar-custom shadow-sm fixed-top">
+    <div class="container-fluid d-flex align-items-center">
+      <!-- Hamburger -->
+      <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+        <i class="fas fa-bars fa-lg"></i>
+      </button>
 
-            <!-- Logo -->
-            <a class="navbar-brand" href="home.php">
-                <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
-            </a>
+      <!-- Logo -->
+      <a class="navbar-brand" href="home.php">
+        <img src="admin/images/vmc_basket_logo.png" alt="VMC Basket" class="vmc-logo">
+      </a>
 
-            <!-- Search bar (desktop) -->
-            <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
-                <input type="text" class="form-control search-box" placeholder="Search products here...">
-                <i class="fas fa-search search-icon"></i>
-            </div>
+      <!-- Search bar (desktop) -->
+      <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
+        <input type="text" class="form-control search-box" placeholder="Search products here...">
+        <i class="fas fa-search search-icon"></i>
+      </div>
 
-            <!-- Right-aligned buttons for small devices -->
-            <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
-                <!-- Search icon (mobile) -->
-                <button class="btn p-0" type="button" id="mobileSearchToggle">
-                    <i class="fas fa-search fa-lg"></i>
-                </button>
-            </div>
+      <!-- Right-aligned buttons for small devices -->
+      <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
+        <!-- Search icon (mobile) -->
+        <button class="btn p-0" type="button" id="mobileSearchToggle">
+          <i class="fas fa-search fa-lg"></i>
+        </button>
+      </div>
 
-            <!-- Cart -->
-            <a href="basket.php" class=" basket-btn text-decoration-none">
-              <i class="fas fa-shopping-basket"></i>
-            </a>
-            <!-- Collapsible search bar (mobile) -->
-            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
-                <input type="text" class="form-control search-box" placeholder="Search products here...">
-            </div>
-        </div>
-    </nav>
-
-    <!-- Offcanvas Sidebar -->
-    <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
-        <div class="offcanvas-body p-0">
-            <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
-                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="profile-section">
-                <img src="admin/images/profile_pic.png">
-                <h4 class="mt-2">Janella Clare Gomez</h4>
-            </div>
-
-            <div class="px-3">
-                <div class="mb-2">
-                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
-                    Profile
-                    </button>
-                    <div class="collapse ps-3" id="profileMenu">
-                    <a href="profile.php">My Account</a>
-                    <a href="purchase_history.php">My Purchase</a>
-                    <a href="favorites.php">My Favorites</a>
-                    </div>
-                </div>
-
-            <a href="home.php">Home</a>
-
-            <div class="mt-2">
-                <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
-                Shop
-                </button>
-                <div class="collapse ps-3" id="shopMenu">
-                <a href="shop_uniforms.php">Uniforms</a>
-                <a href="shop_supplies.php">School Supplies</a>
-                <a href="shop_merch.php">School-related Merchandise</a>
-                </div>
-            </div>
-
-            <a href="logout.php" class="mt-3 d-block">Log out</a>
-            </div>
-        </div>
+      <!-- Cart -->
+      <a href="basket.php" class=" basket-btn text-decoration-none">
+        <i class="fas fa-shopping-basket"></i>
+      </a>
+      <!-- Collapsible search bar (mobile) -->
+      <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+        <input type="text" class="form-control search-box" placeholder="Search products here...">
+      </div>
     </div>
- 
+  </nav>
+
+  <!-- Offcanvas Sidebar -->
+  <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
+    <div class="offcanvas-body p-0">
+      <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
+        <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="profile-section">
+        <img src="admin/images/profile_pic.png">
+        <h4 class="mt-2">Janella Clare Gomez</h4>
+      </div>
+
+      <div class="px-3">
+        <div class="mb-2">
+          <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none"
+            data-bs-toggle="collapse" data-bs-target="#profileMenu">
+            Profile
+          </button>
+          <div class="collapse ps-3" id="profileMenu">
+            <a href="profile.php">My Account</a>
+            <a href="purchase_history.php">My Purchase</a>
+            <a href="favorites.php">My Favorites</a>
+          </div>
+        </div>
+
+        <a href="home.php">Home</a>
+
+        <div class="mt-2">
+          <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none"
+            data-bs-toggle="collapse" data-bs-target="#shopMenu">
+            Shop
+          </button>
+          <div class="collapse ps-3" id="shopMenu">
+            <a href="shop_uniforms.php">Uniforms</a>
+            <a href="shop_supplies.php">School Supplies</a>
+            <a href="shop_merch.php">School-related Merchandise</a>
+          </div>
+        </div>
+
+        <a href="logout.php" class="mt-3 d-block">Log out</a>
+      </div>
+    </div>
+  </div>
+
   <div class="container p-4 margin-top">
-    <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
+    <nav
+      style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
+      aria-label="breadcrumb">
       <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-            <a href="<?= htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'shop.php') ?>" class="text-decoration-none">Shop</a>
-            </li>
-          <li class="breadcrumb-item active" aria-current="page">Product Details</li>
+        <li class="breadcrumb-item">
+          <a href="<?= htmlspecialchars($_SERVER['HTTP_REFERER'] ?? 'shop.php') ?>"
+            class="text-decoration-none">Shop</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Product Details</li>
       </ol>
     </nav>
     <div class="row align-items-stretch g-3">
@@ -508,9 +519,9 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
           <div class="d-flex justify-content-between align-items-start">
             <h3 class="fw-semibold"><?= htmlspecialchars($product1['product_name']) ?></h3>
 
-              <button class="fav-button" onclick="toggleFavorite(event, this, <?= $product1['id'] ?>)">
-                  <i class="bi bi-heart"></i>
-              </button>
+            <button class="fav-button" onclick="toggleFavorite(event, this, <?= $product1['id'] ?>)">
+              <i class="bi bi-heart"></i>
+            </button>
 
             <script>
               function toggleFavorite(event, btn, productId) {
@@ -564,27 +575,41 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
           <!--Badges Display -->
           <div class="badges">
-              <span class="badge preschool_badge">Pre-School</span>
-              <span class="badge uniform_badge">Uniform</span>
+            <?php
+            if (!empty($product1['tags'])) {
+              $tags = explode(',', $product1['tags']); // Assuming tags are comma-separated
+              foreach ($tags as $tag) {
+                $tag = trim($tag);
+                if (!empty($tag)) {
+                  echo '<span class="badge tag_badge">' . htmlspecialchars($tag) . '</span> ';
+                }
+              }
+            }
+            
+            // Display product type badge
+            if ($product1['type']) {
+              echo '<span class="badge uniform_badge">' . htmlspecialchars($product1['type']) . '</span>';
+            }
+
+            
+            ?>
           </div>
 
           <?php if ($is_uniform): ?>
             <div class="mb-4 mt-3">
               <p class="mb-1 fw-semibold">Size:</p>
               <div class="d-flex gap-2 flex-wrap">
-                <?php foreach ($available_sizes as $size): 
-                    $stock = $variants[$size]['stock'] ?? 0;
-                    $disabled = $stock <= 0 ? 'disabled' : '';
-                ?>
-                    <button class="custom-btn" data-size="<?= $size ?>" 
-                            data-stock="<?= $stock ?>" 
-                            data-gender="<?= $variants[$size]['gender'] ?>"
-                            <?= $disabled ?>>
-                        <?= $size ?>
-                    </button>
+                <?php foreach ($available_sizes as $size):
+                  $stock = $variants[$size]['stock'] ?? 0;
+                  $disabled = $stock <= 0 ? 'disabled' : '';
+                  ?>
+                  <button class="custom-btn" data-size="<?= $size ?>" data-stock="<?= $stock ?>"
+                    data-gender="<?= $variants[$size]['gender'] ?>" <?= $disabled ?>>
+                    <?= $size ?>
+                  </button>
                 <?php endforeach; ?>
               </div>
-              <p class="mt-3 mb-0" id="stock-display">Available Stock: -</p>
+              <p class="mt-3 mb-0" id="stock-display">Stock Available:</p>
             </div>
           <?php else: ?>
             <div class="mb-3">
@@ -596,43 +621,40 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
               $stmt->execute();
               $total_stock = $stmt->get_result()->fetch_assoc()['total_stock'] ?? 0;
               ?>
-              <p class="mb-1 fw-semibold">Stock Available:</p>
-              <p class="mt-2 mb-0" id="stock-display">
-                  <?= $total_stock ?> pieces
-              </p>
+              <p class="mb-1 fw-semibold">Stock Available: <?= $total_stock ?> pieces</p>
             </div>
           <?php endif; ?>
 
           <script>
-  const sizeButtons = document.querySelectorAll('.custom-btn[data-size]');
-  const stockDisplay = document.getElementById('stock-display');
-  const genderDisplay = document.getElementById('gender-display');
-  let selectedSize = null;
+            const sizeButtons = document.querySelectorAll('.custom-btn[data-size]');
+            const stockDisplay = document.getElementById('stock-display');
+            const genderDisplay = document.getElementById('gender-display');
+            let selectedSize = null;
 
-sizeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Remove selected class from all buttons
-        sizeButtons.forEach(b => b.classList.remove('selected'));
-        
-        // Add selected class to clicked button
-        btn.classList.add('selected');
-        selectedSize = btn.dataset.size;
-        
-        // Update stock and gender display
-        const stock = btn.dataset.stock;
-        const gender = btn.dataset.gender;
-        stockDisplay.textContent = `Available Stock: ${stock}`;
-        genderDisplay.textContent = ` ${gender}`;
-        
-        // Update quantity input max value
-        const quantityInput = document.querySelector('.quantity-value');
-        quantityInput.max = stock;
-        if (parseInt(quantityInput.value) > parseInt(stock)) {
-            quantityInput.value = stock;
-        }
-    });
-});
-</script>
+            sizeButtons.forEach(btn => {
+              btn.addEventListener('click', () => {
+                // Remove selected class from all buttons
+                sizeButtons.forEach(b => b.classList.remove('selected'));
+
+                // Add selected class to clicked button
+                btn.classList.add('selected');
+                selectedSize = btn.dataset.size;
+
+                // Update stock and gender display
+                const stock = btn.dataset.stock;
+                const gender = btn.dataset.gender;
+                stockDisplay.textContent = `Stock Available: ${stock} pieces`;
+                genderDisplay.textContent = ` ${gender}`;
+
+                // Update quantity input max value
+                const quantityInput = document.querySelector('.quantity-value');
+                quantityInput.max = stock;
+                if (parseInt(quantityInput.value) > parseInt(stock)) {
+                  quantityInput.value = stock;
+                }
+              });
+            });
+          </script>
 
           <div class="mb-4">
             <p class="mb-1 fw-semibold">Quantity:</p>
@@ -642,49 +664,50 @@ sizeButtons.forEach(btn => {
                 style="width: 60px; text-align: center; -moz-appearance: textfield; background-color: #e6f0f9; border: 1px solid #a5c8e2; border-radius: 6px; font-weight: 500; color: #000;" />
               <button class="custom-btn" data-action="increase">+</button>
             </div>
-            <p class="mb-3 text-danger"><i>*Maximum of 5 pieces per item</i></p>
+            <p class="mb-3 text-danger"><i>*Maximum of <?= $product1['max_quantity'] ?> pieces per item</i></p>
           </div>
 
 
-          
-      <script>
-      const quantityContainer = document.getElementById('quantity-control');
-      const quantityInput = quantityContainer.querySelector('.quantity-value');
-      const isSupplies = <?= json_encode($is_supplies); ?>;
-      const totalStock = <?= $is_supplies ? $total_stock : 0 ?>;
 
-      quantityContainer.addEventListener('click', (e) => {
-          const btn = e.target.closest('button');
-          if (!btn) return;
+          <script>
+            const quantityContainer = document.getElementById('quantity-control');
+            const quantityInput = quantityContainer.querySelector('.quantity-value');
+            const isSupplies = <?= json_encode($is_supplies); ?>;
+            const totalStock = <?= $is_supplies ? $total_stock : 0 ?>;
+            const max = <?= $product1['max_quantity'] ?>;
 
-          const action = btn.getAttribute('data-action');
-          let quantity = parseInt(quantityInput.value) || 1;
-          
-          // For uniforms, check selected size stock. For supplies, use total stock
-          const selectedButton = document.querySelector('.custom-btn.selected');
-          const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
+            quantityContainer.addEventListener('click', (e) => {
+              const btn = e.target.closest('button');
+              if (!btn) return;
 
-          if (action === 'decrease' && quantity > 1) {
-              quantity--;
-          } else if (action === 'increase' && quantity < maxStock) {
-              quantity++;
-          }
+              const action = btn.getAttribute('data-action');
+              let quantity = parseInt(quantityInput.value) || 1;
 
-          quantityInput.value = quantity;
-});
+              // For uniforms, check selected size stock. For supplies, use total stock
+              const selectedButton = document.querySelector('.custom-btn.selected');
+              // const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
 
-// Restrict manual input
-quantityInput.addEventListener('input', () => {
-    const selectedButton = document.querySelector('.custom-btn.selected');
-    const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
-    let value = parseInt(quantityInput.value.replace(/\D/g, '')) || 1;
+              if (action === 'decrease' && quantity > 1) {
+                quantity--;
+              } else if (action === 'increase' && quantity < max) {
+                quantity++;
+              }
 
-    if (value < 1) value = 1;
-    if (value > maxStock) value = maxStock;
+              quantityInput.value = quantity;
+            });
 
-    quantityInput.value = value;
-});
-</script>
+            // Restrict manual input
+            quantityInput.addEventListener('input', () => {
+              const selectedButton = document.querySelector('.custom-btn.selected');
+              // const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
+              let value = parseInt(quantityInput.value.replace(/\D/g, '')) || 1;
+
+              if (value < 1) value = 1;
+              if (value > max) value = max;
+
+              quantityInput.value = value;
+            });
+          </script>
 
 
           <div class="d-flex gap-2">
@@ -692,53 +715,53 @@ quantityInput.addEventListener('input', () => {
 
             <script>
               function addToBasket() {
-                  // For uniforms, require size selection
-                  if (!isSupplies) {
-                      const selectedButton = document.querySelector('.custom-btn.selected');
-                      if (!selectedButton) {
-                          alert('Please select a size first.');
-                          return;
-                      }
-
-                      const stock = parseInt(selectedButton.dataset.stock);
-                      if (stock <= 0) {
-                          alert('This size is out of stock.');
-                          return;
-                      }
+                // For uniforms, require size selection
+                if (!isSupplies) {
+                  const selectedButton = document.querySelector('.custom-btn.selected');
+                  if (!selectedButton) {
+                    alert('Please select a size first.');
+                    return;
                   }
 
-                  const productId = <?= $product1['id']; ?>;
-                  const selectedSize = isSupplies ? 'N/A' : document.querySelector('.custom-btn.selected').dataset.size;
-                  const quantity = parseInt(document.querySelector('.quantity-value').value) || 1;
-
-                  // For uniforms, check stock
-                  if (!isSupplies) {
-                      const selectedButton = document.querySelector('.custom-btn.selected');
-                      const stock = parseInt(selectedButton.dataset.stock);
-                      if (quantity > stock) {
-                          alert('Requested quantity exceeds available stock.');
-                          return;
-                      }
+                  const stock = parseInt(selectedButton.dataset.stock);
+                  if (stock <= 0) {
+                    alert('This size is out of stock.');
+                    return;
                   }
+                }
 
-                  // Proceed with the fetch request...
-                  fetch('basket.php', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                      body: `product_id=${productId}&size=${encodeURIComponent(selectedSize)}&quantity=${quantity}`
-                  })
+                const productId = <?= $product1['id']; ?>;
+                const selectedSize = isSupplies ? 'N/A' : document.querySelector('.custom-btn.selected').dataset.size;
+                const quantity = parseInt(document.querySelector('.quantity-value').value) || 1;
+
+                // For uniforms, check stock
+                if (!isSupplies) {
+                  const selectedButton = document.querySelector('.custom-btn.selected');
+                  const stock = parseInt(selectedButton.dataset.stock);
+                  if (quantity > stock) {
+                    alert('Requested quantity exceeds available stock.');
+                    return;
+                  }
+                }
+
+                // Proceed with the fetch request...
+                fetch('basket.php', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: `product_id=${productId}&size=${encodeURIComponent(selectedSize)}&quantity=${quantity}`
+                })
                   .then(response => response.json())
                   .then(data => {
-                      if (data.success) {
-                          alert('Added to basket!');
-                          window.location.href = 'basket.php';
-                      } else {
-                          alert('Failed to add to basket: ' + (data.error || 'Unknown error.'));
-                      }
+                    if (data.success) {
+                      alert('Added to basket!');
+                      window.location.href = 'basket.php';
+                    } else {
+                      alert('Failed to add to basket: ' + (data.error || 'Unknown error.'));
+                    }
                   })
                   .catch(error => {
-                      console.error('Error:', error);
-                      alert('Something went wrong.');
+                    console.error('Error:', error);
+                    alert('Something went wrong.');
                   });
               }
             </script>
@@ -747,22 +770,22 @@ quantityInput.addEventListener('input', () => {
             <button class="btn custom-navy-btn w-100" onclick="placeOrder()">Order Now</button>
 
             <script>
-            const isUniform = <?= json_encode($is_uniform); ?>;
-            
+              const isUniform = <?= json_encode($is_uniform); ?>;
 
-            function placeOrder() {
+
+              function placeOrder() {
                 // Collect order details first
                 const productId = <?= $product1['id']; ?>;
-                const selectedSize = isUniform ? 
-                    (document.querySelector('.custom-btn.selected')?.textContent.trim() || '') : 
-                    'N/A'; // Use N/A for supplies
+                const selectedSize = isUniform ?
+                  (document.querySelector('.custom-btn.selected')?.textContent.trim() || '') :
+                  'N/A'; // Use N/A for supplies
                 const quantity = document.querySelector('.quantity-value')?.value || 1;
                 const price = <?php echo floatval($product1['price']); ?>;
 
                 // Size validation - only check for uniforms
                 if (isUniform && !selectedSize) {
-                    alert('Please select a size first.');
-                    return;
+                  alert('Please select a size first.');
+                  return;
                 }
 
                 // Create form data with all required fields
@@ -776,30 +799,30 @@ quantityInput.addEventListener('input', () => {
 
                 // Send order details via fetch
                 fetch('order_details.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: formData.toString()
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  },
+                  body: formData.toString()
                 })
-                .then(response => {
+                  .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                      throw new Error('Network response was not ok');
                     }
                     return response.json();
-                })
-                .then(data => {
+                  })
+                  .then(data => {
                     if (data.success) {
-                        window.location.href = 'order_details.php';
+                      window.location.href = 'order_details.php';
                     } else {
-                        alert('Failed to place the order: ' + (data.error || 'Unknown error'));
+                      alert('Failed to place the order: ' + (data.error || 'Unknown error'));
                     }
-                })
-                .catch(error => {
+                  })
+                  .catch(error => {
                     console.error('Error:', error);
                     alert('Something went wrong while placing the order. Please try again.');
-                });
-            }
+                  });
+              }
             </script>
           </div>
         </div>
@@ -896,205 +919,197 @@ quantityInput.addEventListener('input', () => {
   <!-- Reviews Section -->
   <div class="container my-5">
     <div class="p-4 ratings-bg">
-        <div class=" d-flex align-items-center">
-            <span class="fs-2 fw-bold me-2">
-                <?php 
-                if ($rating === '—' || !is_numeric($rating)) {
-                    echo '—';
-                } else {
-                    echo number_format((float)$rating, 1);
-                }
-                ?>
-            </span>
-            <small class="text-muted">out of 5</small>
-            <div class="ms-3">
-                <?php
-                if ($rating === '—' || !is_numeric($rating)) {
-                    // Display empty stars if no rating
-                    for ($i = 0; $i < 5; $i++) {
-                        echo '<i class="bi bi-star text-warning"></i>';
-                    }
-                } else {
-                    // Calculate full and half stars
-                    $fullStars = floor($rating);
-                    $hasHalfStar = ($rating - $fullStars) >= 0.5;
-                    
-                    // Output full stars
-                    for ($i = 0; $i < $fullStars; $i++) {
-                        echo '<i class="bi bi-star-fill text-warning"></i>';
-                    }
+      <div class=" d-flex align-items-center">
+        <span class="fs-2 fw-bold me-2">
+          <?php
+          if ($rating === '—' || !is_numeric($rating)) {
+            echo '—';
+          } else {
+            echo number_format((float) $rating, 1);
+          }
+          ?>
+        </span>
+        <small class="text-muted">out of 5</small>
+        <div class="ms-3">
+          <?php
+          if ($rating === '—' || !is_numeric($rating)) {
+            // Display empty stars if no rating
+            for ($i = 0; $i < 5; $i++) {
+              echo '<i class="bi bi-star text-warning"></i>';
+            }
+          } else {
+            // Calculate full and half stars
+            $fullStars = floor($rating);
+            $hasHalfStar = ($rating - $fullStars) >= 0.5;
 
-                    // Output half star if applicable
-                    if ($hasHalfStar) {
-                        echo '<i class="bi bi-star-half text-warning"></i>';
-                    }
+            // Output full stars
+            for ($i = 0; $i < $fullStars; $i++) {
+              echo '<i class="bi bi-star-fill text-warning"></i>';
+            }
 
-                    // Output empty stars
-                    $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
-                    for ($i = 0; $i < $emptyStars; $i++) {
-                        echo '<i class="bi bi-star text-warning"></i>';
-                    }
-                }
-                ?>
-            </div>
+            // Output half star if applicable
+            if ($hasHalfStar) {
+              echo '<i class="bi bi-star-half text-warning"></i>';
+            }
+
+            // Output empty stars
+            $emptyStars = 5 - $fullStars - ($hasHalfStar ? 1 : 0);
+            for ($i = 0; $i < $emptyStars; $i++) {
+              echo '<i class="bi bi-star text-warning"></i>';
+            }
+          }
+          ?>
         </div>
+      </div>
     </div>
 
-      <div class="text-end mt-3">
+    <div class="text-end mt-3">
+      <?php
+      // Get total number of reviews
+      $review_count_sql = "SELECT COUNT(*) as count FROM product_reviews WHERE product_id = ?";
+      $stmt = $conn->prepare($review_count_sql);
+      $stmt->bind_param("i", $productID);
+      $stmt->execute();
+      $review_count = $stmt->get_result()->fetch_assoc()['count'];
+      ?>
+
+      <?php while ($review = $reviews_result->fetch_assoc()): ?>
+        <div class="review-card border-bottom py-3">
+          <div class="d-flex align-items-start mb-2">
+            <?php
+            $userPhoto = $review['user_photo']
+              ? 'admin/uploads/' . $review['user_photo']
+              : 'admin/images/profile_pic.png';
+            ?>
+            <img src="<?= htmlspecialchars($userPhoto) ?>" class="rounded-circle me-3" alt="user" width="48" height="48"
+              style="object-fit: cover;">
+            <div class="text-start">
+              <strong class="d-block">
+                <?= $review['is_anonymous'] ? 'Anonymous' :
+                  htmlspecialchars($review['student_fname'] . ' ' . $review['student_lname']) ?>
+              </strong>
+              <div class="text-warning">
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                  <i class="bi <?= $i <= $review['rating'] ? 'bi-star-fill' : 'bi-star' ?> text-warning"></i>
+                <?php endfor; ?>
+              </div>
+              <small class="text-muted"><?= $review['review_date'] ?></small>
+            </div>
+          </div>
+          <p><?= nl2br(htmlspecialchars($review['review_text'])) ?></p>
+
           <?php
-          // Get total number of reviews
-          $review_count_sql = "SELECT COUNT(*) as count FROM product_reviews WHERE product_id = ?";
-          $stmt = $conn->prepare($review_count_sql);
-          $stmt->bind_param("i", $productID);
-          $stmt->execute();
-          $review_count = $stmt->get_result()->fetch_assoc()['count'];
-          ?>
-            
-          <?php while ($review = $reviews_result->fetch_assoc()): ?>
-              <div class="review-card border-bottom py-3">
-                  <div class="d-flex align-items-start mb-2">
-                      <?php
-                      $userPhoto = $review['user_photo'] 
-                          ? 'admin/uploads/' . $review['user_photo'] 
-                          : 'admin/images/profile_pic.png';
-                      ?>
-                      <img src="<?= htmlspecialchars($userPhoto) ?>" 
-                            class="rounded-circle me-3" 
-                            alt="user" 
-                            width="48" 
-                            height="48"
-                            style="object-fit: cover;">
-                      <div class="text-start">
-                          <strong class="d-block">
-                              <?= $review['is_anonymous'] ? 'Anonymous' : 
-                                  htmlspecialchars($review['student_fname'] . ' ' . $review['student_lname']) ?>
-                          </strong>
-                          <div class="text-warning">
-                              <?php for ($i = 1; $i <= 5; $i++): ?>
-                                  <i class="bi <?= $i <= $review['rating'] ? 'bi-star-fill' : 'bi-star' ?> text-warning"></i>
-                              <?php endfor; ?>
-                          </div>
-                          <small class="text-muted"><?= $review['review_date'] ?></small>
-                      </div>
-                  </div>
-                  <p><?= nl2br(htmlspecialchars($review['review_text'])) ?></p>
-                  
-                  <?php
-                  // Fetch review images
-                  $images_sql = "SELECT image_path FROM review_images WHERE review_id = ?";
-                  $img_stmt = $conn->prepare($images_sql);
-                  $img_stmt->bind_param("i", $review['id']);
-                  $img_stmt->execute();
-                  $images_result = $img_stmt->get_result();
+          // Fetch review images
+          $images_sql = "SELECT image_path FROM review_images WHERE review_id = ?";
+          $img_stmt = $conn->prepare($images_sql);
+          $img_stmt->bind_param("i", $review['id']);
+          $img_stmt->execute();
+          $images_result = $img_stmt->get_result();
 
-                  if ($images_result->num_rows > 0): ?>
-                    <div class="d-flex flex-wrap gap-2">
-                      <?php while ($image = $images_result->fetch_assoc()): ?>
-                        <img src="<?= htmlspecialchars($image['image_path']) ?>"
-                           class="img-thumbnail review-photo"
-                           alt="review"
-                           width="100"
-                           style="height: 100px; object-fit: cover; cursor: pointer;"
-                           data-bs-toggle="modal"
-                           data-bs-target="#photoModal"
-                           data-img="<?= htmlspecialchars($image['image_path']) ?>">
-                      <?php endwhile; ?>
-                    </div>
-                  <?php endif; ?>
-                  </div>
-                  <?php endwhile; ?>
+          if ($images_result->num_rows > 0): ?>
+            <div class="d-flex flex-wrap gap-2">
+              <?php while ($image = $images_result->fetch_assoc()): ?>
+                <img src="<?= htmlspecialchars($image['image_path']) ?>" class="img-thumbnail review-photo" alt="review"
+                  width="100" style="height: 100px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal"
+                  data-bs-target="#photoModal" data-img="<?= htmlspecialchars($image['image_path']) ?>">
+              <?php endwhile; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+      <?php endwhile; ?>
 
-                    <!-- Modal for viewing review photos -->
-                    <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered modal-lg">
-                          <div class="modal-content position-relative">
-                          <div class="modal-body p-0">
-                            <!-- Close button with X icon at top-right -->
-                            <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close"></button>
-                            <img src="" id="modalPhoto" class="w-100" style="object-fit: contain; max-height: 80vh;" alt="Review Photo">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  <script>
-                  document.addEventListener('DOMContentLoaded', function () {
-                    const photoModal = document.getElementById('photoModal');
-                    const modalPhoto = document.getElementById('modalPhoto');
-                    document.querySelectorAll('.review-photo').forEach(img => {
-                      img.addEventListener('click', function () {
-                        modalPhoto.src = this.getAttribute('data-img');
-                      });
-                    });
-                    // Clear modal image on close
-                    photoModal.addEventListener('hidden.bs.modal', function () {
-                      modalPhoto.src = '';
-                    });
-                  });
-                  </script>
-
-          <a href="#" class="text-primary">
-              See all reviews (<?= $review_count ?>)
-          </a>
+      <!-- Modal for viewing review photos -->
+      <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content position-relative">
+            <div class="modal-body p-0">
+              <!-- Close button with X icon at top-right -->
+              <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+              <img src="" id="modalPhoto" class="w-100" style="object-fit: contain; max-height: 80vh;"
+                alt="Review Photo">
+            </div>
+          </div>
+        </div>
       </div>
-      <?php if ($total_pages > 1): ?>
-          <nav aria-label="Review pagination" class="mt-4">
-              <ul class="pagination justify-content-center">
-                  <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                      <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                          <a class="page-link" href="?id=<?= $productID ?>&page=<?= $i ?>">
-                              <?= $i ?>
-                          </a>
-                      </li>
-                  <?php endfor; ?>
-              </ul>
-          </nav>
-      <?php endif; ?>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const photoModal = document.getElementById('photoModal');
+          const modalPhoto = document.getElementById('modalPhoto');
+          document.querySelectorAll('.review-photo').forEach(img => {
+            img.addEventListener('click', function () {
+              modalPhoto.src = this.getAttribute('data-img');
+            });
+          });
+          // Clear modal image on close
+          photoModal.addEventListener('hidden.bs.modal', function () {
+            modalPhoto.src = '';
+          });
+        });
+      </script>
+
+      <a href="#" class="text-primary">
+        See all reviews (<?= $review_count ?>)
+      </a>
+    </div>
+    <?php if ($total_pages > 1): ?>
+      <nav aria-label="Review pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+            <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+              <a class="page-link" href="?id=<?= $productID ?>&page=<?= $i ?>">
+                <?= $i ?>
+              </a>
+            </li>
+          <?php endfor; ?>
+        </ul>
+      </nav>
+    <?php endif; ?>
   </div>
 
-<!-- Footer and chat -->
- <?php include 'footer.php'; ?>
- <?php include 'chat.php'; ?>
+  <!-- Footer and chat -->
+  <?php include 'footer.php'; ?>
+  <?php include 'chat.php'; ?>
 
 
- <!-- Collapse Search for small device Script -->
+  <!-- Collapse Search for small device Script -->
   <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          const toggleBtn = document.getElementById('mobileSearchToggle');
-          const searchBar = document.getElementById('mobileSearchBar');
-          if (toggleBtn && searchBar) {
-              toggleBtn.addEventListener('click', function (e) {
-                  e.stopPropagation();
-                  searchBar.classList.toggle('d-none');
-                  if (!searchBar.classList.contains('d-none')) {
-                      searchBar.querySelector('input').focus();
-                  }
-              });
-              // Optional: Hide search bar when clicking outside
-              document.addEventListener('click', function (e) {
-                  if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
-                      searchBar.classList.add('d-none');
-                  }
-              });
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleBtn = document.getElementById('mobileSearchToggle');
+      const searchBar = document.getElementById('mobileSearchBar');
+      if (toggleBtn && searchBar) {
+        toggleBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          searchBar.classList.toggle('d-none');
+          if (!searchBar.classList.contains('d-none')) {
+            searchBar.querySelector('input').focus();
           }
-      });
-  </script>
-<script>
-
-  // Size button logic
-
-
-
-  // Filter button logic for product ratings
-  const ratingFilterButtons = document.querySelectorAll('.btn-rating-filter');
-  ratingFilterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      ratingFilterButtons.forEach(b => b.classList.remove('active'));
-      button.classList.add('active');
+        });
+        // Optional: Hide search bar when clicking outside
+        document.addEventListener('click', function (e) {
+          if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+            searchBar.classList.add('d-none');
+          }
+        });
+      }
     });
-  });
-</script>
+  
+    // Size button logic
+
+
+
+    // Filter button logic for product ratings
+    const ratingFilterButtons = document.querySelectorAll('.btn-rating-filter');
+    ratingFilterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        ratingFilterButtons.forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+      });
+    });
+  </script>
 
 
 </body>
+
 </html>

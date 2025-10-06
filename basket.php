@@ -6,6 +6,17 @@ session_start();
 // Get user ID from session
 $userId = $_SESSION['user_id'];
 
+// Fetch user information
+$userSql = "SELECT student_fname, student_lname, student_mname, photo FROM users WHERE id = ?";
+$stmt = $conn->prepare($userSql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$userResult = $stmt->get_result();
+$userInfo = $userResult->fetch_assoc();
+
+// Create full name
+$fullName = $userInfo['student_fname'] . ' ' . $userInfo['student_lname'];
+
 // Fetch basket items for this user
 $basketSql = "SELECT * FROM basket WHERE user_id = ?";
 $stmt = $conn->prepare($basketSql);
@@ -70,13 +81,6 @@ $basketItems = [];
 $totalItems = 0;
 $subTotal = 0.00;
 
-
-// Show basket page with items if it's a GET request
-
-
-
-
-
 $conditions = [];
 
 if (!empty($_GET['type'])) {
@@ -120,18 +124,7 @@ $stmt->bind_param('i',$user_id);
 $stmt->execute();
 $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Fetch recommended products
-$recommendations = "SELECT p.*, 
-                   GROUP_CONCAT(DISTINCT pv.gender) as genders,
-                   GROUP_CONCAT(DISTINCT pv.size) as sizes,
-                   COALESCE(AVG(r.rating), 0) as rating,
-                   COUNT(r.id) as rating_count
-                   FROM products p
-                   LEFT JOIN product_variants pv ON p.id = pv.product_id
-                   LEFT JOIN product_reviews r ON p.id = r.product_id
-                   WHERE p.type='uniform' OR p.type='supplies'
-                   GROUP BY p.id, p.product_name, p.price, p.image, p.type";
-$rec_result = $conn->query($recommendations);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -309,8 +302,13 @@ $rec_result = $conn->query($recommendations);
                 <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="profile-section">
-                <img src="admin/images/profile_pic.png">
-                <h4 class="mt-2">Janella Clare Gomez</h4>
+                <?php if (!empty($userInfo['photo'])): ?>
+                    <img src="./admin/uploads/<?php echo htmlspecialchars($userInfo['photo']); ?>" alt="Profile Picture">
+                <?php else: ?>
+                    <img src="admin/images/profile_pic.png" alt="Default Profile">
+                <?php endif; ?>
+                
+                <h4 class="mt-2"><?php echo htmlspecialchars($fullName); ?></h4>
             </div>
 
             <div class="px-3">
@@ -490,7 +488,7 @@ $rec_result = $conn->query($recommendations);
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: `action=update_qty&id=${itemId}&quantity=${newQuantity}`
-            })
+            )
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -523,7 +521,7 @@ $rec_result = $conn->query($recommendations);
                             body: 'action=clear_all' // Send action to clear all items
                         })
                         .then(response => response.json())
-                        .then(data => {
+                        .then data => {
                             if (data.success) {
                                 alert('All items removed from basket!');
                                 window.location.reload();  // Reload the page to reflect changes
@@ -620,7 +618,7 @@ $rec_result = $conn->query($recommendations);
                 body: params
             })
             .then(r => r.json())
-            .then(js => {
+            .then js => {
                 if (js.success) {
                 window.location.href = 'proceed_order.php';
                 } else {

@@ -828,7 +828,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
       const selectAll = document.getElementById('selectAllProducts');
       const checkboxes = document.querySelectorAll('.product-checkbox');
       const bulkDisableContainer = document.getElementById('bulkDisableContainer');
-      const bulkDisableBtn = document.getElementById('bulkDisableBtn');
+      // const bulkDisableBtn = document.getElementById('bulkDisableBtn');
 
       // Select/Deselect all checkboxes
       selectAll.addEventListener('change', function () {
@@ -1048,6 +1048,47 @@ for ($i = 1; $i <= $total_pages; $i++) {
       });
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+    const bulkDisableBtn = document.getElementById('bulkDisableBtn');
+    
+    if (bulkDisableBtn) {
+        bulkDisableBtn.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedIds.length === 0) {
+                alert('Please select at least one account to disable');
+                return;
+            }
+
+            if (confirm('Are you sure you want to disable the selected accounts?')) {
+                // Create form data
+                const formData = new FormData();
+                formData.append('action', 'bulk_disable');
+                formData.append('ids', JSON.stringify(selectedIds));
+
+                // Send AJAX request
+                fetch('update_student_status.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Selected accounts have been disabled');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing your request');
+                });
+            }
+        });
+    }
+});
   </script>
 </body>
 

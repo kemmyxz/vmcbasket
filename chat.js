@@ -89,28 +89,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function appendMessage(msg) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `d-flex ${msg.is_admin == 1 ? '' : 'justify-content-end'} mb-3`;
-        
-        messageDiv.innerHTML = `
-            ${msg.is_admin == 1 ? `
-                <div class="me-2">
-                    <img src="admin/images/VMC School Logo.png" class="chat-avatar" alt="VMC admin" style="width: 30px; height: 30px;">
-                </div>
-            ` : ''}
+    const isAdmin = msg.is_admin == 1;
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `d-flex ${isAdmin ? 'align-items-start' : 'justify-content-end'} mb-3`;
+
+    messageDiv.innerHTML = `
+        ${isAdmin ? `
+            <div class="me-2">
+                <img src="./admin/images/profile_pic.png" class="chat-avatar" alt="VMC admin" style="width: 30px; height: 30px;">
+            </div>
             <div>
-                <div class="chat-bubble ${msg.is_admin == 1 ? 'admin' : 'user'}">
+                <div class="chat-bubble admin">
                     ${msg.message}
                 </div>
-                <small class="text-muted ${msg.is_admin == 1 ? 'text-start' : 'text-end'} d-block">
+                <small class="text-muted text-start d-block">
                     ${msg.created_at}
                 </small>
             </div>
-        `;
-        
-        chatBody.appendChild(messageDiv);
-    }
+        ` : `
+            <div>
+                <div class="chat-bubble user">
+                    ${msg.message}
+                </div>
+                <small class="text-muted text-end d-block">
+                    ${msg.created_at}
+                </small>
+            </div>
+        `}
+    `;
 
+    chatBody.appendChild(messageDiv);
+}
     function scrollChatToBottom() {
         chatBody.scrollTop = chatBody.scrollHeight;
     }

@@ -15,7 +15,7 @@ CREATE TABLE users (
     otp VARCHAR(100),
     otp_expiry DATETIME,
     last_activity TIMESTAMP NULL DEFAULT NULL,
-    active_status ENUM('Active', 'Disable') DEFAULT 'Active'
+    active_status ENUM('Active', 'Disabled') DEFAULT 'Active'
 );
 
     CREATE TABLE admin_login(
@@ -66,7 +66,7 @@ CREATE TABLE inquiries (
     message TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN DEFAULT FALSE,
-    is_admin BOOLEAN DEFAULT FALSE AFTER message;
+    sender ENUM('user', 'admin') DEFAULT 'user',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

@@ -32,19 +32,22 @@ try {
                 throw new Exception("Empty message");
             }
 
-            $sql = "INSERT INTO inquiries (user_id, message, created_at) VALUES (?, ?, NOW())";
+            // Determine sender
+            $sender = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] ? 'admin' : 'user';
+
+            $sql = "INSERT INTO inquiries (user_id, message, sender, created_at) VALUES (?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
-            
+
             if (!$stmt) {
                 throw new Exception($conn->error);
             }
-            
-            $stmt->bind_param("is", $user_id, $message);
-            
+
+            $stmt->bind_param("iss", $user_id, $message, $sender);
+
             if (!$stmt->execute()) {
                 throw new Exception($stmt->error);
             }
-            
+
             echo json_encode(['success' => true]);
             exit();
         }
@@ -54,10 +57,10 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
         if ($_GET['action'] === 'load') {
             $sql = "SELECT i.*, 
-                    CASE WHEN i.user_id = 0 THEN 1 ELSE 0 END as is_admin,
+                    CASE WHEN i.sender = 'admin' THEN 1 ELSE 0 END as is_admin,
                     DATE_FORMAT(i.created_at, '%h:%i %p, %b %d') as created_at
                     FROM inquiries i
-                    WHERE i.user_id = ? OR i.user_id = 0
+                    WHERE i.user_id = ? 
                     ORDER BY i.created_at ASC";
             
             $stmt = $conn->prepare($sql);

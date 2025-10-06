@@ -6,16 +6,10 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo '<script>alert("Please login to use the chat feature");</script>';
-    exit();
-}
+
 
 $user_id = $_SESSION['user_id'];
 
-// Add session check
-echo "<!-- Debug Info: User ID = " . $_SESSION['user_id'] . " -->";
 ?>
 
 <!-- Floating Chat Button -->

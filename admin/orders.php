@@ -579,7 +579,7 @@ $calendarEvents = getCalendarEvents();
             <hr>
             <h5 class="mb-3 fw-bold">Online Payment Receipt</h5>
             <div class="text-center">
-              <img id="receiptImage" src="../Images/sample-receipt.png" alt="Receipt" class="img-fluid"
+              <img id="receiptImage" src="./uploads/receipts/sample_receipt.jpg" alt="Receipt" class="img-fluid"
                 style="max-height: 400px;">
             </div>
           </div>
@@ -657,36 +657,24 @@ function updateOrderStatus(receiptId) {
 
   <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Get modal element first
     const orderModal = document.getElementById('orderDetailsModal');
-    
-    // Add confirm receipt button handler
-    const confirmReceiptBtn = orderModal.querySelector('.btn-primary');
-    confirmReceiptBtn.addEventListener('click', function() {
-        const receiptId = document.getElementById('customerID').textContent;
-        
-        if(confirm('Confirm this receipt? This will change the order status to "ToPickUp"')) {
-            updateReceiptStatus(receiptId);
-        }
-    });
-    
+    if (!orderModal) {
+        console.error('Order details modal not found');
+        return;
+    }
+
+    // View details button handlers
     document.querySelectorAll('.view-details').forEach(button => {
         button.addEventListener('click', function() {
-            const receiptId = this.getAttribute('data-receipt-id');
-            const customer = this.getAttribute('data-customer');
-            const email = this.getAttribute('data-email');
-            const date = this.getAttribute('data-date');
-            const payment = this.getAttribute('data-payment');
-            const products = JSON.parse(this.getAttribute('data-products'));
-            
-            // Update customer information
-            document.getElementById('customerID').textContent = receiptId;
-            document.getElementById('customerName').textContent = customer;
-            document.getElementById('customerEmail').textContent = email;
-            document.getElementById('dateOrdered').textContent = date;
-            document.getElementById('mop').textContent = payment;
-            
-            // Update product details with images
             const productDetails = document.getElementById('productDetails');
+            if (!productDetails) {
+                console.error('Product details container not found');
+                return;
+            }
+
+            const products = JSON.parse(this.getAttribute('data-products') || '[]');
+            
             productDetails.innerHTML = products.map(product => `
                 <tr>
                     <td>
@@ -701,112 +689,52 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>₱${parseFloat(product.subtotal).toFixed(2)}</td>
                 </tr>
             `).join('');
-            
-            // Show/hide receipt section and confirm button based on payment method
-            const receiptSection = orderModal.querySelector('.online-receipt-section');
-            const confirmButton = orderModal.querySelector('.btn-primary');
-            
-            if (payment === 'Cash (Pay at the Counter)') {
-                receiptSection.style.display = 'none';
-                confirmButton.style.display = 'none';
-            } else {
-                receiptSection.style.display = 'block';
-                confirmButton.style.display = 'inline-block';
-            }
 
-            // Update receipt image if available
-            const receiptImage = orderModal.querySelector('#receiptImage');
-            fetch('get_receipt_image.php?receipt_id=' + receiptId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.image_path) {
-                        receiptImage.src = '../' + data.image_path;
-                        receiptSection.style.display = 'block';
-                    } else {
-                        receiptSection.style.display = 'none';
-                    }
-                });
-
-            // Check if receipt is already confirmed
-            fetch('check_receipt_status.php?receipt_id=' + receiptId)
-                .then(response => response.json())
-                .then(data => {
-                    const receiptActions = orderModal.querySelector('#receiptActions');
-                    const confirmReceiptBtn = orderModal.querySelector('.confirm-receipt');
-                    const invalidReceiptBtn = orderModal.querySelector('.invalid-receipt');
-
-                    if (data.status === 'ToPickUp' || data.status === 'Complete') {
-                        // Hide both buttons if order is already confirmed
-                        receiptActions.style.display = 'none';
-                    } else if (data.status === 'Cancelled') {
-                        // Hide both buttons if order is cancelled
-                        receiptActions.style.display = 'none';
-                    } else if (payment === 'Cash (Pay at the Counter)') {
-                        // Hide both buttons for cash payments
-                        receiptActions.style.display = 'none';
-                    } else {
-                        // Show both buttons for pending online receipt orders
-                        receiptActions.style.display = 'block';
-                        confirmReceiptBtn.style.display = 'inline-block';
-                        invalidReceiptBtn.style.display = 'inline-block';
-                    }
-                });
+            // Update other modal content...
+            updateModalContent(this);
         });
     });
 
-    // Invalid receipt button handler
-    const invalidReceiptBtn = orderModal.querySelector('.invalid-receipt');
-    invalidReceiptBtn.addEventListener('click', function() {
-        const receiptId = document.getElementById('customerID').textContent;
-        
-        if(confirm('Mark this receipt as invalid? This will cancel the order.')) {
-            fetch('invalidate_receipt.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'receipt_id=' + receiptId
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Receipt marked as invalid. Order has been cancelled.');
-                    location.reload(); // Refresh the page
-                } else {
-                    alert('Error updating receipt status');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error updating receipt status');
+    // Helper function to update modal content
+    function updateModalContent(button) {
+        const receiptId = button.getAttribute('data-receipt-id');
+        const customer = button.getAttribute('data-customer');
+        const email = button.getAttribute('data-email');
+        const date = button.getAttribute('data-date');
+        const payment = button.getAttribute('data-payment');
+
+        // Safely update DOM elements
+        const elements = {
+            'customerID': receiptId,
+            'customerName': customer,
+            'customerEmail': email,
+            'dateOrdered': date,
+            'mop': payment
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        });
+
+        // Update visibility of receipt sections
+        const receiptSection = orderModal.querySelector('.online-receipt-section');
+        const confirmButton = orderModal.querySelector('.btn-primary');
+        const receiptActions = orderModal.querySelector('#receiptActions');
+
+        if (payment === 'Cash (Pay at the Counter)') {
+            [receiptSection, confirmButton, receiptActions].forEach(el => {
+                if (el) el.style.display = 'none';
+            });
+        } else {
+            [receiptSection, confirmButton, receiptActions].forEach(el => {
+                if (el) el.style.display = 'block';
             });
         }
-    });
+    }
 });
-
-// Replace or update the updateReceiptStatus function
-function updateReceiptStatus(receiptId) {
-    fetch('update_receipt_status.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'receipt_id=' + receiptId
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.success) {
-            alert('Receipt confirmed! Order status updated to To Pick Up.');
-            location.reload(); // Refresh the page to show updated status
-        } else {
-            alert('Error updating receipt status: ' + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating receipt status');
-    });
-}
 </script>
 
   <script>
@@ -894,7 +822,7 @@ function updateReceiptStatus(receiptId) {
       // Add AJAX call to filter orders
       fetch(`filter_orders.php?month=${month}&year=${year}`)
         .then(response => response.json())
-        .then(data => {
+        .then data => {
           if (data.success) {
             // Refresh the page or update the orders table
             location.reload();

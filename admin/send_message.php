@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 session_start();
 require 'inc/config.php';
 
@@ -6,8 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = mysqli_real_escape_string($conn, $_POST['user_id']);
     $message = mysqli_real_escape_string($conn, $_POST['message']);
     
-    $query = "INSERT INTO inquiries (user_id, message, is_admin, is_read, created_at) 
-              VALUES (?, ?, 1, 1, NOW())";
+    $query = "INSERT INTO inquiries (user_id, message, sender, is_read, created_at) 
+              VALUES (?, ?, 'admin', 1, NOW())";
     
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, "is", $user_id, $message);

@@ -32,7 +32,7 @@
             display: none !important;
         }
 
-        /* Add these styles in the existing <style> tag */
+        /* Add these styles in the existing <style> tag
         .small-avatar {
             width: 30px;
             height: 30px;
@@ -56,7 +56,7 @@
             background-color: #2c3e91;
             color: white;
             border-bottom-right-radius: 500px;
-        }
+        } */
     </style>
 </head>
 
@@ -67,13 +67,35 @@
     require 'inc/config.php';
 
     // Fetch all unique users who have sent messages
-    $query = "SELECT DISTINCT i.user_id, u.student_fname, u.student_lname, u.year_level, u.photo, 
-         (SELECT message FROM inquiries WHERE user_id = i.user_id ORDER BY created_at DESC LIMIT 1) as last_message,
-         (SELECT COUNT(*) FROM inquiries WHERE user_id = i.user_id AND is_read = 0 AND is_admin = 0) as unread_count
-         FROM inquiries i 
-         JOIN users u ON i.user_id = u.id 
-         ORDER BY (SELECT created_at FROM inquiries WHERE user_id = i.user_id ORDER BY created_at DESC LIMIT 1) DESC";
+    $query = "SELECT 
+    i.user_id, 
+    u.student_fname, 
+    u.student_lname, 
+    u.year_level, 
+    u.photo,
+    (
+        SELECT COUNT(*) FROM inquiries 
+        WHERE user_id = i.user_id AND sender = 'user' AND is_read = 0
+    ) AS unread_count,
+    (
+        SELECT message FROM inquiries 
+        WHERE user_id = i.user_id 
+        ORDER BY created_at DESC LIMIT 1
+    ) AS last_message
+FROM inquiries i
+JOIN users u ON i.user_id = u.id
+WHERE i.sender = 'user'
+GROUP BY i.user_id
+ORDER BY 
+    (SELECT created_at FROM inquiries WHERE user_id = i.user_id ORDER BY created_at DESC LIMIT 1) DESC";
     $result = mysqli_query($conn, $query);
+
+    $firstUserId = null;
+    if ($row = mysqli_fetch_assoc($result)) {
+        $firstUserId = $row['user_id'];
+        // Rewind the result pointer so the while loop below works
+        mysqli_data_seek($result, 0);
+    }
     ?>
 
     <div class="container-fluid">
@@ -162,33 +184,18 @@
                     <div class="row">
                         <!-- Left Sidebar: Chat List -->
                         <div class="col-md-4 col-lg-4 chat-list p-3 d-sm-block" id="chatList">
+                                                     
                             <!-- Search -->
                             <div class="mb-3 search-chat">
-                                <input type="text" class="form-control" placeholder="Search Message">
+                                <input type="text" class="form-control" id="searchInput" placeholder="Search Message">
                                 <button><i class="bi bi-search"></i></button>
                             </div>
-
+                            
                             <!-- Filters -->
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div>
-                                    <button class="chat-btn active" id="allBtn">All</button>
-                                    <button class="chat-btn" id="unreadBtn">Unread</button>
-                                </div>
-                                <div class="dropdown">
-                                    <button class="chat-btn dropdown-toggle" type="button" id="filterDropdown"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span id="filterDropdownText">Filter</span> <i class="bi bi-filter"></i>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                                        <li><a class="dropdown-item" data-subject="All">All Subjects</a></li>
-                                        <li><a class="dropdown-item" data-subject="Inquiry">Inquiry</a></li>
-                                        <li><a class="dropdown-item" data-subject="Order Status">Order Status</a></li>
-                                        <li><a class="dropdown-item" data-subject="Return/Refund">Return/Refund</a></li>
-                                        <li><a class="dropdown-item" data-subject="Cancel Order">Cancel Order</a></li>
-                                        <li><a class="dropdown-item" data-subject="Payment Issue">Payment Issue</a></li>
-                                        <li><a class="dropdown-item" data-subject="Complain">Complain</a></li>
-                                        <li><a class="dropdown-item" data-subject="Others">Others</a></li>
-                                    </ul>
+                                    <button class="chat-btn active" id="allBtn" data-filter="all">All</button>
+                                    <button class="chat-btn" id="unreadBtn" data-filter="unread">Unread</button>
                                 </div>
                             </div>
 
@@ -201,8 +208,7 @@
                                             <img src="<?php echo $row['photo'] ? './uploads/' . $row['photo'] : './images/profile_pic.png'; ?>"
                                                 class="chat-avatar" alt="Profile Picture">
                                             <?php if ($row['unread_count'] > 0) { ?>
-                                                <span
-                                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                     <?php echo $row['unread_count']; ?>
                                                 </span>
                                             <?php } ?>
@@ -210,12 +216,14 @@
                                         <div>
                                             <strong><?php echo $row['student_fname'] . ' ' . $row['student_lname']; ?></strong>
                                             <div class="small text-muted">
-                                                <?php echo substr($row['last_message'], 0, 30) . '...'; ?></div>
+                                                <?php echo substr($row['last_message'], 0, 30) . '...'; ?>
+                                            </div>
                                         </div>
                                     </li>
                                 <?php } ?>
                             </ul>
                         </div>
+
                         <!-- Right Chat Window -->
                         <div class="col-md-8 col-lg-8 chat-window d-flex flex-column" id="chatWindow">
                             <!-- Chat Header -->
@@ -270,8 +278,7 @@
 
                             <!-- Chat Messages -->
 
-                            <div class="chat-body flex-grow-1 p-3 overflow-auto d-flex flex-column-reverse"
-                                id="chatBody">
+                            <div class="chat-body flex-grow-1 p-3 overflow-auto" id="chatBody">
                                 <!-- Messages will be loaded here dynamically -->
                             </div>
 
@@ -287,21 +294,161 @@
         </div>
 
         <script>
-            // Ensure only one filter button is active at a time
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('searchInput');
+                const chatUsersList = document.getElementById('chatUsersList');
                 const allBtn = document.getElementById('allBtn');
                 const unreadBtn = document.getElementById('unreadBtn');
-                allBtn.classList.add('active');
-                allBtn.addEventListener('click', function () {
-                    allBtn.classList.add('active');
-                    unreadBtn.classList.remove('active');
+                
+                // Store original list items for filtering
+                const originalItems = Array.from(chatUsersList.getElementsByTagName('li'));
+                
+                // Search functionality
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    filterChats(searchTerm, getCurrentFilter());
                 });
-                unreadBtn.addEventListener('click', function () {
-                    unreadBtn.classList.add('active');
-                    allBtn.classList.remove('active');
+                
+                // Filter functionality
+                allBtn.addEventListener('click', function() {
+                    setActiveFilter(this);
+                    filterChats(searchInput.value.toLowerCase(), 'all');
                 });
-            });
+                
+                unreadBtn.addEventListener('click', function() {
+                    setActiveFilter(this);
+                    filterChats(searchInput.value.toLowerCase(), 'unread');
+                });
+                
+                function getCurrentFilter() {
+                    const activeButton = document.querySelector('.chat-btn.active');
+                    return activeButton.getAttribute('data-filter');
+                }
+                
+                function setActiveFilter(button) {
+                    document.querySelectorAll('.chat-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+                }
+                
 
+                function filterChats(searchTerm, filterType) {
+                    let hasVisibleItems = false;
+
+                    originalItems.forEach(item => {
+                        const userName = item.querySelector('strong').textContent.toLowerCase();
+                        const lastMessage = item.querySelector('.small.text-muted').textContent.toLowerCase();
+                        // Check for unread badge (unread_count > 0)
+                        const hasUnreadBadge = item.querySelector('.badge.bg-danger') !== null;
+
+                        // Only show if matches search AND matches filter
+                        const matchesSearch = userName.includes(searchTerm) || lastMessage.includes(searchTerm);
+                        let matchesFilter = true;
+                        if (filterType === 'unread') {
+                            matchesFilter = hasUnreadBadge;
+                        }
+
+                        if (matchesSearch && matchesFilter) {
+                            item.style.display = '';
+                            hasVisibleItems = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+
+                    // Show/hide the chatUsersList <ul>
+                    chatUsersList.style.display = hasVisibleItems ? '' : 'none';
+                    showNoResults(!hasVisibleItems);
+                }
+                
+                function showNoResults(show) {
+                    let noResultsEl = document.getElementById('noResults');
+                    const chatList = document.getElementById('chatList');
+
+                    if (show) {
+                        if (!noResultsEl) {
+                            noResultsEl = document.createElement('div');
+                            noResultsEl.id = 'noResults';
+                            noResultsEl.className = 'text-center p-4';
+                            noResultsEl.innerHTML = `
+                                <div class="text-muted">
+                                    <i class="bi bi-search fs-4 mb-2"></i>
+                                    <p class="mb-0">No messages found</p>
+                                </div>
+                            `;
+                            chatList.appendChild(noResultsEl);
+                        }
+                        noResultsEl.style.display = 'block';
+                    } else if (noResultsEl) {
+                        noResultsEl.style.display = 'none';
+                    }
+                }
+                
+                // Add these styles to the existing style element
+                const additionalStyles = `
+                    #noResults {
+                        background-color: #f8f9fa;
+                        border-radius: 8px;
+                        margin: 1rem 0;
+                    }
+                    
+                    .chat-users:empty {
+                        display: none;
+                    }
+                    
+                    #searchInput {
+                        transition: all 0.3s ease;
+                    }
+                    
+                    #searchInput:focus {
+                        box-shadow: 0 0 0 0.2rem rgba(44, 62, 145, 0.25);
+                        border-color: #2c3e91;
+                    }
+                `;
+                
+                // Add the additional styles
+                style.textContent += additionalStyles;
+            });
+            
+            // Add CSS styles
+            const style = document.createElement('style');
+            style.textContent = `
+                .chat-btn {
+                    padding: 5px 15px;
+                    border: 1px solid #dee2e6;
+                    background: transparent;
+                    border-radius: 20px;
+                    margin-right: 5px;
+                    transition: all 0.3s ease;
+                }
+                
+                .chat-btn.active {
+                    background: #2c3e91;
+                    color: white;
+                    border-color: #2c3e91;
+                }
+                
+                .search-chat {
+                    position: relative;
+                }
+                
+                .search-chat button {
+                    position: absolute;
+                    right: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    border: none;
+                    background: transparent;
+                    color: #6c757d;
+                }
+                
+                .search-chat input {
+                    padding-right: 40px;
+                    border-radius: 20px;
+                }
+            `;
+            document.head.appendChild(style);
             // Change dropdown button text when filter is selected
             document.querySelectorAll('.dropdown-item[data-subject]').forEach(function (item) {
                 item.addEventListener('click', function (e) {
@@ -450,9 +597,9 @@
 
             // Load messages for selected user
             function loadMessages(userId) {
+                if (!userId) return;
                 currentUserId = userId;
 
-                // First, fetch user details
                 fetch(`get_user_details.php?user_id=${userId}`)
                     .then(response => response.json())
                     .then(user => {
@@ -467,47 +614,63 @@
                         document.getElementById('modalStudentId').textContent = user.student_no;
                         document.getElementById('modalYearLevel').textContent = user.year_level;
                         document.getElementById('modalEmail').textContent = user.email;
-                    });
+                    })
+                    .catch(error => console.error('Error loading user details:', error));
 
                 // Then fetch messages
                 fetch(`get_messages.php?user_id=${userId}`)
                     .then(response => response.json())
-                    .then(messages => {
+                    .then(data => {
                         const chatBody = document.getElementById('chatBody');
                         chatBody.innerHTML = '';
-
+                        
+                        // Make sure we're working with an array
+                        const messages = Array.isArray(data.messages) ? data.messages : [];
+                        
+                        // Create a container for messages
+                        const messagesContainer = document.createElement('div');
+                        messagesContainer.className = 'd-flex flex-column';
+                        
+                        // Add messages in chronological order
                         messages.forEach(message => {
-                            // This line determines if the message is from admin
-                            const isAdmin = message.is_admin === '1';
+                            const isAdmin = message.sender === 'admin';
                             const html = `
-                    <div class="d-flex mb-3 ${isAdmin ? 'justify-content-end' : 'justify-content-start'}">
-                        ${!isAdmin ? `
-                            <!-- User avatar on left side -->
-                            <div class="me-2">
-                                <img src="${message.photo ? './uploads/' + message.photo : './images/profile_pic.png'}" 
-                                     class="chat-avatar small-avatar" alt="Profile Picture">
-                            </div>
-                        ` : ''}
-                        <div class="chat-message">
-                            <!-- Admin messages have different styling -->
-                            <div class="chat-bubble ${isAdmin ? 'admin' : 'user'}">${message.message}</div>
-                            <small class="text-muted ${isAdmin ? 'text-end' : ''}">${message.created_at}</small>
-                        </div>
-                        ${isAdmin ? `
-                            <!-- Admin avatar on right side -->
-                            <div class="ms-2">
-                                <img src="./images/profile_pic.png" 
-                                     class="chat-avatar small-avatar" alt="Admin Profile">
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                            chatBody.insertAdjacentHTML('beforeend', html);
+                                <div class="d-flex mb-3 ${isAdmin ? 'justify-content-end' : 'justify-content-start'}">
+                                    ${!isAdmin ? `
+                                        <div class="me-2">
+                                            <img src="./uploads/${message.photo || 'profile_pic.png'}" 
+                                                 class="chat-avatar" alt="User Profile">
+                                        </div>
+                                    ` : ''}
+                                    <div class="chat-message">
+                                        <div class="chat-bubble ${isAdmin ? 'admin' : 'user'}">
+                                            ${message.message}
+                                        </div>
+                                        <small class="chat-timestamp text-muted ${isAdmin ? 'text-end' : 'text-start'}">
+                                            ${message.created_at}
+                                        </small>
+                                    </div>
+                                    ${isAdmin ? `
+                                        <div class="ms-2">
+                                            <img src="./images/profile_pic.png" 
+                                                 class="chat-avatar" alt="Admin Profile">
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                            messagesContainer.insertAdjacentHTML('beforeend', html);
                         });
-
+                        
+                        // Add the messages container to the chat body
+                        chatBody.appendChild(messagesContainer);
+                        
+                        // Scroll to bottom
                         chatBody.scrollTop = chatBody.scrollHeight;
-                    });
+                    })
+                    .catch(error => console.error('Error loading messages:', error));
             }
+            
+            
             // Handle message sending
             document.querySelector('.send-button').addEventListener('click', function () {
                 sendMessage();
@@ -600,14 +763,32 @@
                 });
             });
 
-            // Initialize chat window with "Select a chat" message
+                       
             const selectedUserInfo = document.getElementById('selectedUserInfo');
             if (!currentUserId) {
                 selectedUserInfo.querySelector('#headerUserName').textContent = 'Select a chat';
                 selectedUserInfo.querySelector('#headerUserDetails').textContent = '-';
                 document.getElementById('headerUserImage').src = './images/profile_pic.png';
             }
+       
+       
+    
+    var firstUserId = <?php echo $firstUserId ? json_encode($firstUserId) : 'null'; ?>;
+                        
+            document.addEventListener('DOMContentLoaded', function () {
+                if (firstUserId) {
+                    // Highlight the first user in the list
+                    const firstUserLi = document.querySelector('.chat-users .list-group-item[data-user-id="' + firstUserId + '"]');
+                    if (firstUserLi) {
+                        firstUserLi.classList.add('active');
+                    }
+                    // Load messages for the first user
+                    loadMessages(firstUserId);
+                }
+            });
+           
         </script>
+
 
 </body>
 
