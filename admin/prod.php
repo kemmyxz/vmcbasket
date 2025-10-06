@@ -416,6 +416,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                                 <option value="">Choose Type</option>
                                                 <option value="1">Uniform</option>
                                                 <option value="2">Supplies</option>
+                                                <option value="3">School-Merchandise</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
