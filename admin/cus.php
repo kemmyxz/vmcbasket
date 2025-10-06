@@ -7,6 +7,20 @@ require 'inc/config.php';
 // -------------------------------
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+  // Helper function to set a Bootstrap alert in session and redirect back
+  function set_bootstrap_alert($message, $type = 'danger', $redirect = null) {
+    $_SESSION['alert'] = [
+      'message' => $message,
+      'type' => $type
+    ];
+    if ($redirect) {
+      header("Location: $redirect");
+    } else {
+      header("Location: " . $_SERVER['HTTP_REFERER']);
+    }
+    exit();
+  }
+
   // Fetch form data safely
   $student_no = $_POST['student_no'] ?? '';
   $student_fname = $_POST['student_fname'] ?? '';
@@ -19,31 +33,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   // Validate correct date format (YYYY-MM-DD)
   if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthday)) {
-    echo "<script>alert('Invalid date format! Please enter a valid birthday.'); window.history.back();</script>";
-    exit();
+    set_bootstrap_alert('Invalid date format! Please enter a valid birthday.');
   }
   // Ensure birthday's year is at least 2 years before the current year
   $birth_year = date('Y', strtotime($birthday));
   $current_year = date('Y');
   if ($birth_year > $current_year - 2) {
-    echo "<script>alert('Birthdate must be at least 2 years before the current date!'); window.history.back();</script>";
-    exit();
+    set_bootstrap_alert('Birthdate must be at least 2 years before the current date!');
   }
   // Validate Student Number (must be exactly 6 digits)
   if (!preg_match('/^\d{6}$/', $student_no)) {
-    echo "<script>alert('Error: Student Number must be exactly 6 digits!'); window.history.back();</script>";
-    exit();
+    set_bootstrap_alert('Student Number must be exactly 6 digits!');
   }
   // Validate Phone Number (must be exactly 11 digits)
   if (!preg_match('/^\d{11}$/', $phone_number)) {
-    echo "<script>alert('Error: Phone Number must be exactly 11 digits!'); window.history.back();</script>";
-    exit();
+    set_bootstrap_alert('Phone Number must be exactly 11 digits!');
   }
   // Also ensure birthday is at least 2 years before now (redundant check)
   $min_birthdate = date('Y-m-d', strtotime('-2 years'));
   if ($birthday > $min_birthdate) {
-    echo "<script>alert('Error: Birthday must be at least 2 years before the current date!'); window.history.back();</script>";
-    exit();
+    set_bootstrap_alert('Birthday must be at least 2 years before the current date!');
   }
   // Format birthday (YYYYMMDD) for default password generation
   $formatted_birthday = str_replace("-", "", $birthday);
@@ -59,8 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check_stmt->execute();
     $check_stmt->store_result();
     if ($check_stmt->num_rows > 0) {
-      echo "<script>alert('Error: Student ID already exists!'); window.history.back();</script>";
-      exit();
+      set_bootstrap_alert('Student ID already exists!');
     }
     $check_stmt->close();
   }
@@ -77,11 +85,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $photo = time() . "_" . basename($_FILES["photo"]["name"]);
     $target_file = $target_dir . $photo;
     if (!move_uploaded_file($_FILES["photo"]["tmp_name"], $target_file)) {
-      echo "<script>alert('Failed to upload photo'); window.history.back();</script>";
-      exit();
+      set_bootstrap_alert('Failed to upload photo');
     }
   }
-  $status = $user['active_status'];
+
   // --------------------------------------------
   // Insert New User into Database (with activity)
   // --------------------------------------------
@@ -91,17 +98,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if ($stmt = $conn->prepare($sql)) {
     $stmt->bind_param("ssssssssss", $student_no, $hashed_password, $student_fname, $student_mname, $student_lname, $phone_number, $email, $birthday, $year_level, $photo);
     if ($stmt->execute()) {
-      echo "<script>alert('User added successfully! Default Password: $student_pass'); window.location.href='cus.php';</script>";
-      exit();
+      set_bootstrap_alert(
+        "User added successfully!<br>Default Password: <strong>$student_pass</strong>",
+        'success',
+        'cus.php'
+      );
     } else {
-      echo "<script>alert('Error: " . $stmt->error . "'); window.history.back();</script>";
-      exit();
+      set_bootstrap_alert(htmlspecialchars($stmt->error));
     }
-
   } else {
-    echo "<script>alert('Error preparing statement: " . $conn->error . "'); window.history.back();</script>";
-    exit();
+    set_bootstrap_alert( htmlspecialchars($conn->error));
   }
+}
+
+// Show Bootstrap alert if set in session
+if (isset($_SESSION['alert'])) {
+  $alert = $_SESSION['alert'];
+  echo "<div class='position-fixed top-0 end-0 p-3' style='z-index: 1055;'>
+    <div class='alert alert-{$alert['type']} alert-dismissible fade show' role='alert'>
+      {$alert['message']}
+      <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>
+  </div>";
+  unset($_SESSION['alert']);
 }
 
 // ----------------------------------------------
@@ -291,9 +310,12 @@ for ($i = 1; $i <= $total_pages; $i++) {
           </ul>
         </div>
       </nav>
+
       <!-- Content Area -->
+      <!-- Alert outside modal (for CSV validation) -->
+      <div id="csv-alert-placeholder"></div>
       <!-- Title Page and Search -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+      <main class="col-md-9 ms-sm-auto col-lg-10 content p-4">
         <div class="d-flex justify-content-end mb-5">
           <div class="search-container">
             <input type="text" class="form-control" placeholder="Search...">
@@ -457,13 +479,6 @@ for ($i = 1; $i <= $total_pages; $i++) {
             <i class="bi bi-slash-circle"></i> Disable Account Selected
           </button>
         </div>
-        <!-- Bulk Actions Container (hidden by default) -->
-        <div id="bulkActionsContainer" style="display:none; margin-top: 20px; margin-bottom: 20px;">
-          <button id="bulkDisableBtn" class="btn btn-warning me-2">
-            <i class="bi bi-slash-circle"></i> Disable Account Selected
-          </button>
-
-        </div>
 
         <!-- ADD CUSTOMER MODAL -->
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -478,6 +493,8 @@ for ($i = 1; $i <= $total_pages; $i++) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body mt-2 p-3">
+                  <!-- ✅ Alert inside modal (for DOB validation) -->
+                  <div id="dob-alert-placeholder"></div>
                 <div class="note">
                   <p class="mt-3">Note: Your student number must match with your school ID for verification.</p>
                 </div>
@@ -660,7 +677,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
                     </div>
                   </td>
                   <td><?php echo $row['student_no']; ?></td>
-                  <td><?php echo $row['year_level']; ?></td>
+                    <td style="white-space: normal; word-break: break-word; max-width: 180px;"><?php echo $row['year_level']; ?></td>
                   <td><?php echo $row['phone_number']; ?></td>
                   <td>
                     <?php
@@ -784,46 +801,72 @@ for ($i = 1; $i <= $total_pages; $i++) {
       </div>
     </div>
   </div>
+  
   <script>
-    // Corrected event: Listen for change on the DOB input.
-    document.getElementById('dob').addEventListener('change', function () {
-      let inputDate = new Date(this.value);
-      let currentYear = new Date().getFullYear();
-      let minYear = currentYear - 2;
-      if (inputDate.getFullYear() > minYear) {
-        alert("Error: Birthdate must be at least 2 years before the current date!");
-        this.value = "";
-      }
-    });
+  // Helper function to show a Bootstrap alert dynamically
+  function showAlert(message, type = 'danger', targetId = 'csv-alert-placeholder') {
+    const alertPlaceholder = document.getElementById(targetId);
+    alertPlaceholder.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      const alert = bootstrap.Alert.getOrCreateInstance(
+        alertPlaceholder.querySelector('.alert')
+      );
+      alert.close();
+    }, 5000);
+  }
 
+  // 🎂 DOB validation (inside modal)
+  document.getElementById('dob').addEventListener('change', function () {
+    let inputDate = new Date(this.value);
+    let currentYear = new Date().getFullYear();
+    let minYear = currentYear - 2;
 
-
-    function uploadCSV() {
-      var fileInput = document.getElementById('csv-file');
-      var formData = new FormData();
-      formData.append('csv-file', fileInput.files[0]);
-
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'upload_csv.php', true);
-
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          alert('CSV file uploaded and data processed successfully!');
-          location.reload(); // Reload the page to see the new data
-        } else {
-          alert('Error uploading file.');
-        }
-      };
-
-      xhr.send(formData);
+    if (inputDate.getFullYear() > minYear) {
+      showAlert(
+        '❌ Birthdate must be at least 2 years before the current date!',
+        'danger',
+        'dob-alert-placeholder'
+      );
+      this.value = "";
     }
+  });
+
+  // 📁 CSV upload validation (outside modal)
+  function uploadCSV() {
+    var fileInput = document.getElementById('csv-file');
+    if (!fileInput.files.length) {
+      showAlert('⚠️ Please select a CSV file before uploading.', 'warning', 'csv-alert-placeholder');
+      return;
+    }
+
+    var formData = new FormData();
+    formData.append('csv-file', fileInput.files[0]);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'upload_csv.php', true);
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        showAlert('✅ CSV file uploaded and data processed successfully!', 'success', 'csv-alert-placeholder');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showAlert('❌ Error uploading file. Please try again.', 'danger', 'csv-alert-placeholder');
+      }
+    };
+
+    xhr.send(formData);
+  }
 
   </script>
 
   <script>
-
-
-    //checkbox select all/disabled function
+//checkbox select all/disabled function
     document.addEventListener('DOMContentLoaded', function () {
       const selectAll = document.getElementById('selectAllProducts');
       const checkboxes = document.querySelectorAll('.product-checkbox');
@@ -981,36 +1024,51 @@ for ($i = 1; $i <= $total_pages; $i++) {
 
       // Show/hide year level options based on course selection
       courseSelect.addEventListener('change', function () {
-        if (/Bachelor/i.test(this.value)) {
-          collegeLevels.style.display = 'block';
-        } else {
-          collegeLevels.style.display = 'none';
-          document.querySelectorAll('input[name="college_year_level"]')
-            .forEach(radio => radio.checked = false);
-        }
+      if (/Bachelor/i.test(this.value)) {
+        collegeLevels.style.display = 'block';
+      } else {
+        collegeLevels.style.display = 'none';
+        document.querySelectorAll('input[name="college_year_level"]')
+        .forEach(radio => radio.checked = false);
+      }
       });
+
+      // Helper to show Bootstrap 5.3.3 alert inside the modal
+      function showCollegeAlert(message, type = 'danger') {
+      const alertPlaceholder = document.getElementById('dob-alert-placeholder');
+      alertPlaceholder.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      `;
+      setTimeout(() => {
+        const alert = bootstrap.Alert.getOrCreateInstance(
+        alertPlaceholder.querySelector('.alert')
+        );
+        alert.close();
+      }, 4000);
+      }
 
       // Handle form submission
       const form = courseSelect.closest('form');
       form.addEventListener('submit', function (e) {
+      const selectedCourse = courseSelect.value;
+      if (/Bachelor/i.test(selectedCourse)) {
+        const checkedYear = document.querySelector('input[name="college_year_level"]:checked');
+        if (!checkedYear) {
         e.preventDefault();
-
-        const selectedCourse = courseSelect.value;
-        if (/Bachelor/i.test(selectedCourse)) {
-          const checkedYear = document.querySelector('input[name="college_year_level"]:checked');
-          if (!checkedYear) {
-            alert('Please select a year level for the college course.');
-            return;
-          }
-          // Create a hidden input for the combined value
-          const hiddenInput = document.createElement('input');
-          hiddenInput.type = 'hidden';
-          hiddenInput.name = 'year_level';
-          hiddenInput.value = `${selectedCourse} - ${checkedYear.value}`;
-          form.appendChild(hiddenInput);
+        showCollegeAlert('Please select a year level for the college course.', 'danger');
+        return;
         }
-
-        form.submit();
+        // Create a hidden input for the combined value
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'year_level';
+        hiddenInput.value = `${selectedCourse} - ${checkedYear.value}`;
+        form.appendChild(hiddenInput);
+      }
+      // If not Bachelor, allow normal submit (year_level already set)
       });
     });
 

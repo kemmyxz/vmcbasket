@@ -809,14 +809,6 @@ input[type="number"] {
   }
 }
 
-/*For Products*/
-.product-img {
-  display: block;
-  margin: auto;
-  width: 100px;
-  height: auto;
-}
-
 .rounded-100 {
   border-radius: 100px;
 }

@@ -48,15 +48,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $image_path = $target_dir . $file_name;
 
         // Validate file type
+       // Validate file type
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
         if (!in_array($file_extension, $allowed_types)) {
-            echo "<script>alert('Invalid file type. Only JPG, JPEG, PNG & GIF files are allowed.');</script>";
+            header("Location: prod.php?error=filetype");
             exit;
         }
 
         if (!move_uploaded_file($file_tmp, $image_path)) {
-            echo "<script>alert('Failed to upload image');</script>";
-            $image_path = "";
+            header("Location: prod.php?error=uploadfail");
+            exit;
         }
     }
 
@@ -118,10 +119,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $conn->commit();
-        echo "<script>
-            alert('Product added successfully!');
-            window.location.href='prod.php';
-        </script>";
+        header("Location: prod.php?added=success");
+        exit();
+
     } catch (Exception $e) {
         $conn->rollback();
         echo "<script>alert('Error: " . $e->getMessage() . "');</script>";
@@ -296,8 +296,64 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                 </div>
             </nav>
 
+            <!--Alert Message-->
+            <?php
+                if (isset($_GET['added']) && $_GET['added'] == 'success') {
+                    echo '
+                    <div class="alert alert-success alert-dismissible fade show position-fixed m-3 p-3 d-flex align-items-center"
+                        role="alert"
+                        id="successAlert"
+                        style="width:350px; bottom: 0; right: 0; z-index: 1055;">
+                        <i class="bi bi-check-circle-fill me-2" style="font-size: 1.3rem;"></i>
+                        Product added successfully!
+                        <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>';
+                } elseif (isset($_GET['error'])) {
+                    $message = '';
+                    switch ($_GET['error']) {
+                        case 'filetype':
+                            $message = 'Invalid file type. Only JPG, JPEG, PNG & GIF files are allowed.';
+                            break;
+                        case 'uploadfail':
+                            $message = 'Failed to upload image.';
+                            break;
+                        default:
+                            $message = 'An unknown error occurred.';
+                    }
+
+                    echo '
+                    <div class="alert alert-danger alert-dismissible show position-fixed m-3 p-3 d-flex align-items-center" 
+                        role="alert" 
+                        id="statusAlert"
+                        style="width:400px; bottom: 0; right: 0; z-index: 1055;">
+                        <i class="bi bi-x-circle-fill me-2" style="font-size: 1.3rem;"></i>
+                        ' . htmlspecialchars($message) . '
+                    </div>';
+                }
+            ?>
+            <div id="alertContainer" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1055; width: 90%; max-width: 600px;"></div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h4 class="modal-title" id="deleteConfirmLabel">Confirm Delete</h4>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete the selected product(s)?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+                </div>
+            </div>
+            </div>
+
             <!-- Title Page and Search -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-4">
 
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
@@ -613,7 +669,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                             </tr>
                         </thead>
                         <!--table-body-->
-                        <tbody class="image-table-body text-center">
+                        <tbody class="image-table-body text-center align-middle">
                             <?php if ($result->num_rows > 0): ?>
                                 <?php $count = $offset + 1;
                                 while ($row = $result->fetch_assoc()): ?>
@@ -634,12 +690,16 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                         <td>₱<?= number_format($row['price'], 2); ?></td>
 
                                         <td>
-                                            <?php if (!empty($row['size_variants'])): ?>
-                                                <?= $row['size_variants']; ?><br>
-                                                <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
-                                            <?php else: ?>
-                                                <strong>Total: <?= $row['total_stock']; ?> pcs</strong>
-                                            <?php endif; ?>
+                                            <?php
+                                            // Only show size variants if there is more than one variant (i.e., Uniforms with sizes/genders)
+                                            if (!empty($row['size_variants']) && strpos($row['size_variants'], '<br>') !== false) {
+                                                echo $row['size_variants'] . '<br>';
+                                                echo '<strong>Total: ' . $row['total_stock'] . ' pcs</strong>';
+                                            } else {
+                                                // For supplies or products with no size/gender variants
+                                                echo '<strong>Total: ' . $row['total_stock'] . ' pcs</strong>';
+                                            }
+                                            ?>
                                         </td>
 
 
@@ -677,7 +737,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                             <?php if ($row['stock_status'] === 'In Stock'): ?>
                                                 <span class="status active">In Stock</span>
                                             <?php else: ?>
-                                                <span class="status inactive">Out of Stock</span>
+                                                <span class="status disabled">Out of Stock</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
@@ -1034,25 +1094,16 @@ $total_products = $total_products_result->fetch_assoc()['total'];
 
         // For checkbox
         document.addEventListener('DOMContentLoaded', function () {
-            // Only one checkbox for uniform tags
-            document.querySelectorAll('.uniform-tag-checkbox').forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                        document.querySelectorAll('.uniform-tag-checkbox').forEach(function (box) {
-                            if (box !== checkbox) box.checked = false;
-                        });
-                    }
-                });
-            });
+            // Allow multiple checkboxes for uniform tags (no restriction)
             // Only one checkbox for supplies tags
             document.querySelectorAll('.supplies-tag-checkbox').forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                        document.querySelectorAll('.supplies-tag-checkbox').forEach(function (box) {
-                            if (box !== checkbox) box.checked = false;
-                        });
-                    }
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                document.querySelectorAll('.supplies-tag-checkbox').forEach(function (box) {
+                    if (box !== checkbox) box.checked = false;
                 });
+                }
+            });
             });
         });
 
@@ -1167,96 +1218,82 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             return badgeMap[tag] || 'badge-secondary';
         }
 
-        // For Bulk Delete
-        document.addEventListener('DOMContentLoaded', function () {
-            const selectAll = document.getElementById('selectAllProducts');
-            const checkboxes = document.querySelectorAll('.product-checkbox');
-            const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
-            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        //bulk delete and single delete
+       document.addEventListener("DOMContentLoaded", () => {
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        const checkboxes = document.querySelectorAll('.productCheckbox');
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const alertContainer = document.getElementById('alertContainer');
+        let deleteData = null; // store info about what to delete (single or multiple)
 
-            // Select/Deselect all checkboxes
-            selectAll.addEventListener('change', function () {
-                checkboxes.forEach(cb => cb.checked = selectAll.checked);
-                toggleBulkDelete();
-            });
+        // Function to show Bootstrap alert
+        function showAlert(message, type = 'success') {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show shadow" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+            alertContainer.append(wrapper);
+            setTimeout(() => {
+            const alert = bootstrap.Alert.getOrCreateInstance(wrapper.querySelector('.alert'));
+            alert.close();
+            }, 3000);
+        }
 
-            // Individual checkbox change
-            checkboxes.forEach(cb => {
-                cb.addEventListener('change', function () {
-                    selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
-                    toggleBulkDelete();
-                });
-            });
+        // Handle Bulk Delete
+        bulkDeleteBtn.addEventListener('click', function () {
+            const selectedIds = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
 
-            // Toggle bulk delete button visibility
-            function toggleBulkDelete() {
-                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
-            }
+            if (selectedIds.length === 0) return;
 
-            // Bulk delete functionality
-            bulkDeleteBtn.addEventListener('click', function () {
-                const selectedIds = Array.from(checkboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
+            deleteData = { type: 'bulk', ids: selectedIds };
+            deleteModal.show();
+        });
 
-                if (selectedIds.length === 0) return;
-
-                if (confirm('Are you sure you want to delete the selected products?')) {
-                    // Send delete request
-                    fetch('delete_product.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ ids: selectedIds })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Products deleted successfully!');
-                                location.reload();
-                            } else {
-                                alert('Error deleting products: ' + data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('An error occurred while deleting products');
-                        });
-                }
-            });
-
-            // Single product delete functionality
-            document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
-                button.addEventListener('click', function () {
-                    const productId = this.id.replace('deleteProductBtn', '');
-
-                    if (confirm('Are you sure you want to delete this product?')) {
-                        fetch('delete_product.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ id: productId })
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert('Product deleted successfully!');
-                                    location.reload();
-                                } else {
-                                    alert('Error deleting product: ' + data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('An error occurred while deleting the product');
-                            });
-                    }
-                });
+        // Handle Single Delete
+        document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
+            button.addEventListener('click', function () {
+            const productId = this.id.replace('deleteProductBtn', '');
+            deleteData = { type: 'single', id: productId };
+            deleteModal.show();
             });
         });
+
+        // Confirm Deletion
+        confirmDeleteBtn.addEventListener('click', () => {
+            deleteModal.hide();
+            if (!deleteData) return;
+
+            const url = 'delete_product.php';
+            const bodyData = deleteData.type === 'bulk' ? { ids: deleteData.ids } : { id: deleteData.id };
+
+            fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                showAlert(deleteData.type === 'bulk'
+                    ? 'Products deleted successfully!'
+                    : 'Product deleted successfully!');
+                setTimeout(() => location.reload(), 1500);
+                } else {
+                showAlert('Error deleting product(s): ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showAlert('An error occurred while deleting product(s)', 'danger');
+            });
+        });
+        });
+
 
         // Add Product Form Validation
         document.addEventListener('DOMContentLoaded', function () {
@@ -1344,45 +1381,45 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             const restockForm = document.getElementById('restockForm');
 
             restockModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const tr = button.closest('tr');
-                const productId = tr.querySelector('.product-checkbox').value;
-                const productType = tr.querySelector('.badge').textContent.trim();
-                const variantsText = tr.querySelector('td:nth-child(6)').innerHTML;
+            const button = event.relatedTarget;
+            const tr = button.closest('tr');
+            const productId = tr.querySelector('.product-checkbox').value;
+            const productType = tr.querySelector('.badge').textContent.trim();
+            const variantsText = tr.querySelector('td:nth-child(6)').innerHTML;
 
-                // Reset form
-                restockForm.reset();
+            // Reset form
+            restockForm.reset();
 
-                document.getElementById('restockProductId').value = productId;
-                document.getElementById('restockProductType').value = productType;
+            document.getElementById('restockProductId').value = productId;
+            document.getElementById('restockProductType').value = productType;
 
-                const variantStockInputs = document.getElementById('variantStockInputs');
-                variantStockInputs.innerHTML = ''; // Clear existing inputs
+            const variantStockInputs = document.getElementById('variantStockInputs');
+            variantStockInputs.innerHTML = ''; // Clear existing inputs
 
-                if (productType === 'Uniform') {
-                    const variants = variantsText.split('<br>');
-                    variants.forEach(variant => {
-                        if (!variant.includes('Total:')) {
-                            // Updated regex pattern to handle spaces and capture groups properly
-                            const match = variant.match(/([^(]+)\s*\(([^)]+)\):\s*(\d+)\s*pcs/);
-                            if (match) {
-                                const size = match[1].trim();
-                                const gender = match[2].trim();
-                                const currentStock = match[3];
+            if (productType === 'Uniform') {
+                const variants = variantsText.split('<br>');
+                variants.forEach(variant => {
+                if (!variant.includes('Total:')) {
+                    // Updated regex pattern to handle spaces and capture groups properly
+                    const match = variant.match(/([^(]+)\s*\(([^)]+)\):\s*(\d+)\s*pcs/);
+                    if (match) {
+                    const size = match[1].trim();
+                    const gender = match[2].trim();
+                    const currentStock = match[3];
 
-                                const div = document.createElement('div');
-                                div.className = 'mb-3';
-                                div.innerHTML = `
-                                            <label class="form-label">Add Stock for ${size} (${gender})</label>
-                                            <div class="input-group">
-                                                <input type="number" 
-                                                       class="form-control stock-input" 
-                                                       name="variant_stock[${size}][${gender}]" 
-                                                       min="0"
-                                                       
-                                                       placeholder="Enter quantity to add">
-                                                <span class="input-group-text">Current: ${currentStock} pcs</span>
-                                            </div>
+                    const div = document.createElement('div');
+                    div.className = 'mb-3';
+                    div.innerHTML = `
+                            <label class="form-label">Add Stock for ${size} (${gender})</label>
+                            <div class="input-group">
+                            <input type="number" 
+                                   class="form-control stock-input" 
+                                   name="variant_stock[${size}][${gender}]" 
+                                   min="0"
+                                   
+                                    placeholder="Enter quantity to add"
+                                           required>
+                                    <span class="input-group-text">Current: ${currentStock} pcs</span>
                                         `;
                                 variantStockInputs.appendChild(div);
 
@@ -1390,7 +1427,6 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                 const input = div.querySelector('input');
                                 input.addEventListener('input', function () {
                                     if (this.value < 0) this.value = 0;
-                                    if (this.value === '') this.value = 0;
                                 });
                             }
                         }
@@ -1416,7 +1452,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                     const input = variantStockInputs.querySelector('input');
                     input.addEventListener('input', function () {
                         if (this.value < 0) this.value = 0;
-                        if (this.value === '') this.value = 0;
+    
                     });
                 }
             });
@@ -1425,10 +1461,28 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             restockForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
+                // Helper to show validation message in modal
+                function showRestockValidationMessage(message) {
+                    let alertDiv = restockModal.querySelector('.restock-validation-message');
+                    if (!alertDiv) {
+                        alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger restock-validation-message';
+                        alertDiv.style.marginBottom = '10px';
+                        // Insert at the top of modal body
+                        const modalBody = restockModal.querySelector('.modal-body');
+                        modalBody.insertBefore(alertDiv, modalBody.firstChild);
+                    }
+                    alertDiv.textContent = message;
+                }
+
+                // Remove previous validation message
+                const prevAlert = restockModal.querySelector('.restock-validation-message');
+                if (prevAlert) prevAlert.remove();
+
                 // Validate DR number
                 const drNumber = this.querySelector('input[name="dr_number"]').value.trim();
                 if (!drNumber) {
-                    alert('Please enter a Delivery Receipt Number');
+                    showRestockValidationMessage('Please enter a Delivery Receipt Number');
                     return;
                 }
 
@@ -1441,14 +1495,14 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                 });
 
                 if (totalStock === 0) {
-                    alert('Please add stock quantity for at least one variant');
+                    showRestockValidationMessage('Please enter a stock quantity greater than 0 to one of the product variants');
                     return;
                 }
 
                 // Validate updated_by field
                 const updatedBy = this.querySelector('input[name="updated_by"]').value.trim();
                 if (!updatedBy) {
-                    alert('Please enter your name in the "Stock Update by" field');
+                    showRestockValidationMessage('Please enter your name in the "Stock Update by" field');
                     return;
                 }
 
@@ -1577,6 +1631,40 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             });
         });
 
+        //alert for successful product addition
+            document.addEventListener("DOMContentLoaded", () => {
+                const alertBox = document.getElementById("successAlert");
+                if (alertBox) {
+                    // Auto-hide after 3 seconds (optional)
+                    setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alertBox);
+                    bsAlert.close();
+                    }, 5000);
+
+                    // Remove ?added=success from URL without reloading
+                    const url = new URL(window.location);
+                    url.searchParams.delete("added");
+                    window.history.replaceState({}, document.title, url);
+                }
+        });
+
+        //alert for error in image upload
+        document.addEventListener("DOMContentLoaded", () => {
+            const alertBox = document.getElementById("statusAlert");
+            if (alertBox) {
+                // Auto-hide after 3 seconds (optional)
+                setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alertBox);
+                bsAlert.close();
+                }, 5000);
+
+                // Remove ?added=success or ?error=... from URL
+                const url = new URL(window.location);
+                url.searchParams.delete("added");
+                url.searchParams.delete("error");
+                window.history.replaceState({}, document.title, url);
+            }
+            });
     </script>
 
 </body>

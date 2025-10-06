@@ -222,8 +222,28 @@ $search = $_GET['search'] ?? '';
             </div>
 
             <!-- Cart -->
-            <a href="basket.php" class=" basket-btn text-decoration-none">
+            <?php
+            // Fetch basket count for the logged-in user
+            $basket_count = 0;
+            if (isset($_SESSION['user_id'])) {
+                $basket_query = "SELECT SUM(quantity) as total FROM basket WHERE user_id = ?";
+                $basket_stmt = $conn->prepare($basket_query);
+                $basket_stmt->bind_param("i", $_SESSION['user_id']);
+                $basket_stmt->execute();
+                $basket_result = $basket_stmt->get_result();
+                if ($basket_row = $basket_result->fetch_assoc()) {
+                    $basket_count = (int)$basket_row['total'];
+                }
+                $basket_stmt->close();
+            }
+            ?>
+            <a href="basket.php" class="basket-btn text-decoration-none position-relative">
                 <i class="fas fa-shopping-basket"></i>
+                <?php if ($basket_count > 0): ?>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">
+                        <?php echo $basket_count; ?>
+                    </span>
+                <?php endif; ?>
             </a>
 
             <!-- Collapsible search bar (mobile) -->
