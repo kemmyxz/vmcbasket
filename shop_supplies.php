@@ -459,26 +459,25 @@ $search = $_GET['search'] ?? '';
                                             <p>&nbsp;</p>
                                         <?php endif; ?>
 
-
-                                        <div class="badges">
-
-                                            <?php
-                                            if (!empty($row['tags'])):
-                                                $tags = explode(',', $row['tags']);
-                                                foreach ($tags as $tag):
-                                                    ?>
-                                                    <span class="badge tag_badge"><?= htmlspecialchars(trim($tag)) ?></span>
-                                                <?php
-                                                endforeach;
-                                            endif;
-                                            ?>
-                                            <!-- Display product type -->
-                                            <?php if ($row['type']): ?>
-                                                <span class="badge supplies_badge"><?= htmlspecialchars($row['type']) ?></span>
-                                            <?php endif; ?>
-
-
-                                        </div>
+                            <div class="badges">
+                                <?php
+                                // Display tags
+                                if (!empty($row['tags'])) {
+                                    $tags = explode(',', $row['tags']);
+                                    foreach ($tags as $tag) {
+                                        $tag = trim($tag);
+                                        $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
+                                        echo "<span class='badge {$tagClass}'>{$tag}</span>";
+                                    }
+                                }
+                                
+                                // Display type if available
+                                if (!empty($row['type'])) {
+                                    $typeClass = strtolower($row['type']) . '_badge';
+                                    echo "<span class='badge {$typeClass}'>{$row['type']}</span>";
+                                }
+                                ?>
+                            </div>
 
                                         <div class="price">
                                             ₱<?= number_format($row['price'], 2) ?>

@@ -1,6 +1,5 @@
 <?php 
 include 'links.php';
-session_start();
 
 // Add debugging information
 error_reporting(E_ALL);

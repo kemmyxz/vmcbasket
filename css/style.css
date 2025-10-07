@@ -680,8 +680,12 @@ footer {
   color: #000;
 }
 .supplies_badge {
-  background-color: #dde1f1;
+  background-color: #de16d0;
   color: #000;
+}
+.school_merchandise_badge {
+  background-color: #17a2b8;
+  color: white;
 }
 .tag_badge {
   background-color: #abf3a8;
@@ -728,15 +732,15 @@ footer {
   color: #000;
 }
 
-.writing_badge {
+.writing_tools_badge {
   background-color: #d7ff5e;
   color: #000;
 }
-.paper_badge {
+.paper_products_badge {
   background-color: #bfcaff;
   color: #000;
 }
-.art_badge {
+.art_supplies_badge {
   background-color: #ecbfff;
   color: #000;
 }

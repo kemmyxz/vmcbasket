@@ -306,50 +306,7 @@ $search = $_GET['search'] ?? '';
          <!-- Sidebar Filter -->
             <!-- Filter Sidebar (collapsible on md and below) -->
             <aside class="col-lg-3 col-md-4 mt-4 mb-4">
-                <!-- Toggle button for md and below -->
-                <button class="btn btn-outline-secondary d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
-                    <i class="bi bi-filter me-2"></i>FILTER
-                </button>
-                <!-- Collapsible filter content -->
-                <div class="collapse d-md-block" id="filterCollapse">
-                    <h4 class="fw-semibold mb-3 d-none d-md-block">
-                        <i class="bi bi-filter me-2"></i>FILTER
-                    </h4>
-                    
-                    <!-- By Year-Level -->
-                    <div class="mb-4 mt-3">
-                        <h5 class="fw-semibold filter-title" style="color: #26387D">BY YEAR-LEVEL:</h5>
-                        <h6 class="fw-semibold filter-title">Basic Education</h6>
-                        <ul class="list-unstyled filter-text">
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Pre-School</li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Elementary</li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Junior High School</li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Senior High School</li>
-                        </ul>
-                    </div>
-
-                    <!-- College -->
-                    <div class="mb-4">
-                        <h6 class="fw-semibold filter-title">College</h6>
-                        <ul class="list-unstyled filter-text">
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Tourism Management</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Information System</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Hotel and Restaurant Management</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Secondary Education</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">BS Elementary Education</li>
-                            <li><input type="radio" name="year_level_college" class="form-check-input me-2">Criminology</li>
-                        </ul>
-                    </div>
-
-                    <!-- By Gender -->
-                    <div class="mb-4">
-                        <h5 class="fw-semibold filter-title" style="color: #26387D">By Gender:</h5>
-                        <ul class="list-unstyled filter-text">
-                            <li><input type="radio" name="gender" class="form-check-input me-2">Female</li>
-                            <li><input type="radio" name="gender" class="form-check-input me-2">Male</li>
-                        </ul>
-                    </div>
-                </div>
+               
             </aside>
             <!--Header -->
             <section class="col-lg-9 col-md-8">
@@ -405,21 +362,22 @@ $search = $_GET['search'] ?? '';
                     </ul>
                 </nav>
             </div>
-             <!-- UNIFORMS SECTION -->
+             <!-- SCHOOL-MERCHANDISE SECTION -->
             <div class="row g-4 mb-5">
                 <?php
-                $uniforms_sql = "SELECT COUNT(*) as total FROM products WHERE type='Uniform'";
-                $uniforms_result = $conn->query($uniforms_sql);
-                $uniforms_total = $uniforms_result->fetch_assoc()['total'];
-                $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
-
-                $uniforms_sql = "SELECT p.*, pv.gender, pv.size 
-                                FROM products p 
-                                LEFT JOIN product_variants pv ON p.id = pv.product_id 
-                                WHERE p.type='Uniform'
-                                GROUP BY p.id
-                                LIMIT $items_per_page OFFSET $offset";
-                $result = $conn->query($uniforms_sql);
+                $school_merchandise_sql = "SELECT p.*, pv.gender, pv.size, 
+                                          CASE WHEN f.favorite = 1 THEN true ELSE false END as is_favorited
+                                          FROM products p 
+                                          LEFT JOIN product_variants pv ON p.id = pv.product_id 
+                                          LEFT JOIN favorites f ON p.id = f.product_id AND f.user_id = ?
+                                          WHERE FIND_IN_SET('School Merchandise', p.tags)
+                                          GROUP BY p.id
+                                          LIMIT $items_per_page OFFSET $offset";
+                
+                $stmt = $conn->prepare($school_merchandise_sql);
+                $stmt->bind_param("i", $user['id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
                 if ($result->num_rows > 0):
                     while ($row = $result->fetch_assoc()):
@@ -438,9 +396,25 @@ $search = $_GET['search'] ?? '';
                                 </p>
                             <?php endif; ?>
 
+                            
                             <div class="badges">
-                                <span class="badge preschool_badge">Pre-School</span>
-                                <span class="badge uniform_badge">Uniform</span>
+                                <?php
+                                // Display tags
+                                if (!empty($row['tags'])) {
+                                    $tags = explode(',', $row['tags']);
+                                    foreach ($tags as $tag) {
+                                        $tag = trim($tag);
+                                        $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
+                                        echo "<span class='badge {$tagClass}'>{$tag}</span>";
+                                    }
+                                }
+                                
+                                // Display type if available
+                                if (!empty($row['type'])) {
+                                    $typeClass = strtolower($row['type']) . '_badge';
+                                    echo "<span class='badge {$typeClass}'>{$row['type']}</span>";
+                                }
+                                ?>
                             </div>
 
                             <div class="price">

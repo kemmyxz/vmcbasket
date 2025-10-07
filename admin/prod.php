@@ -416,7 +416,6 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                                 <option value="">Choose Type</option>
                                                 <option value="1">Uniform</option>
                                                 <option value="2">Supplies</option>
-                                                <option value="3">School-Merchandise</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -453,6 +452,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                                     ['id' => 'tagSecondary', 'value' => 'BS Secondary Education', 'badge' => 'secondary_badge', 'label' => 'BS Secondary Education', 'badgeId' => 'badgeSecondary'],
                                                     ['id' => 'tagEduc', 'value' => 'BS Elementary Education', 'badge' => 'educ_badge', 'label' => 'BS Elementary Education', 'badgeId' => 'badgeEduc'],
                                                     ['id' => 'tagCrim', 'value' => 'Criminology', 'badge' => 'crim_badge', 'label' => 'Criminology', 'badgeId' => 'badgeCriminology'],
+                                                    ['id' => 'tagMerch', 'value' => 'School-Merchandise', 'badge' => 'merch_badge', 'label' => 'School-Merchandise', 'badgeId' => 'badgeMerch'],
                                                 ];
                                                 foreach ($uniformTags as $tag) {
                                                     ?>
@@ -480,6 +480,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                                     ['id' => 'tagWriting', 'value' => 'Writing Tools', 'badge' => 'writing_badge', 'label' => 'Writing Tools', 'badgeId' => 'badgeWriting'],
                                                     ['id' => 'tagPaper', 'value' => 'Paper Products', 'badge' => 'paper_badge', 'label' => 'Paper Products', 'badgeId' => 'badgePaper'],
                                                     ['id' => 'tagArt', 'value' => 'Art Supplies', 'badge' => 'art_badge', 'label' => 'Art Supplies', 'badgeId' => 'badgeArt'],
+                                                    ['id' => 'tagMerch', 'value' => 'School-Merchandise', 'badge' => 'merch_badge', 'label' => 'School-Merchandise', 'badgeId' => 'badgeMerch']
                                                 ];
                                                 foreach ($suppliesTags as $tag) {
                                                     ?>
@@ -1220,15 +1221,92 @@ $total_products = $total_products_result->fetch_assoc()['total'];
         }
 
         //bulk delete and single delete
-       document.addEventListener("DOMContentLoaded", () => {
+          document.addEventListener("DOMContentLoaded", () => {
+        const selectAllCheckbox = document.getElementById('selectAllProducts');
+        const productCheckboxes = document.querySelectorAll('.product-checkbox');
+        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
         const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-        const checkboxes = document.querySelectorAll('.productCheckbox');
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const alertContainer = document.getElementById('alertContainer');
-        let deleteData = null; // store info about what to delete (single or multiple)
-
-        // Function to show Bootstrap alert
+        let deleteData = null;
+    
+        // Select All checkbox functionality
+        selectAllCheckbox.addEventListener('change', function() {
+            productCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBulkDeleteButton();
+        });
+    
+        // Individual checkbox functionality
+        productCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(productCheckboxes).every(cb => cb.checked);
+                const someChecked = Array.from(productCheckboxes).some(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                updateBulkDeleteButton();
+            });
+        });
+    
+        // Update bulk delete button visibility
+        function updateBulkDeleteButton() {
+            const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+            bulkDeleteContainer.style.display = checkedBoxes.length > 0 ? 'block' : 'none';
+        }
+    
+        // Handle Bulk Delete
+        bulkDeleteBtn.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+                .map(cb => cb.value);
+    
+            if (selectedIds.length === 0) return;
+    
+            deleteData = { type: 'bulk', ids: selectedIds };
+            deleteModal.show();
+        });
+    
+        // Handle Single Delete
+        document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.id.replace('deleteProductBtn', '');
+                deleteData = { type: 'single', id: productId };
+                deleteModal.show();
+            });
+        });
+    
+        // Confirm Delete Action
+        confirmDeleteBtn.addEventListener('click', () => {
+            deleteModal.hide();
+            if (!deleteData) return;
+    
+            const url = 'delete_product.php';
+            const bodyData = deleteData.type === 'bulk' ? { ids: deleteData.ids } : { id: deleteData.id };
+    
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(deleteData.type === 'bulk' 
+                        ? 'Selected products deleted successfully!' 
+                        : 'Product deleted successfully!');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showAlert('Error deleting product(s): ' + (data.message || 'Unknown error'), 'danger');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showAlert('An error occurred while deleting product(s)', 'danger');
+            });
+        });
+    
+        // Alert function
         function showAlert(message, type = 'success') {
             const wrapper = document.createElement('div');
             wrapper.innerHTML = `
@@ -1238,64 +1316,11 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             </div>`;
             alertContainer.append(wrapper);
             setTimeout(() => {
-            const alert = bootstrap.Alert.getOrCreateInstance(wrapper.querySelector('.alert'));
-            alert.close();
+                const alert = bootstrap.Alert.getOrCreateInstance(wrapper.querySelector('.alert'));
+                alert.close();
             }, 3000);
         }
-
-        // Handle Bulk Delete
-        bulkDeleteBtn.addEventListener('click', function () {
-            const selectedIds = Array.from(checkboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
-
-            if (selectedIds.length === 0) return;
-
-            deleteData = { type: 'bulk', ids: selectedIds };
-            deleteModal.show();
-        });
-
-        // Handle Single Delete
-        document.querySelectorAll('[id^="deleteProductBtn"]').forEach(button => {
-            button.addEventListener('click', function () {
-            const productId = this.id.replace('deleteProductBtn', '');
-            deleteData = { type: 'single', id: productId };
-            deleteModal.show();
-            });
-        });
-
-        // Confirm Deletion
-        confirmDeleteBtn.addEventListener('click', () => {
-            deleteModal.hide();
-            if (!deleteData) return;
-
-            const url = 'delete_product.php';
-            const bodyData = deleteData.type === 'bulk' ? { ids: deleteData.ids } : { id: deleteData.id };
-
-            fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bodyData)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                showAlert(deleteData.type === 'bulk'
-                    ? 'Products deleted successfully!'
-                    : 'Product deleted successfully!');
-                setTimeout(() => location.reload(), 1500);
-                } else {
-                showAlert('Error deleting product(s): ' + (data.message || 'Unknown error'), 'danger');
-                }
-            })
-            .catch(err => {
-                console.error('Error:', err);
-                showAlert('An error occurred while deleting product(s)', 'danger');
-            });
-        });
-        });
-
-
+    });
         // Add Product Form Validation
         document.addEventListener('DOMContentLoaded', function () {
             const addProductForm = document.querySelector('#addProductModal form');
