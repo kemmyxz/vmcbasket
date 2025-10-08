@@ -11,6 +11,49 @@ if(isset($_SESSION['filter_month']) && isset($_SESSION['filter_year'])) {
     $where_clause = "WHERE MONTH(o.order_date) = $month AND YEAR(o.order_date) = $year";
 }
 
+// Add status filter
+if (isset($_GET['status']) && $_GET['status'] !== '') {
+    $status = $conn->real_escape_string($_GET['status']);
+    if ($where_clause === "") {
+        $where_clause = "WHERE r.order_status = '$status'";
+    } else {
+        $where_clause .= " AND r.order_status = '$status'";
+    }
+}
+
+if (isset($_GET['payment_method']) && $_GET['payment_method'] !== '') {
+    $payment_method = $conn->real_escape_string($_GET['payment_method']);
+    if ($where_clause === "") {
+        $where_clause = "WHERE o.payment_method = '$payment_method'";
+    } else {
+        $where_clause .= " AND o.payment_method = '$payment_method'";
+    }
+}
+
+if (!empty($_GET['from_date']) && !empty($_GET['to_date'])) {
+    $from_date = $conn->real_escape_string($_GET['from_date']);
+    $to_date = $conn->real_escape_string($_GET['to_date']);
+    if ($where_clause === "") {
+        $where_clause = "WHERE o.order_date BETWEEN '$from_date' AND '$to_date'";
+    } else {
+        $where_clause .= " AND o.order_date BETWEEN '$from_date' AND '$to_date'";
+    }
+} elseif (!empty($_GET['from_date'])) {
+    $from_date = $conn->real_escape_string($_GET['from_date']);
+    if ($where_clause === "") {
+        $where_clause = "WHERE o.order_date >= '$from_date'";
+    } else {
+        $where_clause .= " AND o.order_date >= '$from_date'";
+    }
+} elseif (!empty($_GET['to_date'])) {
+    $to_date = $conn->real_escape_string($_GET['to_date']);
+    if ($where_clause === "") {
+        $where_clause = "WHERE o.order_date <= '$to_date'";
+    } else {
+        $where_clause .= " AND o.order_date <= '$to_date'";
+    }
+}
+
 // Set number of items per page
 $items_per_page = 10;
 
@@ -59,16 +102,23 @@ $total_pages = ceil($total_records / $items_per_page);
 
 $results = $conn->query($sql);
 
-// Add this query near the top of the file after your existing queries
-$sql_receipt_images = "SELECT r.*, ri.image_path 
-        FROM order_receipt r 
-        LEFT JOIN order_receipts_images ri ON r.receipt_id = ri.receipt_id";
+// Add this query after your existing $sql query
+$sql_images = "SELECT ri.image_path 
+               FROM order_receipts_images ri 
+               WHERE ri.receipt_id = ?";
 
 // Create an array to group orders by receipt_id
 $grouped_orders = [];
 while ($row = $results->fetch_assoc()) {
     $receipt_id = $row['receipt_id'];
     if (!isset($grouped_orders[$receipt_id])) {
+        // Prepare statement for receipt image
+        $stmt = $conn->prepare($sql_images);
+        $stmt->bind_param("s", $receipt_id);
+        $stmt->execute();
+        $result_image = $stmt->get_result();
+        $image_path = $result_image->fetch_assoc()['image_path'] ?? null;
+        
         $grouped_orders[$receipt_id] = [
             'receipt_id' => $receipt_id,
             'order_status' => $row['order_status'],
@@ -79,7 +129,8 @@ while ($row = $results->fetch_assoc()) {
             'date_ordered' => $row['date_ordered'],
             'user_id' => $row['user_id'], // Add this line
             'products' => [],
-            'total_amount' => 0
+            'total_amount' => 0,
+            'receipt_image' => $image_path // Add this line
         ];
     }
 
@@ -197,6 +248,12 @@ $calendarEvents = getCalendarEvents();
       background-color: #FEBFBC;
       color: #E8261A;
     }
+    .ToPickUp {
+      background-color: #ADD8E6;
+      color: #00527F;
+      border: none;
+
+    }
 
 
     #orderDetailsModal .modal-body h6 {
@@ -312,16 +369,16 @@ $calendarEvents = getCalendarEvents();
       <!-- Title Page and Search -->
       <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
         <div class="d-flex justify-content-end mb-5">
-          <div class="search-container">
-              <input type="text" class="form-control" placeholder="Search...">
-              <button><i class="bi bi-search"></i></button>
-          </div>
+<div class="search-container">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search orders...">
+    <button><i class="bi bi-search"></i></button>
+</div>
         </div>
         <div class="mt-2 mb-5">
           <h2>Orders</h2>
         </div>
          <div class="col-12 col-md mb-3">
-            <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="cus.php" style="gap: 8px;">
+            <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="orders.php" style="gap: 8px;">
               <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
                 <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1" style="font-size: 15px;"><strong>From</strong></label>
                 <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="from_date" name="from_date" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
@@ -332,7 +389,7 @@ $calendarEvents = getCalendarEvents();
             </form>
           </div>
           <div class="mt-4 mb-3">
-            <strong>Total Orders: 100</strong>
+            <strong>Total Orders: <?= $total_records ?></strong>
           </div>
 
            <!-- Bulk Delete Button (hidden by default) -->
@@ -345,34 +402,32 @@ $calendarEvents = getCalendarEvents();
         <!-- TABLE -->
         <div class="table-responsive">
             <div class="d-flex">
-              <button class="tab-button active">All Orders</button>
-              <button class="tab-button">Pending</button>
-              <button class="tab-button">To Pick Up</button>
-              <button class="tab-button">Completed</button>
-              <button class="tab-button">Cancelled</button>
-              <button class="tab-button">Returned</button>
-              <button class="tab-button curve-tab">Refunded</button>
+              <a href="orders.php" class="tab-button <?= !isset($_GET['status']) ? 'active' : '' ?>">All Orders</a>
+              <a href="orders.php?status=Pending" class="tab-button <?= ($_GET['status'] ?? '') === 'Pending' ? 'active' : '' ?>">Pending</a>
+              <a href="orders.php?status=ToPickUp" class="tab-button <?= ($_GET['status'] ?? '') === 'ToPickUp' ? 'active' : '' ?>">To Pick Up</a>
+              <a href="orders.php?status=Complete" class="tab-button <?= ($_GET['status'] ?? '') === 'Complete' ? 'active' : '' ?>">Completed</a>
+              <a href="orders.php?status=Cancelled" class="tab-button <?= ($_GET['status'] ?? '') === 'Cancelled' ? 'active' : '' ?>">Cancelled</a>
+              <a href="orders.php?status=Return" class="tab-button <?= ($_GET['status'] ?? '') === 'Return' ? 'active' : '' ?>">Returned</a>
+              <a href="orders.php?status=Refunded" class="tab-button curve-tab <?= ($_GET['status'] ?? '') === 'Refunded' ? 'active' : '' ?>">Refunded</a>
             </div>
             <table class="table table-container">
               <thead>
                   <tr>
-                      <th>
-                        <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
-                      </th>
+
                       <th>#</th>
                       <th>Product Details</th>
                       <th>Customer Details</th>
                       <th class="align-middle text-center">
-                          <div class="dropdown">
+                        <div class="dropdown">
                           <button class="btn p-0 m-0 align-baseline table-dropdown dropdown-toggle" type="button" id="mopDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none;">
-                              MOP
+                            MOP
                           </button>
                           <ul class="dropdown-menu" aria-labelledby="mopDropdown">
-                              <li><a class="dropdown-item" href="#">All</a></li>
-                              <li><a class="dropdown-item" href="#">Send Online Receipt (Gcash)</a></li>
-                              <li><a class="dropdown-item" href="#">Cash (Pay at the Counter)</a></li>
+                            <li><a class="dropdown-item" href="orders.php<?= isset($_GET['status']) ? '?status=' . urlencode($_GET['status']) : '' ?>">All</a></li>
+                            <li><a class="dropdown-item" href="orders.php?<?= isset($_GET['status']) ? 'status=' . urlencode($_GET['status']) . '&' : '' ?>payment_method=Send Online Receipt">Send Online Receipt (Gcash)</a></li>
+                            <li><a class="dropdown-item" href="orders.php?<?= isset($_GET['status']) ? 'status=' . urlencode($_GET['status']) . '&' : '' ?>payment_method=Cash (Pay at the Counter)">Cash (Pay at the Counter)</a></li>
                           </ul>
-                          </div>
+                        </div>
                       </th>
                       <th>Status</th>
                       <th>Action</th>
@@ -381,9 +436,7 @@ $calendarEvents = getCalendarEvents();
               <tbody class="align-middle">
                   <?php $count = 1; foreach ($grouped_orders as $order) : ?>
                       <tr>
-                          <td>
-                              <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
-                          </td>
+
                           <td><?= $count++ ?></td>
                           <td>
                             <div class="d-flex flex-column h-100 justify-content-between">
@@ -410,9 +463,7 @@ $calendarEvents = getCalendarEvents();
                               <strong>Student Name: </strong><?= $order['customer_name'] ?><br>
                               <strong>Customer Type: </strong><?= $order['user_id'] ? 'Registered Student' : 'Walk-in Customer' ?><br>
                               <strong>Date Ordered: </strong><?= $order['date_ordered'] ?><br>
-                              <!--<//?php //if($order['phone'] != 'N/A'): ?>
-                                  <strong>Phone: </strong><//?= $order['phone'] ?>
-                              <//?php //endif; ?>-->
+
                           </td>
                           <td>
                             <?php
@@ -448,26 +499,25 @@ $calendarEvents = getCalendarEvents();
                                   data-date="<?= $order['date_ordered'] ?>"
                                   data-payment="<?= htmlspecialchars($order['payment_method']) ?>"
                                   data-products='<?= json_encode($order['products']) ?>'
-                                  data-total="<?= $order['total_amount'] ?>">
+                                  data-total="<?= $order['total_amount'] ?>"
+                                  data-receipt-images='<?= htmlspecialchars($order['receipt_image']) ?>'>
                                 <i class="bi bi-file-text me-2"></i>View Details
                               </button>
                               </li>
-                              <li>
-                              <button class="dropdown-item text-danger delete-order"
-                                  data-receipt-id="<?= $order['receipt_id'] ?>">
-                                <i class="bi bi-trash me-2"></i>Delete
-                              </button>
-                              </li>
+
                             </ul>
                             </div>
                             <br>
                             <?php if(($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending') 
                               || ($order['payment_method'] == 'Send Online Receipt' && $order['order_status'] == 'ToPickUp')): ?>
-                            <button class="bi bi-check-circle btn btn-success complete-order" 
+
+                            <?php if($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending'): ?>
+                            <button class="bi bi-check-circle btn btn-success topickup-order" 
                                 data-receipt-id="<?= $order['receipt_id'] ?>"
                                 style="border-radius: 5px;">
-                              Complete  
+                                To Pick Up
                             </button>
+                            <?php endif; ?>
                             <?php endif; ?>
                           </td>
                       </tr>
@@ -597,65 +647,44 @@ $calendarEvents = getCalendarEvents();
     </div>
   </div>
 
+   
   <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const completeButtons = document.querySelectorAll('.complete-order');
-    
-    completeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const receiptId = this.getAttribute('data-receipt-id');
-            
-            updateOrderStatus(receiptId);
-        });
-    });
-});
+  document.addEventListener('DOMContentLoaded', function() {
+      const toPickupButtons = document.querySelectorAll('.topickup-order');
+      
+      toPickupButtons.forEach(button => {
+          button.addEventListener('click', function() {
+              const receiptId = this.getAttribute('data-receipt-id');
+              updateToPickup(receiptId);
+          });
+      });
+  });
+  
+  function updateToPickup(receiptId) {
+      if (confirm('Are you sure you want to mark this order as ready for pickup?')) {
+          fetch('update_order_status.php', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: 'receipt_id=' + encodeURIComponent(receiptId) + '&action=topickup'
+          })
+          .then(response => response.json())
+          .then(data => {  
+              if (data.success) {
+                  alert('Order status updated to "To Pick Up" successfully.');
+                  location.reload();
+              } else {
+                  alert('Error: ' + (data.error || 'Unknown error occurred'));
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert('Error updating order status. Please try again.');
+          });
+      }
+  }
 
-function updateOrderStatus(receiptId) {
-    if (confirm('Are you sure you want to complete this order? This will update product stock levels.')) {
-        fetch('update_order_status.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'receipt_id=' + encodeURIComponent(receiptId)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                let message = 'Order completed successfully.\n';
-                if (data.stockUpdates) {
-                    message += '\nStock levels updated:';
-                    data.stockUpdates.forEach(update => {
-                        message += `\n- ${update.product_name}: ${update.old_stock} → ${update.new_stock}`;
-                    });
-                }
-                alert(message);
-                location.reload();
-            } else {
-                if (data.error === 'insufficient_stock') {
-                    let errorMessage = 'Cannot complete order due to insufficient stock:\n\n';
-                    data.details.forEach(item => {
-                        if (item.error) {
-                            errorMessage += `${item.product_name}: ${item.error}\n`;
-                        } else {
-                            errorMessage += `${item.product_name}: Requested: ${item.requested}, Available: ${item.available}\n`;
-                        }
-                    });
-                    alert(errorMessage);
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error occurred'));
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error updating order status. Please try again.');
-        });
-    }
-}
-</script>
-
-  <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Get modal element first
     const orderModal = document.getElementById('orderDetailsModal');
@@ -696,14 +725,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Helper function to update modal content
-    function updateModalContent(button) {
+        function updateModalContent(button) {
         const receiptId = button.getAttribute('data-receipt-id');
         const customer = button.getAttribute('data-customer');
         const email = button.getAttribute('data-email');
         const date = button.getAttribute('data-date');
         const payment = button.getAttribute('data-payment');
-
-        // Safely update DOM elements
+        const receiptImage = button.getAttribute('data-receipt-image');
+    
+        // Update all text elements
         const elements = {
             'customerID': receiptId,
             'customerName': customer,
@@ -711,130 +741,161 @@ document.addEventListener('DOMContentLoaded', function() {
             'dateOrdered': date,
             'mop': payment
         };
-
+    
         Object.entries(elements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
-                element.textContent = value;
+                element.textContent = value || 'N/A';
             }
         });
-
+    
+        // Update receipt image
+        const receiptImageElement = document.getElementById('receiptImage');
+        if (receiptImageElement) {
+            if (receiptImage) {
+                receiptImageElement.src = receiptImage;
+                receiptImageElement.style.display = 'block';
+            } else {
+                receiptImageElement.style.display = 'none';
+            }
+        }
+    
         // Update visibility of receipt sections
         const receiptSection = orderModal.querySelector('.online-receipt-section');
-        const confirmButton = orderModal.querySelector('.btn-primary');
+        const confirmButton = orderModal.querySelector('.confirm-receipt');
+        const invalidButton = orderModal.querySelector('.invalid-receipt');
         const receiptActions = orderModal.querySelector('#receiptActions');
-
+    
         if (payment === 'Cash (Pay at the Counter)') {
-            [receiptSection, confirmButton, receiptActions].forEach(el => {
+            [receiptSection, receiptActions].forEach(el => {
                 if (el) el.style.display = 'none';
             });
         } else {
-            [receiptSection, confirmButton, receiptActions].forEach(el => {
+            [receiptSection, receiptActions].forEach(el => {
                 if (el) el.style.display = 'block';
             });
         }
     }
 });
-</script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const tabButtons = document.querySelectorAll('.tab-button');
-
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-
-          tabButtons.forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
 
 
-          let filter = button.textContent.trim();
-          if (filter === 'Completed') filter = 'Complete';
-          if (filter === 'Cancel') filter = 'Cancelled';
-          if (filter === 'To Pick Up') filter = 'ToPickUp';
-          if (filter === 'Pending') filter = 'Pending';
-          if (filter === 'Returns') filter = 'Return';
-          if (filter === 'Refund') filter = 'Refunded';
 
-
-          document.querySelectorAll('table tbody tr').forEach(row => {
-            const badge = row.querySelector('.status-badge');
-            const status = badge
-              ? Array.from(badge.classList).find(c => c !== 'status-badge')
-              : '';
-
-            if (filter === 'All Orders' || status === filter) {
-              row.style.display = '';
-            } else {
-              row.style.display = 'none';
-            }
-          });
+      
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const tableRows = document.querySelectorAll('.table-container tbody tr');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            tableRows.forEach(function(row) {
+                const rowText = row.textContent.toLowerCase();
+                
+                if (rowText.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Update visible row numbers
+            updateRowNumbers();
         });
-      });
+        
+        function updateRowNumbers() {
+            const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+            visibleRows.forEach((row, index) => {
+                const numberCell = row.querySelector('td:nth-child(2)');
+                if (numberCell) {
+                    numberCell.textContent = index + 1;
+                }
+            });
+        }
     });
+ 
 
     var calendar;
 
-    document.addEventListener('DOMContentLoaded', function () {
-      var calendarEl = document.getElementById('calendar');
-      var now = new Date();
-      var monthYear = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    
+    // Only initialize calendar if element exists
+    if (calendarEl) {
+        var now = new Date();
+        var monthYear = now.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-      // Update button and modal title
-      document.getElementById('calendarButton').innerHTML = '<i class="bi bi-calendar3 me-2"></i>' + monthYear;
-      document.getElementById('calendarModalLabel').innerText = 'Monthly Transactions - ' + monthYear;
-
-      // Initialize Calendar with dynamic events from PHP
-      calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        height: 600,
-        initialDate: now,
-        events: <?php echo json_encode($calendarEvents); ?>,
-        eventClick: function(info) {
-            // Handle event click - you can add functionality here
-            alert('Orders on ' + info.event.startStr + ': ' + info.event.title);
+        // Update button and modal title with null checks
+        const calendarButton = document.getElementById('calendarButton');
+        const calendarModalLabel = document.getElementById('calendarModalLabel');
+        
+        if (calendarButton) {
+            calendarButton.innerHTML = '<i class="bi bi-calendar3 me-2"></i>' + monthYear;
         }
-      });
+        
+        if (calendarModalLabel) {
+            calendarModalLabel.innerText = 'Monthly Transactions - ' + monthYear;
+        }
 
-      calendar.render();
-    });
+        // Initialize Calendar with dynamic events from PHP
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: 600,
+            initialDate: now,
+            events: <?php echo json_encode($calendarEvents); ?>,
+            eventClick: function(info) {
+                // Handle event click - you can add functionality here
+                alert('Orders on ' + info.event.startStr + ': ' + info.event.title);
+            }
+        });
 
-    // Rerender calendar after modal fully shown
-    var calendarModal = document.getElementById('calendarModal');
-    calendarModal.addEventListener('shown.bs.modal', function () {
-      calendar.render();
-    });
+        calendar.render();
 
-    document.getElementById('viewMonthButton').addEventListener('click', function () {
-      var currentDate = calendar.getDate();
-      var currentMonth = currentDate.getMonth() + 1;
-      var currentYear = currentDate.getFullYear();
+        // Rerender calendar after modal fully shown - ONLY if modal exists
+        var calendarModal = document.getElementById('calendarModal');
+        if (calendarModal) {
+            calendarModal.addEventListener('shown.bs.modal', function () {
+                calendar.render();
+            });
+        }
 
-      // Filter orders for the selected month
-      filterOrdersByMonth(currentMonth, currentYear);
+        // View month button - ONLY if button exists
+        const viewMonthButton = document.getElementById('viewMonthButton');
+        if (viewMonthButton) {
+            viewMonthButton.addEventListener('click', function () {
+                var currentDate = calendar.getDate();
+                var currentMonth = currentDate.getMonth() + 1;
+                var currentYear = currentDate.getFullYear();
 
-      // Close the modal
-      var modal = bootstrap.Modal.getInstance(document.getElementById('calendarModal'));
-      modal.hide();
-    });
+                // Filter orders for the selected month
+                filterOrdersByMonth(currentMonth, currentYear);
 
-    function filterOrdersByMonth(month, year) {
-      // Add AJAX call to filter orders
-      fetch(`filter_orders.php?month=${month}&year=${year}`)
+                // Close the modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('calendarModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            });
+        }
+    }
+});
+
+function filterOrdersByMonth(month, year) {
+    // Add AJAX call to filter orders
+    fetch(`filter_orders.php?month=${month}&year=${year}`)
         .then(response => response.json())
-        .then data => {
-          if (data.success) {
-            // Refresh the page or update the orders table
-            location.reload();
-          } else {
-            alert('Error filtering orders');
-          }
+        .then(data => {
+            if (data.success) {
+                // Refresh the page or update the orders table
+                location.reload();
+            } else {
+                alert('Error filtering orders');
+            }
         })
         .catch(error => {
-          console.error('Error:', error);
-          alert('Error filtering orders');
+            console.error('Error:', error);
+            alert('Error filtering orders');
         });
-    }
+      }
   </script>
 
   <script>
@@ -853,45 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   </script>
 
-  <script>
-//Multiple delete functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectAll = document.getElementById('selectAllProducts');
-        const checkboxes = document.querySelectorAll('.product-checkbox');
-        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
-        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
 
-        // Select/Deselect all checkboxes
-        selectAll.addEventListener('change', function() {
-        checkboxes.forEach(cb => cb.checked = selectAll.checked);
-        toggleBulkDelete();
-        });
 
-        // If any checkbox is changed, update selectAll and bulk delete button
-        checkboxes.forEach(cb => {
-        cb.addEventListener('change', function() {
-            selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
-            toggleBulkDelete();
-        });
-        });
-
-        function toggleBulkDelete() {
-        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
-        }
-
-        // Example: Bulk delete action (replace with your AJAX or form submit)
-        bulkDeleteBtn.addEventListener('click', function() {
-        const selectedIds = Array.from(checkboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
-        if (selectedIds.length === 0) return;
-        if (confirm('Are you sure you want to delete the selected products?')) {
-            // TODO: Send selectedIds to server for deletion (AJAX or form)
-            alert('Selected IDs: ' + selectedIds.join(', '));
-        }
-        });
-    });
-</script>
 </body>
 </html>

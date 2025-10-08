@@ -564,7 +564,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         </button>
     <?php else: ?>
         <button class="btn custom-outline-black" disabled>
-            Already Reviewed
+             Reviewed
         </button>
          <button class="btn custom-navy-btn">
             Buy Again

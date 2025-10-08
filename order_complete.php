@@ -1,10 +1,23 @@
 <?php
 require('admin/inc/config.php');
 session_start();
+
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'error' => 'User not logged in']);
     exit;
+}
+
+// Check if this is an online payment order and verify receipt upload
+if (isset($_POST['payment_method']) && $_POST['payment_method'] === 'Send Online Receipt') {
+    if (!isset($_SESSION['receipt_image'])) {
+        echo json_encode(['success' => false, 'error' => 'Receipt upload required for online payment']);
+        exit;
+    }
+    
+    // Move the receipt information to the order
+    $receipt_image = $_SESSION['receipt_image'];
+    unset($_SESSION['receipt_image']); // Clear from session after use
 }
 
 // Get the item count from session

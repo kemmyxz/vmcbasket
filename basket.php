@@ -18,7 +18,9 @@ $userInfo = $userResult->fetch_assoc();
 $fullName = $userInfo['student_fname'] . ' ' . $userInfo['student_lname'];
 
 // Fetch basket items for this user
-$basketSql = "SELECT * FROM basket WHERE user_id = ?";
+$basketSql = "SELECT b.*, p.max_quantity FROM basket b 
+              JOIN products p ON b.product_id = p.id 
+              WHERE b.user_id = ?";
 $stmt = $conn->prepare($basketSql);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
@@ -480,13 +482,17 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     <?php endif; ?>
                     <div class="fw-bold mt-2 mb-4 product-price">₱ <?php echo number_format($row['price'], 2); ?></div>
 
-                    <div class="d-flex align-items-center mt-2">
-                        <button class="btn btn-outline-secondary btn-sm qty-btn minus"
-                            onclick="changeQty(<?php echo $row['id']; ?>, -1)">−</button>
-                            <span id="quantity-<?php echo $row['id']; ?>" class="mx-2 quantity"><?php echo $row['quantity']; ?></span>
-                        <button class="btn btn-outline-secondary btn-sm qty-btn plus"
-                            onclick="changeQty(<?php echo $row['id']; ?>, 1)">+</button>
-                    </div>
+                   <div class="d-flex align-items-center mt-2">
+    <button class="btn btn-outline-secondary btn-sm qty-btn minus"
+        onclick="changeQty(<?php echo $row['id']; ?>, -1)">−</button>
+    <span id="quantity-<?php echo $row['id']; ?>" 
+          class="mx-2 quantity"
+          data-max="<?php echo $row['max_quantity']; ?>">
+        <?php echo $row['quantity']; ?>
+    </span>
+    <button class="btn btn-outline-secondary btn-sm qty-btn plus"
+        onclick="changeQty(<?php echo $row['id']; ?>, 1)">+</button>
+</div>
                 </div>
             </div>
         </div>
@@ -495,24 +501,39 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         function changeQty(itemId, increment) {
             const quantityElement = document.querySelector(`#quantity-${itemId}`);
             let currentQuantity = parseInt(quantityElement.textContent);
+            const maxQuantity = parseInt(quantityElement.dataset.max);
             const newQuantity = currentQuantity + increment;
-
+        
+            // Check minimum quantity
             if (newQuantity <= 0) {
                 alert("Quantity can't be less than 1.");
                 return;
             }
-
+        
+            // Check maximum quantity
+            if (newQuantity > maxQuantity) {
+                alert(`Maximum quantity allowed is ${maxQuantity}`);
+                return;
+            }
+        
             fetch('delete.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: `action=update_qty&id=${itemId}&quantity=${newQuantity}`
-            )
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    quantityElement.textContent = newQuantity;  // Update the quantity on the page
+                    quantityElement.textContent = newQuantity;
+                    
+                    // Update the checkbox data-quantity attribute
+                    const checkbox = document.querySelector(`.basket-checkbox[data-id="${itemId}"]`);
+                    if (checkbox) {
+                        checkbox.dataset.quantity = newQuantity;
+                        recalculateTotal(); // Recalculate the total after quantity update
+                    }
                 } else {
                     alert('Failed to update quantity: ' + (data.error || 'Unknown error.'));
                 }
@@ -531,31 +552,42 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 
             <script>
-            function clearAllItems() {
-                    if (confirm("Are you sure you want to clear all items from the basket?")) {
-                        fetch('delete.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'action=clear_all' // Send action to clear all items
-                        })
-                        .then(response => response.json())
-                        .then data => {
-                            if (data.success) {
-                                alert('All items removed from basket!');
-                                window.location.reload();  // Reload the page to reflect changes
-                            } else {
-                                alert('Failed to clear basket: ' + (data.error || 'Unknown error.'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Something went wrong.');
-                        });
-                    }
+                        function clearAllItems() {
+                // Get all checked checkboxes
+                const checkedItems = document.querySelectorAll('.basket-checkbox:checked');
+                
+                if (checkedItems.length === 0) {
+                    alert("Please select items to remove from the basket.");
+                    return;
                 }
-                </script>
+            
+                if (confirm("Are you sure you want to remove the selected items from the basket?")) {
+                    // Get all checked item IDs
+                    const itemIds = Array.from(checkedItems).map(checkbox => checkbox.dataset.id);
+            
+                    fetch('delete.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `action=clear_selected&ids=${JSON.stringify(itemIds)}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Selected items removed from basket!');
+                            window.location.reload();  // Reload the page to reflect changes
+                        } else {
+                            alert('Failed to clear selected items: ' + (data.error || 'Unknown error.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Something went wrong.');
+                    });
+                }
+            }
+            </script>
             </div>
         </div>
     </div>
@@ -589,67 +621,74 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
             <script>
             function placeOrder() {
-            if (!confirm('Are you sure you want to place the order?')) return;
-
-            // collect all checked items
-            const checked = Array.from(
-                document.querySelectorAll('.basket-checkbox:checked')
-            );
-            if (checked.length === 0) {
-                alert('Please select at least one item to order.');
-                return;
-                
-            }
-
-            const itemCount = checked.length;
-
+                if (!confirm('Are you sure you want to place the order?')) return;
             
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'get_item_count.php';
-
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'item_count';
-            input.value = itemCount;
-
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
-
-
-            // build up POST params
-            const params = new URLSearchParams();
-            checked.forEach(box => {
-                const id   = box.dataset.id;
-                const size = box.dataset.size;
-                // read the live quantity from your span#quantity-{id}
-                const qty  = document.getElementById(`quantity-${id}`).textContent;
-                params.append('basket_ids[]', id);
-                params.append(`size[${id}]`, size);
-                params.append(`quantity[${id}]`, qty);
-            });
-
-        
-            // send to your new place_orders.php
-            fetch('place_order.php', {
-                method: 'POST',
-                body: params
-            })
-            .then(r => r.json())
-            .then js => {
-                if (js.success) {
-                window.location.href = 'proceed_order.php';
-                } else {
-                alert('Failed to place order: ' + (js.error || 'Unknown error'));
+                // collect all checked items
+                const checked = Array.from(
+                    document.querySelectorAll('.basket-checkbox:checked')
+                );
+                
+                if (checked.length === 0) {
+                    alert('Please select at least one item to order.');
+                    return;
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Something went wrong when placing your order.');
-            });
-            }
+            
+                // Validate quantities
+                for (const box of checked) {
+                    const id = box.dataset.id;
+                    const qty = parseInt(document.getElementById(`quantity-${id}`).textContent);
+                    const max = parseInt(document.getElementById(`quantity-${id}`).dataset.max);
+                    
+                    if (qty > max) {
+                        alert(`Maximum quantity allowed for an item is ${max}`);
+                        return;
+                    }
+                }
+            
+                const itemCount = checked.length;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'get_item_count.php';
+            
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'item_count';
+                input.value = itemCount;
+            
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            
+                // build up POST params
+                const params = new URLSearchParams();
+                checked.forEach(box => {
+                    const id = box.dataset.id;
+                    const size = box.dataset.size;
+                    const qty = document.getElementById(`quantity-${id}`).textContent;
+                    params.append('basket_ids[]', id);
+                    params.append(`size[${id}]`, size);
+                    params.append(`quantity[${id}]`, qty);
+                });
+            
+                // send to your new place_orders.php
+                fetch('place_order.php', {
+                    method: 'POST',
+                    body: params
+                })
+                .then(r => r.json())
+                .then(js => {
+                    if (js.success) {
+                        window.location.href = 'proceed_order.php';
+                    } else {
+                        alert('Failed to place order: ' + (js.error || 'Unknown error'));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Something went wrong when placing your order.');
+                });
+            }            
+            
             </script>
             </div>
         </div>

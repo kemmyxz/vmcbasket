@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $customer_name = $data['customer_name'];
 
         // First, insert into order_receipt table
-        $sql = "INSERT INTO order_receipt (receipt_id, order_status) VALUES (?, 'Complete')";
+        $sql = "INSERT INTO order_receipt (receipt_id, order_status) VALUES (?, 'ToPickUp')";
         $stmt = $conn->prepare($sql);
         
         if (!$stmt) {
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert order with image, payment method and customer name
             $sql = "INSERT INTO orders (receipt_no, product_id, product_name, customer_name, size, price, 
                     total_price, quantity, image, payment_method, status) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Complete')";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ToPickUp')";
             
             $stmt = $conn->prepare($sql);
             

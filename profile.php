@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $birthday = $_POST['birthday'];
     $year_level = $_POST['year_level'];
 
-   
-    
+
+
 
     // Handle new image upload
     if (isset($_FILES["profile_pic"]) && $_FILES["profile_pic"]['error'] == 0) {
@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -74,128 +75,147 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Custom CSS for Profile Page -->
 
     <style>
-    .highlight-orange {
-        background-color: #ffd498;
-        padding: 0.3rem 1rem;
-        border-radius: 6px;
-        border: 1px solid black;
-        box-shadow: 3px 3px 0px #000;
-        font-weight: 600;
-    }       
-
-    .profile-container {
-        max-width: 950px;
-        height: auto;
-        background-color: #F5EFEB;
-        padding: 10px;
-        border-radius: 10px;
-        border: solid 1px #FF9E5E;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .profile-container h3 {
-        font-family: "Ubuntu", sans-serif;
-        font-size: 30px;
-        color: #00527F;
-        font-weight: bold;
-    }
-    .profile-container hr{
-        border: solid 1px #FF9E5E;
-        opacity: 0.6;
-    }
-    .changebtn{
-        border-top: solid 1px #CED4DA;
-        border-right: solid 1px #CED4DA;
-        border-bottom: solid 1px #CED4DA;
-        border-left:0px;
-        border-radius: 0px 10px 10px 0px;
-        background-color: white;
-        color: #0066FF;
-    }
-    .changebtn:hover, .changebtn:focus, .changebtn.active {
-        background-color: #0066FF;
-        color: white;
-    }
-
-    .profile-img{
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-    }
-
-    /* Tablet styles */
-    @media (max-width: 991.98px) {
-        .profile-container {
-            padding: 8px;
-        }
-        .profile-img {
-            width: 120px;
-            height: 120px;
-        }
-        .profile-container h3 {
-            font-size: 24px;
-        }
-    }
-    @media (max-width: 575.98px) {
-
         .highlight-orange {
-            font-size: 1rem;
+            background-color: #ffd498;
+            padding: 0.3rem 1rem;
+            border-radius: 6px;
+            border: 1px solid black;
+            box-shadow: 3px 3px 0px #000;
+            font-weight: 600;
         }
+
         .profile-container {
-            padding: 5px;
+            max-width: 950px;
+            height: auto;
+            background-color: #F5EFEB;
+            padding: 10px;
+            border-radius: 10px;
+            border: solid 1px #FF9E5E;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .profile-img {
-            width: 80px;
-            height: 80px;
-        }
+
         .profile-container h3 {
-            font-size: 18px;
-        }
-        .profile-container p{
-            font-size: 0.85rem;
-        }
-        .navbar-custom {
-            padding: 0.5rem 1rem;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .container-fluid.d-flex.align-items-center {
-            justify-content: start;
-        }
-        .vmc-logo {
-            max-width: 90px;
-        }
-        .search-box {
-            width: 100%;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+            font-family: "Ubuntu", sans-serif;
+            font-size: 30px;
+            color: #00527F;
+            font-weight: bold;
         }
 
-        .basket-btn {
-            width: 38px;
-            height: 38px;
-            font-size: 1.2rem;
-            margin-right: 5px;
+        .profile-container hr {
+            border: solid 1px #FF9E5E;
+            opacity: 0.6;
         }
 
-        .profile-section img {
-            width: 70px;
-            height: 70px;
+        .changebtn {
+            border-top: solid 1px #CED4DA;
+            border-right: solid 1px #CED4DA;
+            border-bottom: solid 1px #CED4DA;
+            border-left: 0px;
+            border-radius: 0px 10px 10px 0px;
+            background-color: white;
+            color: #0066FF;
         }
-        footer {
-            font-size: 1rem;
-        }
-    }
 
- </style>
+        .changebtn:hover,
+        .changebtn:focus,
+        .changebtn.active {
+            background-color: #0066FF;
+            color: white;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        /* Tablet styles */
+        @media (max-width: 991.98px) {
+            .profile-container {
+                padding: 8px;
+            }
+
+            .profile-img {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-container h3 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+
+            .highlight-orange {
+                font-size: 1rem;
+            }
+
+            .profile-container {
+                padding: 5px;
+            }
+
+            .profile-img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .profile-container h3 {
+                font-size: 18px;
+            }
+
+            .profile-container p {
+                font-size: 0.85rem;
+            }
+
+            .navbar-custom {
+                padding: 0.5rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .container-fluid.d-flex.align-items-center {
+                justify-content: start;
+            }
+
+            .vmc-logo {
+                max-width: 90px;
+            }
+
+            .search-box {
+                width: 100%;
+                font-size: 0.85rem;
+                margin-top: 0.5rem;
+            }
+
+            .basket-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.2rem;
+                margin-right: 5px;
+            }
+
+            .profile-section img {
+                width: 70px;
+                height: 70px;
+            }
+
+            footer {
+                font-size: 1rem;
+            }
+        }
+    </style>
 
 </head>
+
 <body>
 
     <!-- Navbar -->
     <nav class="navbar navbar-custom shadow-sm fixed-top">
         <div class="container-fluid d-flex align-items-center">
             <!-- Hamburger -->
-            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sideMenu">
                 <i class="fas fa-bars fa-lg"></i>
             </button>
 
@@ -228,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $basket_stmt->execute();
                 $basket_result = $basket_stmt->get_result();
                 if ($basket_row = $basket_result->fetch_assoc()) {
-                    $basket_count = (int)$basket_row['total'];
+                    $basket_count = (int) $basket_row['total'];
                 }
                 $basket_stmt->close();
             }
@@ -236,7 +256,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="basket.php" class="basket-btn text-decoration-none position-relative">
                 <i class="fas fa-shopping-basket"></i>
                 <?php if ($basket_count > 0): ?>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size:0.8rem;">
                         <?php echo $basket_count; ?>
                     </span>
                 <?php endif; ?>
@@ -253,38 +274,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
         <div class="offcanvas-body p-0">
             <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
-                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
             </div>
             <div class="profile-section">
                 <img src="admin/uploads/<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture">
                 <h4 class="mt-2"><?php echo htmlspecialchars($fullName); ?></h4>
             </div>
-    
+
             <div class="px-3">
                 <div class="mb-2">
-                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
-                    Profile
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none"
+                        data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                        Profile
                     </button>
                     <div class="collapse ps-3" id="profileMenu">
-                    <a href="profile.php">My Account</a>
-                    <a href="purchase_history.php">My Purchase</a>
-                    <a href="favorites.php">My Favorites</a>
+                        <a href="profile.php">My Account</a>
+                        <a href="purchase_history.php">My Purchase</a>
+                        <a href="favorites.php">My Favorites</a>
                     </div>
                 </div>
-    
+
                 <a href="home.php">Home</a>
-    
+
                 <div class="mt-2">
-                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
-                    Shop
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none"
+                        data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                        Shop
                     </button>
                     <div class="collapse ps-3" id="shopMenu">
-                    <a href="shop_uniforms.php">Uniforms</a>
-                    <a href="shop_supplies.php">School Supplies</a>
-                    <a href="shop_merch.php">School-related Merchandise</a>
+                        <a href="shop_uniforms.php">Uniforms</a>
+                        <a href="shop_supplies.php">School Supplies</a>
+                        <a href="shop_merch.php">School-related Merchandise</a>
                     </div>
                 </div>
-    
+
                 <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
@@ -299,250 +323,284 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <p class="mb-3">Manage and protect your account</p>
             <hr>
 
-    <!-- Editable Form -->
-    <form class="mt-4" method="POST" enctype="multipart/form-data">
-            <div class="text-center">
-                <!-- Dynamic Profile Picture -->
-                <!-- Display the Profile Image -->
-                <img src= "admin/uploads/<?= $profilePic ?>" class="rounded-circle mb-3 profile-img" id="profileImage" name="profileImage" alt="profile">
-                <br>
-                <input type="file" id="imageUpload" accept="image/*" name="profile_pic" style="display: none;" onchange="previewImage(event)">
-                <button type="button" class="custom-navy-btn mt-2" onclick="document.getElementById('imageUpload').click();">Select Image</button>
+            <!-- Editable Form -->
+            <form class="mt-4" method="POST" enctype="multipart/form-data">
+                <div class="text-center">
+                    <!-- Dynamic Profile Picture -->
+                    <!-- Display the Profile Image -->
+                    <img src="admin/uploads/<?= $profilePic ?>" class="rounded-circle mb-3 profile-img"
+                        id="profileImage" name="profileImage" alt="profile">
+                    <br>
+                    <input type="file" id="imageUpload" accept="image/*" name="profile_pic" style="display: none;"
+                        onchange="previewImage(event)">
+                    <button type="button" class="custom-navy-btn mt-2"
+                        onclick="document.getElementById('imageUpload').click();">Select Image</button>
+                    <hr>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Student Number</label>
+                        <input type="text" name="student_no" class="form-control"
+                            value="<?php echo $user['student_no']; ?>" readonly tabindex="-1"
+                            style="pointer-events: none; background-color: #e9ecef;">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" value="<?php echo $fullName; ?>"
+                            readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
+                    </div>
+                </div>
+
+                <div class="row mb-3 mb-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <div class="input-group">
+                            <input type="email" name="email" id="email" class="form-control"
+                                value="<?php echo $user['email']; ?>" required>
+                            <button class="changebtn" type="button" onclick="enableEdit('email', this)">Change</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number</label>
+                        <div class="input-group">
+                            <input type="text" id="phone" name="phone" class="form-control"
+                                value="<?php echo $user['phone_number']; ?>" required>
+                            <button class="changebtn" type="button" onclick="enableEdit('phone', this)">Change</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Date of Birth</label>
+                        <div class="input-group">
+                            <input type="date" name="birthday" class="form-control"
+                                value="<?php echo $user['birthday']; ?>" required>
+                            <button class="changebtn" type="button" onclick="enableEdit('dob', this)">Change</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Year-level</label>
+                        <div class="input-group">
+                            <input type="text" id="year" name="year_level" class="form-control"
+                                value="<?php echo $user['year_level']; ?>" required>
+                            <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button>
+                        </div>
+                    </div>
+                </div>
                 <hr>
-            </div>
-        <div class="row mb-3">
-            <div class="col-md-6 mb-2">
-            <label class="form-label">Student Number</label>
-            <input type="text" name="student_no" class="form-control" value="<?php echo $user['student_no']; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
-            </div>
-            <div class="col-md-6 mb-2">
-            <label class="form-label">Full Name</label>
-            <input type="text" name="full_name" class="form-control" value="<?php echo $fullName; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
-            </div>
+                <div class="col-md-6 mb-2">
+                    <a href="forgot_password.php" class="text-decoration-none">Reset Password</a>
+                </div>
+                <div class="text-center mt-5">
+                    <button type="submit" class="custom-navy-btn" id="saveBtn" disabled>Save</button>
+                </div>
+            </form>
         </div>
 
-        <div class="row mb-3 mb-2">
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <div class="input-group">
-                <input type="email" name="email" id="email" class="form-control" value="<?php echo $user['email']; ?>" required>
-                    <button class="changebtn" type="button" onclick="enableEdit('email', this)">Change</button>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Phone Number</label>
-                <div class="input-group">     
-                    <input type="text" id="phone" name="phone" class="form-control" value="<?php echo $user['phone_number']; ?>" required >
-                    <button class="changebtn" type="button" onclick="enableEdit('phone', this)">Change</button>
-                </div>
-            </div>
-        </div>
+    </div>
+    </div>
 
-        <div class="row mb-3">
-            <div class="col-md-6 mb-2">
-                <label class="form-label">Date of Birth</label>
-                <div class="input-group">
-                    <input type="date" name="birthday" class="form-control" value="<?php echo $user['birthday']; ?>" required>
-                    <button class="changebtn" type="button" onclick="enableEdit('dob', this)">Change</button>
-                </div>
-            </div>
-            <div class="col-md-6 mb-2">
-                <label class="form-label">Year-level</label>
-                <div class="input-group">
-                    <input type="text" id="year" name="year_level" class="form-control" value="<?php echo $user['year_level']; ?>" required>
-                    <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="col-md-6 mb-2">
-            <a href="forgot_password.php" class="text-decoration-none">Reset Password</a>
-        </div>
-        <div class="text-center mt-5">
-            <button type="submit" class="custom-navy-btn" id="saveBtn" disabled>Save</button>
-        </div>
-    </form>
-</div>
-
-     </div>
-</div>
-
-   <!-- Footer and chat -->
+    <!-- Footer and chat -->
     <?php include 'footer.php'; ?>
     <?php include 'chat.php'; ?>
 
-<!-- Javascript -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    // Disable Save button on page load
-    document.getElementById("saveBtn").disabled = true;
+    <!-- Javascript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Disable Save button on page load
+            document.getElementById("saveBtn").disabled = true;
 
-    // Listen for changes in the Email and Date of Birth fields
-    document.getElementById('email').addEventListener('change', enableSaveButton);
-    document.getElementById('dob').addEventListener('change', enableSaveButton);
-});
-
-function enableEdit(fieldId, btn) {
-    let field = document.getElementById(fieldId);
-    let saveButton = document.getElementById("saveBtn");
-
-    if (fieldId === "year") {
-        let currentValue = field.value;
-        let select = document.createElement("select");
-        select.className = "form-control shadow-none";
-        select.id = fieldId;
-        select.name = "year_level"; 
-        let options = [
-            "Pre-School",
-            "Elementary Grade 1",
-            "Elementary Grade 2",
-            "Elementary Grade 3",
-            "Elementary Grade 4",
-            "Elementary Grade 5",
-            "Elementary Grade 6",
-            "Junior High School Grade 7",
-            "Junior High School Grade 8",
-            "Junior High School Grade 9",
-            "Senior High School Grade 11",
-            "Senior High School Grade 12",
-            "Bachelor of Science in Information System",
-            "Bachelor of Science in Business Administration",
-            "Bachelor of Science in Elementary Education Major Pre-School and Special Education",
-            "Bachelor of Science in Management and Tourism",
-            "Bachelor of Science in Criminology",
-            "Bachelor of Science in Hotel and Restaurant Management",
-            "Bachelor of Science in Secondary Education Major in English and Mathematics"
-        ];
-
-        options.forEach(optionText => {
-            let option = document.createElement("option");
-            option.value = optionText;
-            option.textContent = optionText;
-            if (optionText === currentValue) option.selected = true;
-            select.appendChild(option);
+            // Listen for changes in the Email and Date of Birth fields
+            document.getElementById('email').addEventListener('change', enableSaveButton);
+            document.getElementById('dob').addEventListener('change', enableSaveButton);
         });
 
-        field.replaceWith(select);
-        select.focus();
-    } 
-    else if (fieldId === "dob") {
-        let currentValue = field.value;
-        let dateInput = document.createElement("input");
-        dateInput.type = "date";
-        dateInput.className = "form-control shadow-none";
-        dateInput.id = fieldId;
-        dateInput.value = currentValue.replace(/\*/g, ""); // Remove masking0
+        function enableEdit(fieldId, btn) {
+            let field = document.getElementById(fieldId);
+            let saveButton = document.getElementById("saveBtn");
 
-        field.replaceWith(dateInput);
-        dateInput.focus();
-    } 
-    else if (fieldId === "phone") {
-        field.disabled = false;
-        field.type = "tel"; 
-        field.setAttribute("pattern", "[0-9]*");
-        field.setAttribute("inputmode", "numeric");
-        field.focus();
-        field.name = "phone";
-    } 
-    else {
-        field.disabled = false;
-        field.focus();
-    }
+            if (fieldId === "year") {
+                let currentValue = field.value;
+                let select = document.createElement("select");
+                select.className = "form-control shadow-none";
+                select.id = fieldId;
+                select.name = "year_level";
+                let options = [
+                    "Pre-School",
+                    "Kindergarten",
+                    "Elementary Grade 1",
+                    "Elementary Grade 2",
+                    "Elementary Grade 3",
+                    "Elementary Grade 4",
+                    "Elementary Grade 5",
+                    "Elementary Grade 6",
+                    "Junior High School Grade 7",
+                    "Junior High School Grade 8",
+                    "Junior High School Grade 9",
+                    "Junior High School Grade 10",
+                    "Senior High School Grade 11",
+                    "Senior High School Grade 12",
+                    "Bachelor of Science in Information System - 1st Year",
+                    "Bachelor of Science in Information System - 2nd Year",
+                    "Bachelor of Science in Information System - 3rd Year",
+                    "Bachelor of Science in Information System - 4th Year",
+                    "Bachelor of Science in Business Administration - 1st Year",
+                    "Bachelor of Science in Business Administration - 2nd Year",
+                    "Bachelor of Science in Business Administration - 3rd Year",
+                    "Bachelor of Science in Business Administration - 4th Year",
+                    "Bachelor of Science in Elementary Education Major Pre-School and Special Education - 1st Year",
+                    "Bachelor of Science in Elementary Education Major Pre-School and Special Education - 2nd Year",
+                    "Bachelor of Science in Elementary Education Major Pre-School and Special Education - 3rd Year",
+                    "Bachelor of Science in Elementary Education Major Pre-School and Special Education - 4th Year",
+                    "Bachelor of Science in Management and Tourism - 1st Year",
+                    "Bachelor of Science in Management and Tourism - 2nd Year",
+                    "Bachelor of Science in Management and Tourism - 3rd Year",
+                    "Bachelor of Science in Management and Tourism - 4th Year",
+                    "Bachelor of Science in Criminology - 1st Year",
+                    "Bachelor of Science in Criminology - 2nd Year",
+                    "Bachelor of Science in Criminology - 3rd Year",
+                    "Bachelor of Science in Criminology - 4th Year",
+                    "Bachelor of Science in Hotel and Restaurant Management - 1st Year",
+                    "Bachelor of Science in Hotel and Restaurant Management - 2nd Year",
+                    "Bachelor of Science in Hotel and Restaurant Management - 3rd Year",
+                    "Bachelor of Science in Hotel and Restaurant Management - 4th Year",
+                    "Bachelor of Science in Secondary Education Major in English and Mathematics - 1st Year",
+                    "Bachelor of Science in Secondary Education Major in English and Mathematics - 2nd Year",
+                    "Bachelor of Science in Secondary Education Major in English and Mathematics - 3rd Year",
+                    "Bachelor of Science in Secondary Education Major in English and Mathematics - 4th Year"
+                ];
 
-    // Keep Change button active (blue)
-    btn.classList.add("active");
+                options.forEach(optionText => {
+                    let option = document.createElement("option");
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    if (optionText === currentValue) option.selected = true;
+                    select.appendChild(option);
+                });
 
-    // Enable Save button
-    document.getElementById("saveBtn").disabled = false;
-}
-
-function enableSaveButton() {
-    // Enable Save button whenever there is a change in email or date of birth
-    document.getElementById("saveBtn").disabled = false;
-}
-
-function resetForm() {
-    // Reset all Change buttons to default style
-    document.querySelectorAll(".changebtn").forEach(button => {
-        button.classList.remove("active");
-    });
-
-    // Reset only form inputs inside the profile-container (except the image upload button)
-    document.querySelectorAll(".profile-container input, .profile-container select").forEach(field => {
-        let value = field.value;
-
-        if (field.id === "imageUpload") {
-            // Skip resetting the image upload input
-            return;
-        }
-
-        if (field.tagName === "SELECT") {
-            // Convert select back to text input
-            let textInput = document.createElement("input");
-            textInput.type = "text";
-            textInput.className = "form-control";
-            textInput.id = field.id;
-            textInput.value = value;
-            textInput.disabled = true;
-            field.replaceWith(textInput);
-        } else {
-            if (field.type === "date") {
-                // Convert date input back to text input
-                let textInput = document.createElement("input");
-                textInput.type = "text";
-                textInput.className = "form-control";
-                textInput.id = field.id;
-                textInput.value = value;
-                textInput.disabled = true;
-                field.replaceWith(textInput);
-            } else {
-                field.disabled = true;
+                field.replaceWith(select);
+                select.focus();
             }
+            else if (fieldId === "dob") {
+                let currentValue = field.value;
+                let dateInput = document.createElement("input");
+                dateInput.type = "date";
+                dateInput.className = "form-control shadow-none";
+                dateInput.id = fieldId;
+                dateInput.value = currentValue.replace(/\*/g, ""); // Remove masking0
+
+                field.replaceWith(dateInput);
+                dateInput.focus();
+            }
+            else if (fieldId === "phone") {
+                field.disabled = false;
+                field.type = "tel";
+                field.setAttribute("pattern", "[0-9]*");
+                field.setAttribute("inputmode", "numeric");
+                field.focus();
+                field.name = "phone";
+            }
+            else {
+                field.disabled = false;
+                field.focus();
+            }
+
+            // Keep Change button active (blue)
+            btn.classList.add("active");
+
+            // Enable Save button
+            document.getElementById("saveBtn").disabled = false;
         }
-    });
 
-    // Re-enable the sidebar and other buttons (if they were disabled by mistake)
-    document.querySelectorAll("button").forEach(button => {
-        if (button.id !== "saveBtn" && button.id !== "imageUpload") {
-            button.disabled = false;
+        function enableSaveButton() {
+            // Enable Save button whenever there is a change in email or date of birth
+            document.getElementById("saveBtn").disabled = false;
         }
-    });
 
-    // Disable Save button again
-    document.getElementById("saveBtn").disabled = true;
-}
+        function resetForm() {
+            // Reset all Change buttons to default style
+            document.querySelectorAll(".changebtn").forEach(button => {
+                button.classList.remove("active");
+            });
 
-function previewImage(event) {
-    var reader = new FileReader();
-    reader.onload = function(){
-        var output = document.getElementById('profileImage');
-        output.src = reader.result;
-        document.getElementById("saveBtn").disabled = false; // ✅ Enable Save
-    };
-    reader.readAsDataURL(event.target.files[0]);
-}
-//Collapse Search for small device Script 
+            // Reset only form inputs inside the profile-container (except the image upload button)
+            document.querySelectorAll(".profile-container input, .profile-container select").forEach(field => {
+                let value = field.value;
 
-document.addEventListener("DOMContentLoaded", function () {
-    const toggleBtn = document.getElementById('mobileSearchToggle');
-    const searchBar = document.getElementById('mobileSearchBar');
-    if (toggleBtn && searchBar) {
-        toggleBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            searchBar.classList.toggle('d-none');
-            if (!searchBar.classList.contains('d-none')) {
-                searchBar.querySelector('input').focus();
+                if (field.id === "imageUpload") {
+                    // Skip resetting the image upload input
+                    return;
+                }
+
+                if (field.tagName === "SELECT") {
+                    // Convert select back to text input
+                    let textInput = document.createElement("input");
+                    textInput.type = "text";
+                    textInput.className = "form-control";
+                    textInput.id = field.id;
+                    textInput.value = value;
+                    textInput.disabled = true;
+                    field.replaceWith(textInput);
+                } else {
+                    if (field.type === "date") {
+                        // Convert date input back to text input
+                        let textInput = document.createElement("input");
+                        textInput.type = "text";
+                        textInput.className = "form-control";
+                        textInput.id = field.id;
+                        textInput.value = value;
+                        textInput.disabled = true;
+                        field.replaceWith(textInput);
+                    } else {
+                        field.disabled = true;
+                    }
+                }
+            });
+
+            // Re-enable the sidebar and other buttons (if they were disabled by mistake)
+            document.querySelectorAll("button").forEach(button => {
+                if (button.id !== "saveBtn" && button.id !== "imageUpload") {
+                    button.disabled = false;
+                }
+            });
+
+            // Disable Save button again
+            document.getElementById("saveBtn").disabled = true;
+        }
+
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('profileImage');
+                output.src = reader.result;
+                document.getElementById("saveBtn").disabled = false; // ✅ Enable Save
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+        //Collapse Search for small device Script 
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn = document.getElementById('mobileSearchToggle');
+            const searchBar = document.getElementById('mobileSearchBar');
+            if (toggleBtn && searchBar) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    searchBar.classList.toggle('d-none');
+                    if (!searchBar.classList.contains('d-none')) {
+                        searchBar.querySelector('input').focus();
+                    }
+                });
+                // Optional: Hide search bar when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
+                        searchBar.classList.add('d-none');
+                    }
+                });
             }
         });
-        // Optional: Hide search bar when clicking outside
-        document.addEventListener('click', function (e) {
-            if (!searchBar.classList.contains('d-none') && !searchBar.contains(e.target) && e.target !== toggleBtn) {
-                searchBar.classList.add('d-none');
-            }
-        });
-    }
-});
 
-</script>
+    </script>
 </body>
+
 </html>

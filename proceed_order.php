@@ -497,7 +497,117 @@ $products = getProducts();
             console.error('Error:', error);
         });
     }
-</script>
+
+    // Add validation before form submission
+document.querySelector('a[href="order_complete.php"]').addEventListener('click', function(e) {
+    const onlinePaymentSelected = document.querySelector('input[name="paymentMethod"][value="Send Online Receipt"]').checked;
+    const hasUploadedReceipt = document.querySelector('#previewContainer img') !== null;
+
+    if (onlinePaymentSelected && !hasUploadedReceipt) {
+        e.preventDefault();
+        alert('Please upload your GCash e-receipt before proceeding with the order.');
+        return false;
+    }
+    
+    // If receipt is uploaded for online payment or if it's cash payment, proceed with form submission
+    const formData = new FormData();
+    
+    if (onlinePaymentSelected && hasUploadedReceipt) {
+        // Get the receipt image file
+        const receiptFile = document.querySelector('#gcashReceiptInput').files[0];
+        formData.append('receipt_image', receiptFile);
+        
+        // Send the receipt first
+        fetch('upload_receipt.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Only proceed to order_complete.php if upload was successful
+                window.location.href = 'order_complete.php';
+            } else {
+                alert('Error uploading receipt: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error uploading receipt');
+        });
+        
+        e.preventDefault(); // Prevent default navigation
+    }
+});
+
+// Update the original GCash upload handling
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("gcashReceiptInput");
+    const dropArea = document.getElementById("dropArea");
+    const uploadPrompt = document.getElementById("uploadPrompt");
+    const previewContainer = document.getElementById("previewContainer");
+    const allowedExtensions = ["jpg", "jpeg", "png"];
+
+    function resetUpload() {
+        fileInput.value = "";
+        previewContainer.innerHTML = "";
+        uploadPrompt.style.display = "block";
+    }
+
+    function handleFile(file) {
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            alert("Invalid file type. Please upload a JPG, JPEG, or PNG image.");
+            return;
+        }
+
+        if (file.size > 50 * 1024 * 1024) {
+            alert("File is too large. Please upload an image up to 50MB.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            uploadPrompt.style.display = "none";
+            previewContainer.innerHTML = `
+                <img src="${e.target.result}" class="img-fluid rounded mb-3" style="max-height: 250px;" alt="Uploaded Preview">
+                <br>
+                <button type="button" class="btn btn-danger btn-sm" id="removeImageBtn">Remove Image</button>
+            `;
+            document.getElementById("removeImageBtn").addEventListener("click", resetUpload);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // File input change handler
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) {
+            handleFile(fileInput.files[0]);
+        }
+    });
+
+    // Drag & Drop handling
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    dropArea.addEventListener("dragover", () => dropArea.classList.add("bg-light"));
+    dropArea.addEventListener("dragleave", () => dropArea.classList.remove("bg-light"));
+
+    dropArea.addEventListener("drop", e => {
+        dropArea.classList.remove("bg-light");
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+});
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"

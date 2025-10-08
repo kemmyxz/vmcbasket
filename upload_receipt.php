@@ -5,15 +5,6 @@ require 'admin/inc/config.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = ['success' => false, 'message' => ''];
     
-    // Check if receipt_no is provided
-    if (!isset($_POST['receipt_no'])) {
-        $response['message'] = 'Receipt number is required';
-        echo json_encode($response);
-        exit;
-    }
-
-    $receipt_no = $_POST['receipt_no'];
-    
     // Check if file was uploaded
     if (!isset($_FILES['receipt_image']) || $_FILES['receipt_image']['error'] !== UPLOAD_ERR_OK) {
         $response['message'] = 'No file uploaded or upload error';
@@ -44,29 +35,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mkdir($uploadDir, 0777, true);
     }
 
-    // Generate unique filename
+    // Generate unique filename using session ID or user ID
+    $userId = $_SESSION['user_id'];
+    $timestamp = time();
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = 'receipt_' . $receipt_no . '_' . time() . '.' . $extension;
+    $filename = 'receipt_' . $userId . '_' . $timestamp . '.' . $extension;
     $filepath = $uploadDir . $filename;
 
     // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        // Store file info in database
-        $sql = "INSERT INTO order_receipts_images (receipt_id, image_path) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $receipt_no, $filepath);
+        // Start transaction
+        $conn->begin_transaction();
         
-        if ($stmt->execute()) {
-            // Update order status to 'ToPickUp'
-            $updateSql = "UPDATE order_receipt SET order_status = 'Pending' WHERE receipt_id = ?";
-            $updateStmt = $conn->prepare($updateSql);
-            $updateStmt->bind_param("s", $receipt_no);
-            $updateStmt->execute();
+        try {
+            // Get the order ID for the current pending order
+            $stmt = $conn->prepare("SELECT id FROM orders WHERE user_id = ? AND status = 'Pending' ORDER BY id DESC LIMIT 1");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $order = $result->fetch_assoc();
+            
+            if (!$order) {
+                throw new Exception('No pending order found');
+            }
 
+            // Insert into order_receipts_images table
+            $stmt = $conn->prepare("INSERT INTO order_receipts_images (receipt_id, image_path, order_id) VALUES (?, ?, ?)");
+            $stmt->bind_param("ssi", $receiptNo, $filepath, $order['id']);
+            
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to store receipt image information');
+            }
+
+            // Update the orders table with the receipt reference
+            $stmt = $conn->prepare("UPDATE orders SET receipt_no = ? WHERE id = ?");
+            $stmt->bind_param("si", $receiptNo, $order['id']);
+            
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update order with receipt information');
+            }
+
+            // Commit transaction
+            $conn->commit();
+            
             $response['success'] = true;
-            $response['message'] = 'Receipt uploaded successfully';
-        } else {
-            $response['message'] = 'Error saving to database';
+            $response['message'] = 'Receipt uploaded and stored successfully';
+            $response['filepath'] = $filepath;
+            
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            $conn->rollback();
+            // Delete the uploaded file since database update failed
+            unlink($filepath);
+            $response['message'] = 'Error: ' . $e->getMessage();
         }
     } else {
         $response['message'] = 'Error uploading file';

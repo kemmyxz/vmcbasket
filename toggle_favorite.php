@@ -1,9 +1,9 @@
-
 <?php
 require('admin/inc/config.php');
 session_start();
 
-if (!isset($_SESSION['student_no'])) {
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit();
 }
@@ -16,22 +16,16 @@ if (!$data || !isset($data['product_id'])) {
     exit();
 }
 
-// Get user ID from session
-$student_no = $_SESSION['student_no'];
-$sql = "SELECT id FROM users WHERE student_no = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $student_no);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$user_id = $user['id'];
+$user_id = $_SESSION['user_id'];
+$product_id = $data['product_id'];
 
 // Check if product is already in favorites
 $check_sql = "SELECT id, favorite FROM favorites WHERE user_id = ? AND product_id = ?";
 $check_stmt = $conn->prepare($check_sql);
-$check_stmt->bind_param("ii", $user_id, $data['product_id']);
+$check_stmt->bind_param("ii", $user_id, $product_id);
 $check_stmt->execute();
-$existing = $check_stmt->get_result()->fetch_assoc();
+$result = $check_stmt->get_result();
+$existing = $result->fetch_assoc();
 
 if ($existing) {
     // Toggle favorite status
@@ -44,19 +38,25 @@ if ($existing) {
     // Insert new favorite
     $insert_sql = "INSERT INTO favorites (user_id, product_id, favorite) VALUES (?, ?, 1)";
     $insert_stmt = $conn->prepare($insert_sql);
-    $insert_stmt->bind_param("ii", $user_id, $data['product_id']);
+    $insert_stmt->bind_param("ii", $user_id, $product_id);
     $success = $insert_stmt->execute();
     $new_status = 1;
 }
 
+// Make sure we send a proper JSON response
+header('Content-Type: application/json');
+
 if ($success) {
     echo json_encode([
-        'success' => true, 
+        'success' => true,
         'isFavorite' => $new_status == 1,
         'message' => $new_status == 1 ? 'Added to favorites' : 'Removed from favorites'
     ]);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Failed to update favorites']);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error: ' . $conn->error
+    ]);
 }
 
 $conn->close();

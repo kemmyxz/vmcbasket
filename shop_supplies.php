@@ -352,14 +352,29 @@ $search = $_GET['search'] ?? '';
                     </h4>
 
                     <!-- By Year-Level -->
+
                     <div class="mb-4 mt-3">
                         <h6 class="fw-semibold filter-title" style="color: #26387D">School Supplies:</h6>
                         <ul class="list-unstyled filter-text">
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Writing Tools
+                            <li>
+                                <input type="radio" name="supply_filter" value="Writing Tools"
+                                    class="form-check-input me-2 supply-filter" id="writing">
+                                <label for="writing">Writing Tools</label>
                             </li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Paper Products
+                            <li>
+                                <input type="radio" name="supply_filter" value="Paper Products"
+                                    class="form-check-input me-2 supply-filter" id="paper">
+                                <label for="paper">Paper Products</label>
                             </li>
-                            <li><input type="radio" name="year_level_basic" class="form-check-input me-2">Art Supplies
+                            <li>
+                                <input type="radio" name="supply_filter" value="Art Supplies"
+                                    class="form-check-input me-2 supply-filter" id="art">
+                                <label for="art">Art Supplies</label>
+                            </li>
+                            <li>
+                                <input type="radio" name="supply_filter" value=""
+                                    class="form-check-input me-2 supply-filter" id="all" checked>
+                                <label for="all">Show All</label>
                             </li>
                         </ul>
                     </div>
@@ -422,22 +437,37 @@ $search = $_GET['search'] ?? '';
                 <!-- SCHOOL SUPPLIES -->
                 <div class="row g-4 mb-5">
                     <?php
+                    $tag_filter = isset($_GET['tag']) ? $_GET['tag'] : '';
+
                     $supplies_sql = "SELECT COUNT(*) as total FROM products WHERE type='Supplies'";
                     $supplies_result = $conn->query($supplies_sql);
                     $supplies_total = $supplies_result->fetch_assoc()['total'];
                     $supplies_total_pages = ceil($supplies_total / $items_per_page);
 
                     $supplies_sql = "SELECT p.*, 
-                                     CASE WHEN f.favorite = 1 THEN true ELSE false END as is_favorited
-                                     FROM products p 
-                                     LEFT JOIN favorites f ON p.id = f.product_id AND f.user_id = ?
-                                     WHERE p.type='Supplies'
-                                     LIMIT $items_per_page OFFSET $offset";
+                 CASE WHEN f.favorite = 1 THEN true ELSE false END as is_favorited
+                 FROM products p 
+                 LEFT JOIN favorites f ON p.id = f.product_id AND f.user_id = ?
+                 WHERE p.type='Supplies'";
+
+                    if (!empty($tag_filter)) {
+                        $supplies_sql .= " AND p.tags LIKE ?";
+                    }
+
+                    $supplies_sql .= " LIMIT $items_per_page OFFSET $offset";
+
 
                     $stmt = $conn->prepare($supplies_sql);
-                    $stmt->bind_param("i", $user['id']);
+                    if (!empty($tag_filter)) {
+                        $tag_param = "%$tag_filter%";
+                        $stmt->bind_param("is", $user['id'], $tag_param);
+                    } else {
+                        $stmt->bind_param("i", $user['id']);
+                    }
                     $stmt->execute();
                     $result = $stmt->get_result();
+
+                    
 
                     if ($result->num_rows > 0):
                         while ($row = $result->fetch_assoc()):
@@ -459,25 +489,25 @@ $search = $_GET['search'] ?? '';
                                             <p>&nbsp;</p>
                                         <?php endif; ?>
 
-                            <div class="badges">
-                                <?php
-                                // Display tags
-                                if (!empty($row['tags'])) {
-                                    $tags = explode(',', $row['tags']);
-                                    foreach ($tags as $tag) {
-                                        $tag = trim($tag);
-                                        $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
-                                        echo "<span class='badge {$tagClass}'>{$tag}</span>";
-                                    }
-                                }
-                                
-                                // Display type if available
-                                if (!empty($row['type'])) {
-                                    $typeClass = strtolower($row['type']) . '_badge';
-                                    echo "<span class='badge {$typeClass}'>{$row['type']}</span>";
-                                }
-                                ?>
-                            </div>
+                                        <div class="badges">
+                                            <?php
+                                            // Display tags
+                                            if (!empty($row['tags'])) {
+                                                $tags = explode(',', $row['tags']);
+                                                foreach ($tags as $tag) {
+                                                    $tag = trim($tag);
+                                                    $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
+                                                    echo "<span class='badge {$tagClass}'>{$tag}</span>";
+                                                }
+                                            }
+
+                                            // Display type if available
+                                            if (!empty($row['type'])) {
+                                                $typeClass = strtolower($row['type']) . '_badge';
+                                                echo "<span class='badge {$typeClass}'>{$row['type']}</span>";
+                                            }
+                                            ?>
+                                        </div>
 
                                         <div class="price">
                                             ₱<?= number_format($row['price'], 2) ?>
@@ -598,6 +628,44 @@ $search = $_GET['search'] ?? '';
                 });
         }
 
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterInputs = document.querySelectorAll('.supply-filter');
+
+            filterInputs.forEach(input => {
+                input.addEventListener('change', function () {
+                    if (this.checked) {
+                        const tag = this.value;
+                        let url = new URL(window.location.href);
+
+                        if (tag) {
+                            url.searchParams.set('tag', tag);
+                        } else {
+                            url.searchParams.delete('tag');
+                        }
+
+                        // Keep the page parameter if it exists
+                        const currentPage = url.searchParams.get('page');
+                        if (currentPage) {
+                            url.searchParams.set('page', '1'); // Reset to first page on filter
+                        }
+
+                        window.location.href = url.toString();
+                    }
+                });
+            });
+
+            // Check the appropriate radio button based on current filter
+            const currentTag = new URLSearchParams(window.location.search).get('tag');
+            if (currentTag) {
+                const radio = document.querySelector(`input[value="${currentTag}"]`);
+                if (radio) radio.checked = true;
+            } else {
+                document.getElementById('all').checked = true;
+            }
+        });
     </script>
 
 </body>
