@@ -365,48 +365,53 @@ $fullName = $user['student_fname'] . " " . $user['student_lname'];
         <div class="row g-4">
             <?php if ($favoriteResult->num_rows > 0): ?>
                 <?php while ($row = $favoriteResult->fetch_assoc()): ?>
-                    <div class="col-md-4 col-lg-3">
-                        <div class="product-card" onclick="location.href='product_details.php?id=<?= $row['id'] ?>'">
+                    <div class="col-md-4 col-lg-3 d-flex">
+                        <div class="product-card d-flex flex-column w-100" style="height:100%;" onclick="location.href='product_details.php?id=<?= $row['id'] ?>'">
 
                             <!-- Product Image -->
                             <img src="admin/<?= htmlspecialchars($row['image']) ?>"
                                 alt="<?= htmlspecialchars($row['product_name']) ?>">
 
                             <!-- Product Info -->
-                            <div class="product-info">
+                            <div class="product-info d-flex flex-column h-100">
                                 <h3><?= htmlspecialchars($row['product_name']) ?></h3>
                                 <?php
                                 $genders = trim($row['genders'] ?? '');
 
                                 if ($genders !== ''): ?>
-                                    <p>
+                                    <p class="mb-2">
                                         <?= htmlspecialchars($genders) ?>
                                     </p>
                                 <?php else: ?>
                                     <p>&nbsp;</p>
                                 <?php endif; ?>
-
-                                <div class="badges">
-                                    <?php
-                                   
-
-                                    // Display badges for tags if they exist
-                                    if (!empty($row['tags'])) {
-                                        $tags = explode(',', $row['tags']);
-                                        foreach ($tags as $tag): ?>
-                                            <span class="badge tag_badge">
-                                                <?= htmlspecialchars(ucfirst(trim($tag))) ?>
-                                            </span><br>
-                                        <?php endforeach;
-                                    } 
                                     
-                                     // Display badge for product type
+                                <div style="min-height:40px; display:flex; flex-wrap:wrap; align-items:flex-start;">
+                                    <?php
+                                    // Display tags if they exist
+                                        $tagCount = 0;
+                                        if (!empty($row['tags'])) {
+                                            $tags = explode(',', $row['tags']); // Split tags string into array
+                                            foreach ($tags as $tag) {
+                                                $tag = trim($tag); // Remove any whitespace
+                                                if (!empty($tag)) {
+                                                    $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
+                                                    echo "<span class='badge {$tagClass} me-1 mb-1 fw-normal'>" . htmlspecialchars($tag) . "</span> ";
+                                                    $tagCount++;
+                                                }
+                                            }
+                                        }
+
+                                        // Display badge for product type
                                     if (!empty($row['type'])): ?>
-                                        <span class="badge <?= strtolower($row['type']) ?>_badge" style="margin-top: 5px;">
+                                        <span class="badge <?= strtolower($row['type']) ?>_badge me-1 mb-1 fw-normal">
                                             <?= htmlspecialchars(ucfirst($row['type'])) ?>
                                         </span>
                                     <?php endif; ?>
                                 </div>
+
+                                <!-- Spacer to push price to bottom if few tags -->
+                                        <div style="flex-grow:1;"></div>
 
                                 <!-- Price Range -->
                                 <div class="price">
@@ -497,60 +502,87 @@ $fullName = $user['student_fname'] . " " . $user['student_lname'];
 
     <script>
 
-         function addToBasket(productId) {
+        function addToBasket(productId) {
             // Directly redirect to product details page
             window.location.href = `product_details.php?id=${productId}`;
         }
 
         function toggleFavorite(button, productId) {
             fetch('toggle_favorite.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productId
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const heartIcon = button.querySelector('i');
-                        if (data.isFavorite) {
-                            heartIcon.classList.remove('bi-heart');
-                            heartIcon.classList.add('bi-heart-fill');
-                            button.classList.add('active');
-                        } else {
-                            heartIcon.classList.remove('bi-heart-fill');
-                            heartIcon.classList.add('bi-heart');
-                            button.classList.remove('active');
-                            // Remove the product card from favorites page
-                            button.closest('.col-md-4').remove();
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                const heartIcon = button.querySelector('i');
+                if (data.isFavorite) {
+                    heartIcon.classList.remove('bi-heart');
+                    heartIcon.classList.add('bi-heart-fill');
+                    button.classList.add('active');
+                } else {
+                    heartIcon.classList.remove('bi-heart-fill');
+                    heartIcon.classList.add('bi-heart');
+                    button.classList.remove('active');
+                    // Remove the product card from favorites page
+                    button.closest('.col-md-4').remove();
 
-                            // Check if there are any products left
-                            const productsContainer = document.querySelector('.row.g-4');
-                            if (!productsContainer.children.length) {
-                                // Show empty state
-                                productsContainer.innerHTML = `
-                        <section class="text-center py-3 mb-5">
-                            <div class="container">
-                                <img src="./admin/images/favorites.png" alt="Empty Favorites" class="mb-4 fav-icon">
-                                <h4 class="title-text fw-bold mt-1">Your Favorites is empty.</h4>
-                                <p class="text-muted mb-5">Start shopping and find your new academic essentials.</p>
-                                <a href="shop_uniforms.php" class="custom-navy-btn text-decoration-none">Go to Shop</a>
-                            </div>
-                        </section>
-                    `;
-                            }
-                        }
-                    } else {
-                        alert(data.message || 'Failed to update favorite');
+                    // Show Bootstrap alert
+                    showFavoriteRemovedAlert();
+
+                    // Check if there are any products left
+                    const productsContainer = document.querySelector('.row.g-4');
+                    if (!productsContainer.children.length) {
+                    // Show empty state
+                    productsContainer.innerHTML = `
+                <section class="text-center py-3 mb-5">
+                    <div class="container">
+                    <img src="./admin/images/favorites.png" alt="Empty Favorites" class="mb-4 fav-icon">
+                    <h4 class="title-text fw-bold mt-1">Your Favorites is empty.</h4>
+                    <p class="text-muted mb-5">Start shopping and find your new academic essentials.</p>
+                    <a href="shop_uniforms.php" class="custom-navy-btn text-decoration-none">Go to Shop</a>
+                    </div>
+                </section>
+                `;
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating favorite');
-                });
+                }
+                } else {
+                alert(data.message || 'Failed to update favorite');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating favorite');
+            });
+        }
+
+        // Bootstrap 5.3.3 alert for favorite removal
+        function showFavoriteRemovedAlert() {
+            // Remove existing alert if present
+            const oldAlert = document.getElementById('favoriteRemovedAlert');
+            if (oldAlert) oldAlert.remove();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'favoriteRemovedAlert';
+            alertDiv.className = 'alert alert-warning alert-dismissible fade show position-fixed top-0 end-0 mt-3 me-3 shadow';
+            alertDiv.style.zIndex = '1055';
+            alertDiv.style.minWidth = '300px';
+            alertDiv.innerHTML = `<i class="bi bi-heart text-danger me-2"></i>
+            Item has been removed from your favorites.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Auto-dismiss after 2 seconds
+            setTimeout(() => {
+            const alertInstance = bootstrap.Alert.getOrCreateInstance(alertDiv);
+            alertInstance.close();
+            }, 2000);
         }
     </script>
 </body>

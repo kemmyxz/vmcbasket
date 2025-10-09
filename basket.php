@@ -437,28 +437,90 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
                 <script>
                 function removeItem(itemId) {
-                    if (confirm("Are you sure you want to remove this item from the basket?")) {
+                    // Create Bootstrap modal HTML if not exists
+                    let modal = document.getElementById('removeConfirmModal');
+                    if (!modal) {
+                        modal = document.createElement('div');
+                        modal.id = 'removeConfirmModal';
+                        modal.className = 'modal fade';
+                        modal.tabIndex = -1;
+                        modal.innerHTML = `
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">Remove Item</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to remove this item from the basket?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                    }
+
+                    // Show modal
+                    const bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+
+                    // Remove previous event listener if any
+                    const confirmBtn = document.getElementById('confirmRemoveBtn');
+                    confirmBtn.onclick = function () {
                         fetch('delete.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded'
                             },
-                            body: 'action=remove_item&id=' + itemId // Concatenate itemId correctly
+                            body: 'action=remove_item&id=' + itemId
                         })
                         .then(response => response.json())
                         .then(data => {
+                            bsModal.hide();
                             if (data.success) {
-                                alert('Item removed from basket!');
-                                window.location.reload();  // Reload the page to reflect changes
+                                showBootstrapAlert(' Item removed from basket!', 'success');
+                                setTimeout(() => window.location.reload(), 1200);
                             } else {
-                                alert('Failed to remove item: ' + (data.error || 'Unknown error.'));
+                                showBootstrapAlert('Failed to remove item: ' + (data.error || 'Unknown error.'), 'danger');
                             }
                         })
                         .catch(error => {
+                            bsModal.hide();
                             console.error('Error:', error);
-                            alert('Something went wrong.');
+                            showBootstrapAlert('Something went wrong.', 'danger');
                         });
-                    }
+                    };
+                }
+
+                // Bootstrap 5.3.3 alert helper
+                function showBootstrapAlert(message, type = 'success') {
+                    let alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 me-3 mt-3`;
+                    alertDiv.style.zIndex = '9999';
+                    alertDiv.role = 'alert';
+                    alertDiv.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">
+                            ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                                type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                                type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                                '<i class="bi bi-info-circle-fill text-info"></i>'}
+                            </span>
+                            <span>${message}</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                    document.body.appendChild(alertDiv);
+
+                    setTimeout(() => {
+                        alertDiv.classList.remove('show');
+                        alertDiv.classList.add('hide');
+                        setTimeout(() => alertDiv.remove(), 500);
+                    }, 3000);
                 }
             </script>
     
@@ -503,19 +565,19 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             let currentQuantity = parseInt(quantityElement.textContent);
             const maxQuantity = parseInt(quantityElement.dataset.max);
             const newQuantity = currentQuantity + increment;
-        
+
             // Check minimum quantity
             if (newQuantity <= 0) {
-                alert("Quantity can't be less than 1.");
+                showBootstrapAlert("Quantity can't be less than 1.", 'warning');
                 return;
             }
-        
+
             // Check maximum quantity
             if (newQuantity > maxQuantity) {
-                alert(`Maximum quantity allowed is ${maxQuantity}`);
+                showBootstrapAlert(`Maximum quantity allowed is ${maxQuantity}`, 'warning');
                 return;
             }
-        
+
             fetch('delete.php', {
                 method: 'POST',
                 headers: {
@@ -527,21 +589,49 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             .then(data => {
                 if (data.success) {
                     quantityElement.textContent = newQuantity;
-                    
+
                     // Update the checkbox data-quantity attribute
                     const checkbox = document.querySelector(`.basket-checkbox[data-id="${itemId}"]`);
                     if (checkbox) {
                         checkbox.dataset.quantity = newQuantity;
                         recalculateTotal(); // Recalculate the total after quantity update
                     }
+                    showBootstrapAlert('Quantity updated!', 'success');
                 } else {
-                    alert('Failed to update quantity: ' + (data.error || 'Unknown error.'));
+                    showBootstrapAlert('Failed to update quantity: ' + (data.error || 'Unknown error.'), 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Something went wrong.');
+                showBootstrapAlert('Something went wrong.', 'danger');
             });
+        }
+
+        // Bootstrap 5.3.3 alert helper
+        function showBootstrapAlert(message, type = 'success') {
+            let alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 me-3 mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <span class="me-2">
+                    ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                        type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                        type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                        '<i class="bi bi-info-circle-fill text-info"></i>'}
+                    </span>
+                    <span>${message}</span>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                alertDiv.classList.add('hide');
+                setTimeout(() => alertDiv.remove(), 500);
+            }, 3000);
         }
             </script>
             <!-- Footer Controls -->
@@ -552,41 +642,102 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 
             <script>
-                        function clearAllItems() {
-                // Get all checked checkboxes
-                const checkedItems = document.querySelectorAll('.basket-checkbox:checked');
-                
-                if (checkedItems.length === 0) {
-                    alert("Please select items to remove from the basket.");
-                    return;
+                function clearAllItems() {
+                    // Get all checked checkboxes
+                    const checkedItems = document.querySelectorAll('.basket-checkbox:checked');
+                    
+                    if (checkedItems.length === 0) {
+                        showBootstrapAlert("Please select items to remove from the basket.", 'warning');
+                        return;
+                    }
+
+                    // Create Bootstrap modal HTML if not exists
+                    let modal = document.getElementById('clearConfirmModal');
+                    if (!modal) {
+                        modal = document.createElement('div');
+                        modal.id = 'clearConfirmModal';
+                        modal.className = 'modal fade';
+                        modal.tabIndex = -1;
+                        modal.innerHTML = `
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">Remove Selected Items</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to remove the selected items from the basket?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-danger" id="confirmClearBtn">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                    }
+
+                    // Show modal
+                    const bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+
+                    // Remove previous event listener if any
+                    const confirmBtn = document.getElementById('confirmClearBtn');
+                    confirmBtn.onclick = function () {
+                        const itemIds = Array.from(checkedItems).map(checkbox => checkbox.dataset.id);
+
+                        fetch('delete.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `action=clear_selected&ids=${JSON.stringify(itemIds)}`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            bsModal.hide();
+                            if (data.success) {
+                                showBootstrapAlert('Selected items removed from basket!', 'success');
+                                setTimeout(() => window.location.reload(), 1200);
+                            } else {
+                                showBootstrapAlert('Failed to clear selected items: ' + (data.error || 'Unknown error.'), 'danger');
+                            }
+                        })
+                        .catch(error => {
+                            bsModal.hide();
+                            console.error('Error:', error);
+                            showBootstrapAlert('Something went wrong.', 'danger');
+                        });
+                    };
                 }
-            
-                if (confirm("Are you sure you want to remove the selected items from the basket?")) {
-                    // Get all checked item IDs
-                    const itemIds = Array.from(checkedItems).map(checkbox => checkbox.dataset.id);
-            
-                    fetch('delete.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `action=clear_selected&ids=${JSON.stringify(itemIds)}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Selected items removed from basket!');
-                            window.location.reload();  // Reload the page to reflect changes
-                        } else {
-                            alert('Failed to clear selected items: ' + (data.error || 'Unknown error.'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Something went wrong.');
-                    });
+
+                // Bootstrap 5.3.3 alert helper
+                function showBootstrapAlert(message, type = 'success') {
+                    let alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 me-3 mt-3`;
+                    alertDiv.style.zIndex = '9999';
+                    alertDiv.role = 'alert';
+                    alertDiv.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">
+                            ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                                type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                                type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                                '<i class="bi bi-info-circle-fill text-info"></i>'}
+                            </span>
+                            <span>${message}</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                    document.body.appendChild(alertDiv);
+
+                    setTimeout(() => {
+                        alertDiv.classList.remove('show');
+                        alertDiv.classList.add('hide');
+                        setTimeout(() => alertDiv.remove(), 500);
+                    }, 3000);
                 }
-            }
             </script>
             </div>
         </div>
@@ -621,44 +772,24 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
             <script>
             function placeOrder() {
-                if (!confirm('Are you sure you want to place the order?')) return;
-            
                 // collect all checked items
-                const checked = Array.from(
-                    document.querySelectorAll('.basket-checkbox:checked')
-                );
-                
+                const checked = Array.from(document.querySelectorAll('.basket-checkbox:checked'));
                 if (checked.length === 0) {
-                    alert('Please select at least one item to order.');
+                    showBootstrapAlert('Please select at least one item to order.', 'warning');
                     return;
                 }
-            
+
                 // Validate quantities
                 for (const box of checked) {
                     const id = box.dataset.id;
                     const qty = parseInt(document.getElementById(`quantity-${id}`).textContent);
                     const max = parseInt(document.getElementById(`quantity-${id}`).dataset.max);
-                    
                     if (qty > max) {
-                        alert(`Maximum quantity allowed for an item is ${max}`);
+                        showBootstrapAlert(`Maximum quantity allowed for an item is ${max}`, 'warning');
                         return;
                     }
                 }
-            
-                const itemCount = checked.length;
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'get_item_count.php';
-            
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'item_count';
-                input.value = itemCount;
-            
-                form.appendChild(input);
-                document.body.appendChild(form);
-                form.submit();
-            
+
                 // build up POST params
                 const params = new URLSearchParams();
                 checked.forEach(box => {
@@ -669,8 +800,7 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     params.append(`size[${id}]`, size);
                     params.append(`quantity[${id}]`, qty);
                 });
-            
-                // send to your new place_orders.php
+
                 fetch('place_order.php', {
                     method: 'POST',
                     body: params
@@ -678,17 +808,44 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 .then(r => r.json())
                 .then(js => {
                     if (js.success) {
-                        window.location.href = 'proceed_order.php';
+                        showBootstrapAlert('Processing your Order', 'success');
+                        setTimeout(() => window.location.href = 'proceed_order.php', 1200);
                     } else {
-                        alert('Failed to place order: ' + (js.error || 'Unknown error'));
+                        showBootstrapAlert('Failed to place order: ' + (js.error || 'Unknown error'), 'danger');
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert('Something went wrong when placing your order.');
+                    showBootstrapAlert('Something went wrong when placing your order.', 'danger');
                 });
-            }            
-            
+            }
+
+            // Bootstrap 5.3.3 alert helper
+            function showBootstrapAlert(message, type = 'success') {
+                let alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 me-3 mt-3`;
+                alertDiv.style.zIndex = '9999';
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">
+                        ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                            type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                            type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                            '<i class="bi bi-info-circle-fill text-info"></i>'}
+                        </span>
+                        <span>${message}</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                document.body.appendChild(alertDiv);
+
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    alertDiv.classList.add('hide');
+                    setTimeout(() => alertDiv.remove(), 500);
+                }, 3000);
+            }
             </script>
             </div>
         </div>

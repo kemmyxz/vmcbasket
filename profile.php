@@ -6,7 +6,7 @@ if (!isset($_SESSION['student_no'])) {
     header("Location: login.php"); // or an appropriate redirect
     exit();
 }
-// Get user info
+ // Get user info
 $student_no = $_SESSION['student_no'];
 $sql = "SELECT * FROM users WHERE student_no = ?";
 $stmt = $conn->prepare($sql);
@@ -19,16 +19,21 @@ $user = $result->fetch_assoc();
 $profilePic = $user['photo'];
 $fullName = $user['student_fname'] . " " . $user['student_lname'];
 
+// Bootstrap alert message logic
+$alertMessage = '';
+$alertType = 'success';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $birthday = $_POST['birthday'];
     $year_level = $_POST['year_level'];
 
-
-
-
     // Handle new image upload
+    $photo = $user['photo']; // Default to current photo
+    $photoUpdated = false;
+    $photoAlert = '';
+
     if (isset($_FILES["profile_pic"]) && $_FILES["profile_pic"]['error'] == 0) {
         $target_dir = "admin/uploads/";
 
@@ -43,22 +48,106 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (move_uploaded_file($_FILES["profile_pic"]["tmp_name"], $target_file)) {
             $photo = $newImageName; // Save new image filename to DB
+            $photoUpdated = true;
+            $photoAlert = '<div><i class="bi bi-check-circle-fill text-success"></i> Profile picture updated.</div>';
+        } else {
+            $alertType = 'danger';
+            $photoAlert = '<div><i class="bi bi-x-circle-fill text-danger"></i> Failed to upload profile picture.</div>';
         }
     }
 
-    // Update user info
-    $update_sql = "UPDATE users SET email = ?, phone_number = ?, birthday = ?, year_level = ?, photo = ? WHERE student_no = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("ssssss", $email, $phone, $birthday, $year_level, $photo, $student_no);
-    $update_stmt->execute();
+    // Check if only photo was updated (no other field changed)
+    $fieldsChanged = (
+        $email !== $user['email'] ||
+        $phone !== $user['phone_number'] ||
+        $birthday !== $user['birthday'] ||
+        $year_level !== $user['year_level']
+    );
 
-    // Redirect with success message
-    echo "<script>
-  
-    alert('Profile updated successfully!'); window.location.href='profile.php';</script>";
+    if ($photoUpdated && !$fieldsChanged) {
+        // Only photo updated
+        $update_sql = "UPDATE users SET photo = ? WHERE student_no = ?";
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("ss", $photo, $student_no);
+        if ($update_stmt->execute()) {
+            $alertMessage = $photoAlert;
+            $alertType = 'success';
+
+            // Refresh user info for display without redirect
+            $sql = "SELECT * FROM users WHERE student_no = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $student_no);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $profilePic = $user['photo'];
+            $fullName = $user['student_fname'] . " " . $user['student_lname'];
+        } else {
+            $alertMessage = '<div><i class="bi bi-x-circle-fill text-danger"></i> Failed to update profile picture.</div>';
+            $alertType = 'danger';
+        }
+    } elseif ($fieldsChanged || $photoUpdated) {
+        // Other fields or photo updated
+        $update_sql = "UPDATE users SET email = ?, phone_number = ?, birthday = ?, year_level = ?, photo = ? WHERE student_no = ?";
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("ssssss", $email, $phone, $birthday, $year_level, $photo, $student_no);
+        if ($update_stmt->execute()) {
+            $alertMessage .= '<div><i class="bi bi-check-circle-fill text-success"></i> Profile information updated successfully!</div>';
+            $alertType = 'success';
+
+            // Refresh user info for display without redirect
+            $sql = "SELECT * FROM users WHERE student_no = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $student_no);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $profilePic = $user['photo'];
+            $fullName = $user['student_fname'] . " " . $user['student_lname'];
+        } else {
+            $alertMessage .= '<div><i class="bi bi-x-circle-fill text-danger"></i> Failed to update profile information.</div>';
+            $alertType = 'danger';
+        }
+    } else if ($_POST['birthday'] !== $user['birthday']) {
+        // If only birthday changed, still update
+        $update_sql = "UPDATE users SET birthday = ? WHERE student_no = ?";
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("ss", $birthday, $student_no);
+        if ($update_stmt->execute()) {
+            $alertMessage .= '<div><i class="bi bi-check-circle-fill text-success"></i> Birthday updated successfully!</div>';
+            $alertType = 'success';
+
+            // Refresh user info for display without redirect
+            $sql = "SELECT * FROM users WHERE student_no = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $student_no);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $profilePic = $user['photo'];
+            $fullName = $user['student_fname'] . " " . $user['student_lname'];
+        } else {
+            $alertMessage .= '<div><i class="bi bi-x-circle-fill text-danger"></i> Failed to update birthday.</div>';
+            $alertType = 'danger';
+        }
+    }
+
+    // Only show alert if something was updated
+    if ($alertMessage) {
+        echo "<div id='profileAlert' class='position-fixed top-0 end-0 p-3' style='z-index: 1055;'>
+            <div class='alert alert-$alertType alert-dismissible fade show shadow' role='alert'>
+                $alertMessage
+                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+            </div>
+        </div>
+        <script>
+            setTimeout(function() {
+                var alertEl = document.getElementById('profileAlert');
+                if (alertEl) alertEl.remove();
+            }, 2200);
+        </script>";
+    }
 }
-
-
 
 ?>
 
@@ -351,8 +440,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                 </div>
 
-                <div class="row mb-3 mb-2">
-                    <div class="col-md-6">
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-2">
                         <label class="form-label">Email</label>
                         <div class="input-group">
                             <input type="email" name="email" id="email" class="form-control"
@@ -360,7 +449,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button class="changebtn" type="button" onclick="enableEdit('email', this)">Change</button>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
                         <label class="form-label">Phone Number</label>
                         <div class="input-group">
                             <input type="text" id="phone" name="phone" class="form-control"
@@ -371,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-6 mb-2">
+                    <div class="col-md-12 mb-2">
                         <label class="form-label">Date of Birth</label>
                         <div class="input-group">
                             <input type="date" name="birthday" class="form-control"
@@ -379,7 +468,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button class="changebtn" type="button" onclick="enableEdit('dob', this)">Change</button>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-2">
+                </div>
+                <div class="row mb-3">
+                      <div class="col-md-12 mb-2">
                         <label class="form-label">Year-level</label>
                         <div class="input-group">
                             <input type="text" id="year" name="year_level" class="form-control"

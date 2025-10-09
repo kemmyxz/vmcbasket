@@ -305,13 +305,60 @@ require 'inc/config.php';
 
 
 <script>
+// Helper to show Bootstrap 5.3.3 alerts
+function showBootstrapAlert(message, type = 'success', timeout = 3000) {
+    // Remove existing alerts
+    document.querySelectorAll('.custom-bs-alert').forEach(el => el.remove());
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} custom-bs-alert position-fixed top-0 end-0 m-3 fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.style.zIndex = 9999;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    // Auto-dismiss after timeout
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+        alertDiv.classList.add('hide');
+        setTimeout(() => alertDiv.remove(), 500);
+    }, timeout);
+}
+
 // Delete review functionality
 document.querySelectorAll('.delete-review').forEach(button => {
     button.addEventListener('click', function() {
         const reviewId = this.getAttribute('data-review-id');
         const row = this.closest('tr');
-        
-        if(confirm('Are you sure you want to delete this review?')) {
+
+        // Create confirmation modal
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal fade';
+        modalDiv.tabIndex = -1;
+        modalDiv.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h4 class="modal-title">Confirm Delete</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this review?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        const bsModal = new bootstrap.Modal(modalDiv);
+        bsModal.show();
+
+        modalDiv.querySelector('#confirmDeleteBtn').addEventListener('click', function() {
             fetch('delete_review.php', {
                 method: 'POST',
                 headers: {
@@ -323,7 +370,7 @@ document.querySelectorAll('.delete-review').forEach(button => {
             .then(data => {
                 if(data.status === 'success') {
                     row.remove();
-                    alert('Review deleted successfully');
+                    showBootstrapAlert('Review deleted successfully', 'success');
                     // Renumber table rows
                     const rows = document.querySelectorAll('table tbody tr');
                     rows.forEach((tr, idx) => {
@@ -331,74 +378,116 @@ document.querySelectorAll('.delete-review').forEach(button => {
                         if(numCell) numCell.textContent = idx + 1;
                     });
                 } else {
-                    alert(data.message || 'Error deleting review');
+                    showBootstrapAlert(data.message || 'Error deleting review', 'danger');
                 }
+                bsModal.hide();
+                modalDiv.remove();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error deleting review: ' + error.message);
+                showBootstrapAlert('Error deleting review: ' + error.message, 'danger');
+                bsModal.hide();
+                modalDiv.remove();
             });
-        }
+        });
+
+        // Remove modal from DOM when closed
+        modalDiv.addEventListener('hidden.bs.modal', function () {
+            modalDiv.remove();
+        });
     });
 });
 
 // Delete all reviews functionality
-document.getElementById('deleteAllBtn').addEventListener('click', function() {
-    if(confirm('Are you sure you want to delete ALL reviews? This action cannot be undone.')) {
-        fetch('delete_all_reviews.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.status === 'success') {
-                // Remove all rows from the table
-                const tbody = document.querySelector('table tbody');
-                tbody.innerHTML = '';
-                alert('All reviews deleted successfully');
-            } else {
-                alert(data.message || 'Error deleting all reviews');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error deleting all reviews: ' + error.message);
-        });
-    }
-});
+const deleteAllBtn = document.getElementById('deleteAllBtn');
+if (deleteAllBtn) {
+    deleteAllBtn.addEventListener('click', function() {
+        if(confirm('Are you sure you want to delete ALL reviews? This action cannot be undone.')) {
+            fetch('delete_all_reviews.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    // Remove all rows from the table
+                    const tbody = document.querySelector('table tbody');
+                    tbody.innerHTML = '';
+                    showBootstrapAlert('All reviews deleted successfully', 'success');
+                } else {
+                    showBootstrapAlert(data.message || 'Error deleting all reviews', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showBootstrapAlert('Error deleting all reviews: ' + error.message, 'danger');
+            });
+        }
+    });
+}
 </script>
 
 <script>
 //Multiple delete functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectAll = document.getElementById('selectAllProducts');
-        const checkboxes = document.querySelectorAll('.product-checkbox');
-        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
-        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('selectAllProducts');
+    const checkboxes = document.querySelectorAll('.product-checkbox');
+    const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
 
-        // Select/Deselect all checkboxes
-        selectAll.addEventListener('change', function() {
+    // Select/Deselect all checkboxes
+    selectAll.addEventListener('change', function() {
         checkboxes.forEach(cb => cb.checked = selectAll.checked);
         toggleBulkDelete();
-        });
+    });
 
-        // If any checkbox is changed, update selectAll and bulk delete button
-        checkboxes.forEach(cb => {
+    // If any checkbox is changed, update selectAll and bulk delete button
+    checkboxes.forEach(cb => {
         cb.addEventListener('change', function() {
             selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
             toggleBulkDelete();
         });
-        });
+    });
 
-        function toggleBulkDelete() {
+    function toggleBulkDelete() {
         const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
         bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
-        }
+    }
 
-        // Example: Bulk delete action (replace with your AJAX or form submit)
-        bulkDeleteBtn.addEventListener('click', function() {
+    // Helper to get icon HTML based on alert type
+    function getAlertIcon(type) {
+        switch(type) {
+            case 'success': return '<i class="bi bi-check-circle-fill me-2"></i>';
+            case 'danger':  return '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+            case 'warning': return '<i class="bi bi-exclamation-circle-fill me-2"></i>';
+            case 'info':    return '<i class="bi bi-info-circle-fill me-2"></i>';
+            default:        return '';
+        }
+    }
+
+    // Override showBootstrapAlert to include icon
+    window.showBootstrapAlert = function(message, type = 'success', timeout = 3000) {
+        document.querySelectorAll('.custom-bs-alert').forEach(el => el.remove());
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} custom-bs-alert position-fixed top-0 end-0 m-3 fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.style.zIndex = 9999;
+        alertDiv.innerHTML = `
+            ${getAlertIcon(type)}${message}
+            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            alertDiv.classList.add('hide');
+            setTimeout(() => alertDiv.remove(), 500);
+        }, timeout);
+    };
+
+    // Bulk delete action with modal confirmation
+     bulkDeleteBtn.addEventListener('click', function() {
         const selectedIds = Array.from(checkboxes)
             .filter(cb => cb.checked)
             .map(cb => cb.value);
@@ -407,8 +496,8 @@ document.getElementById('deleteAllBtn').addEventListener('click', function() {
             // TODO: Send selectedIds to server for deletion (AJAX or form)
             alert('Selected IDs: ' + selectedIds.join(', '));
         }
-        });
-    });
+     });
+});
 
     // Photo Viewer Modal (single initialization)
     let currentImages = [];

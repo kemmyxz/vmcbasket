@@ -16,6 +16,9 @@ header {
   font-family: "Montserrat", sans-serif;
 }
 
+.navy-text {
+  color: #26387d;
+}
 .highlight-pink {
   background-color: #ffc0c4;
   padding: 0.3rem 1rem;
@@ -165,7 +168,6 @@ header {
   background: #fff;
   position: relative;
   transition: 0.3s;
-  cursor: pointer;
 }
 .product-card:hover {
   transform: translateY(-5px);
@@ -658,7 +660,7 @@ footer {
   padding: 5px 8px;
   border-radius: 8px;
   display: inline-block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   text-align: center;
   box-shadow: 0 2px 6px rgba(7, 148, 0, 0.08);
@@ -680,18 +682,14 @@ footer {
   color: #000;
 }
 .supplies_badge {
-  background-color: #de16d0;
+  background-color: #dde1f1;
   color: #000;
 }
-.school_merchandise_badge {
-  background-color: #17a2b8;
-  color: white;
-}
-.tag_badge {
+.pre_school_badge {
   background-color: #abf3a8;
   color: #000;
 }
-.kinder_badge {
+.kindergarten_badge {
   background-color: #a8eef3;
   color: #000;
 }
@@ -699,35 +697,39 @@ footer {
   background-color: #ffed98;
   color: #000;
 }
-.jhs_badge {
+.junior_high_school_badge {
   background-color: #ff9e5e;
   color: #000;
 }
-.shs_badge {
+.senior_high_school_badge {
   background-color: #ffbff1;
   color: #000;
 }
-.bstm_badge {
+.bs_tourism_management_badge {
   background-color: #ddafaf;
   color: #000;
 }
-.bsis_badge {
+.bs_information_system_badge {
   background-color: #baaafa;
   color: #000;
 }
-.bhrm_badge {
+.bs_hotel_and_restaurant_management_badge {
   background-color: #94d6cc;
   color: #000;
 }
-.secondary_badge {
+.bs_secondary_education_badge {
   background-color: #96b7ff;
   color: #000;
 }
-.educ_badge {
+.bs_elementary_education_badge {
   background-color: #e18cf8;
   color: #000;
 }
-.crim_badge {
+.bs_business_administration_badge {
+  background-color: #e88a8b;
+  color: #000;
+}
+.criminology_badge {
   background-color: #d2d2d2;
   color: #000;
 }
@@ -740,8 +742,13 @@ footer {
   background-color: #bfcaff;
   color: #000;
 }
+.tag_badge,
 .art_supplies_badge {
   background-color: #ecbfff;
+  color: #000;
+}
+.school_merchandise_badge {
+  background-color: #ede9a4;
   color: #000;
 }
 

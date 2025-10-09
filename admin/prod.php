@@ -303,7 +303,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                     <div class="alert alert-success alert-dismissible fade show position-fixed m-3 p-3 d-flex align-items-center"
                         role="alert"
                         id="successAlert"
-                        style="width:350px; bottom: 0; right: 0; z-index: 1055;">
+                        style="width:350px; top: 0; right: 0; z-index: 1055;">
                         <i class="bi bi-check-circle-fill me-2" style="font-size: 1.3rem;"></i>
                         Product added successfully!
                         <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -325,13 +325,13 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                     <div class="alert alert-danger alert-dismissible show position-fixed m-3 p-3 d-flex align-items-center" 
                         role="alert" 
                         id="statusAlert"
-                        style="width:400px; bottom: 0; right: 0; z-index: 1055;">
+                        style="width:400px; top: 0; right: 0; z-index: 1055;">
                         <i class="bi bi-x-circle-fill me-2" style="font-size: 1.3rem;"></i>
                         ' . htmlspecialchars($message) . '
                     </div>';
                 }
             ?>
-            <div id="alertContainer" class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1055; width: 90%; max-width: 600px;"></div>
+            <div id="alertContainer" class="position-fixed top-0 end-0 mt-3 me-3" style="z-index: 1055; width: 90%; max-width: 600px;"></div>
 
             <!-- Delete Confirmation Modal -->
             <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
@@ -353,7 +353,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             </div>
 
             <!-- Title Page and Search -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
 
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
@@ -448,6 +448,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                                     ['id' => 'tagSeniorHigh', 'value' => 'Senior High School', 'badge' => 'shs_badge', 'label' => 'Senior High School', 'badgeId' => 'badgeSHS'],
                                                     ['id' => 'tagTourism', 'value' => 'BS Tourism Management', 'badge' => 'bstm_badge', 'label' => 'BS Tourism Management', 'badgeId' => 'badgeTM'],
                                                     ['id' => 'tagBSIS', 'value' => 'BS Information System', 'badge' => 'bsis_badge', 'label' => 'BS Information System', 'badgeId' => 'badgeBSIS'],
+                                                    ['id' => 'tagBSBA', 'value' => 'BS Business Administration', 'badge' => 'bsba_badge', 'label' => 'BS Business Administration', 'badgeId' => 'badgeBSBA'],
                                                     ['id' => 'tagBHRM', 'value' => 'BS Hotel and Restaurant Management', 'badge' => 'bhrm_badge', 'label' => 'BS Hotel and Restaurant Management', 'badgeId' => 'badgeBHRM'],
                                                     ['id' => 'tagSecondary', 'value' => 'BS Secondary Education', 'badge' => 'secondary_badge', 'label' => 'BS Secondary Education', 'badgeId' => 'badgeSecondary'],
                                                     ['id' => 'tagEduc', 'value' => 'BS Elementary Education', 'badge' => 'educ_badge', 'label' => 'BS Elementary Education', 'badgeId' => 'badgeEduc'],
@@ -555,25 +556,23 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                             <div class="row" id="gendersContainer">
                                                 <div class="col-md-4">
                                                     <div class="form-check">
-                                                        <input class="form-check-input styled-checkbox" type="checkbox"
+                                                        <input class="form-check-input styled-checkbox" type="radio"
                                                             name="genders[]" value="Male" id="genderMale">
                                                         <label class="form-check-label" for="genderMale">Male</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-check">
-                                                        <input class="form-check-input styled-checkbox" type="checkbox"
+                                                        <input class="form-check-input styled-checkbox" type="radio"
                                                             name="genders[]" value="Female" id="genderFemale">
-                                                        <label class="form-check-label"
-                                                            for="genderFemale">Female</label>
+                                                        <label class="form-check-label" for="genderFemale">Female</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-check">
-                                                        <input class="form-check-input styled-checkbox" type="checkbox"
+                                                        <input class="form-check-input styled-checkbox" type="radio"
                                                             name="genders[]" value="Unisex" id="genderUnisex">
-                                                        <label class="form-check-label"
-                                                            for="genderUnisex">Unisex</label>
+                                                        <label class="form-check-label" for="genderUnisex">Unisex</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -707,9 +706,9 @@ $total_products = $total_products_result->fetch_assoc()['total'];
 
                                         <td>
                                             <?php if ($row['type_name'] === 'Uniform'): ?>
-                                                <span class="badge bg-primary"><?= htmlspecialchars($row['type_name']); ?></span>
+                                                <span class="badge uniform_badge"><?= htmlspecialchars($row['type_name']); ?></span>
                                             <?php else: ?>
-                                                <span class="badge bg-success"><?= htmlspecialchars($row['type_name']); ?></span>
+                                                <span class="badge supplies_badge"><?= htmlspecialchars($row['type_name']); ?></span>
                                             <?php endif; ?>
                                         </td>
 
@@ -1141,7 +1140,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
 
                         // Stock/variant information
                         const variantsContainer = document.getElementById('productVariants');
-                        if (data.variants) {
+                        if (data.variants && data.variants.trim() !== '') {
                             variantsContainer.innerHTML = `${data.variants}<br><strong>Total: ${data.totalStock} pcs</strong>`;
                         } else {
                             variantsContainer.innerHTML = `<strong>Total: ${data.totalStock} pcs</strong>`;
@@ -1280,32 +1279,34 @@ $total_products = $total_products_result->fetch_assoc()['total'];
         confirmDeleteBtn.addEventListener('click', () => {
             deleteModal.hide();
             if (!deleteData) return;
-    
+
             const url = 'delete_product.php';
             const bodyData = deleteData.type === 'bulk' ? { ids: deleteData.ids } : { id: deleteData.id };
-    
+
             fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyData)
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bodyData)
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    showAlert(deleteData.type === 'bulk' 
-                        ? 'Selected products deleted successfully!' 
-                        : 'Product deleted successfully!');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showAlert('Error deleting product(s): ' + (data.message || 'Unknown error'), 'danger');
-                }
+            if (data.success) {
+                showAlert(
+                `<i class="bi bi-check-circle-fill me-2" style="font-size: 1.3rem;"></i>` +
+                (deleteData.type === 'bulk'
+                    ? 'Selected products deleted successfully!'
+                    : 'Product deleted successfully!')
+                );
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert('Error deleting product(s): ' + (data.message || 'Unknown error'), 'danger');
+            }
             })
             .catch(err => {
-                console.error('Error:', err);
-                showAlert('An error occurred while deleting product(s)', 'danger');
+            console.error('Error:', err);
+            showAlert('An error occurred while deleting product(s)', 'danger');
             });
         });
-    
         // Alert function
         function showAlert(message, type = 'success') {
             const wrapper = document.createElement('div');
@@ -1321,82 +1322,112 @@ $total_products = $total_products_result->fetch_assoc()['total'];
             }, 3000);
         }
     });
-        // Add Product Form Validation
+        // Add Product Form Validation with Bootstrap Alerts
         document.addEventListener('DOMContentLoaded', function () {
             const addProductForm = document.querySelector('#addProductModal form');
+            const modalBody = addProductForm.closest('.modal-content').querySelector('.modal-body');
+
+            // Helper to show Bootstrap alert in modal
+            function showFormAlert(message, type = 'danger') {
+            // Remove previous alert
+            const prevAlert = modalBody.querySelector('.form-validation-alert');
+            if (prevAlert) prevAlert.remove();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} form-validation-alert alert-dismissible fade show`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            modalBody.insertBefore(alertDiv, modalBody.firstChild);
+
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                alertDiv.classList.remove('show');
+                alertDiv.classList.add('hide');
+                setTimeout(() => alertDiv.remove(), 500);
+                }
+            }, 4000);
+            }
 
             addProductForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+            e.preventDefault();
 
-                // Basic validation
-                const requiredFields = ['product_name', 'dr_number', 'price', 'type', 'max_quantity'];
-                let isValid = true;
+            // Remove previous alert
+            const prevAlert = modalBody.querySelector('.form-validation-alert');
+            if (prevAlert) prevAlert.remove();
 
-                requiredFields.forEach(field => {
-                    const input = this.querySelector(`[name="${field}"]`);
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        input.classList.add('is-invalid');
-                    } else {
-                        input.classList.remove('is-invalid');
-                    }
+            // Basic validation
+            const requiredFields = ['product_name', 'dr_number', 'price', 'type', 'max_quantity'];
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                const input = this.querySelector(`[name="${field}"]`);
+                if (!input.value.trim()) {
+                isValid = false;
+                input.classList.add('is-invalid');
+                } else {
+                input.classList.remove('is-invalid');
+                }
+            });
+
+            // Validate tags
+            const type = this.querySelector('#productType').value;
+            const uniformTags = document.querySelectorAll('.uniform-tag-checkbox:checked');
+            const suppliesTags = document.querySelectorAll('.supplies-tag-checkbox:checked');
+
+            if (type === '1' && uniformTags.length === 0) {
+                isValid = false;
+                showFormAlert('Please select at least one uniform tag.');
+                return;
+            }
+
+            if (type === '2' && suppliesTags.length === 0) {
+                isValid = false;
+                showFormAlert('Please select at least one supplies tag.');
+                return;
+            }
+
+            // Validate stocks
+            if (type === '1') {
+                const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
+                const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
+
+                if (selectedSizes.length === 0 || selectedGenders.length === 0) {
+                isValid = false;
+                showFormAlert('Please select at least one size and gender for uniforms.');
+                return;
+                }
+
+                // Check if at least one stock quantity is entered
+                const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
+                let hasStock = false;
+                stockInputs.forEach(input => {
+                if (parseInt(input.value) > 0) {
+                    hasStock = true;
+                }
                 });
 
-                // Validate tags
-                const type = this.querySelector('#productType').value;
-                const uniformTags = document.querySelectorAll('.uniform-tag-checkbox:checked');
-                const suppliesTags = document.querySelectorAll('.supplies-tag-checkbox:checked');
-
-                if (type === '1' && uniformTags.length === 0) {
-                    isValid = false;
-                    alert('Please select at least one uniform tag');
-                    return;
+                if (!hasStock) {
+                isValid = false;
+                showFormAlert('Please enter stock quantity for at least one size-gender combination.');
+                return;
                 }
-
-                if (type === '2' && suppliesTags.length === 0) {
-                    isValid = false;
-                    alert('Please select at least one supplies tag');
-                    return;
+            } else {
+                const totalStock = document.querySelector('input[name="stocks[total]"]');
+                if (!totalStock || parseInt(totalStock.value) <= 0) {
+                isValid = false;
+                showFormAlert('Please enter a valid stock quantity.');
+                return;
                 }
+            }
 
-                // Validate stocks
-                if (type === '1') {
-                    const selectedSizes = Array.from(document.querySelectorAll('input[name="sizes[]"]:checked')).map(input => input.value);
-                    const selectedGenders = Array.from(document.querySelectorAll('input[name="genders[]"]:checked')).map(input => input.value);
-
-                    if (selectedSizes.length === 0 || selectedGenders.length === 0) {
-                        isValid = false;
-                        alert('Please select at least one size and gender for uniforms');
-                        return;
-                    }
-
-                    // Check if at least one stock quantity is entered
-                    const stockInputs = document.querySelectorAll('#stocksContainer input[type="number"]');
-                    let hasStock = false;
-                    stockInputs.forEach(input => {
-                        if (parseInt(input.value) > 0) {
-                            hasStock = true;
-                        }
-                    });
-
-                    if (!hasStock) {
-                        isValid = false;
-                        alert('Please enter stock quantity for at least one size-gender combination');
-                        return;
-                    }
-                } else {
-                    const totalStock = document.querySelector('input[name="stocks[total]"]');
-                    if (!totalStock || parseInt(totalStock.value) <= 0) {
-                        isValid = false;
-                        alert('Please enter a valid stock quantity');
-                        return;
-                    }
-                }
-
-                // Submit form if valid
-                if (isValid) {
-                    this.submit();
-                }
+            // Submit form if valid
+            if (isValid) {
+                this.submit();
+            }
             });
         });
 

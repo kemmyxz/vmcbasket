@@ -344,6 +344,10 @@ strong {
   background-color: #e18cf8;
   color: #000;
 }
+.bsba_badge {
+  background-color: #e88a8b;
+  color: #000;
+}
 .crim_badge {
   background-color: #d2d2d2;
   color: #000;
@@ -359,6 +363,10 @@ strong {
 }
 .art_badge {
   background-color: #ecbfff;
+  color: #000;
+}
+.merch_badge {
+  background-color: #ede9a4;
   color: #000;
 }
 /*For Forms*/
@@ -426,6 +434,7 @@ input[type="number"] {
   font-weight: 600;
   padding: 10px 20px;
   color: white;
+  text-decoration: none;
   transition: background-color 0.3s;
 }
 
@@ -599,6 +608,15 @@ input[type="number"] {
 .chat-avatar {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(44, 62, 145, 0.12);
+}
+
+.chat-profile {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
   display: inline-block;

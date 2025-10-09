@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VMC Basket - Admin/Products</title>
+    <title>VMC Basket - Admin/Chats</title>
     <?php include 'links.php'; ?>
     <style>
         @media (max-width: 768px) {
@@ -240,7 +240,7 @@ ORDER BY
                                         </div>
                                         <div>
                                             <h6 class="mb-0" id="headerUserName">Select a chat</h6>
-                                            <small class="text-muted" id="headerUserDetails">-</small>
+                                            <small class="text-white" id="headerUserDetails">-</small>
                                         </div>
                                     </div>
                                 </div>
@@ -262,7 +262,7 @@ ORDER BY
                                             </div>
                                             <div class="modal-body text-center">
                                                 <img id="modalUserImage" src="./images/profile_pic.png"
-                                                    class="chat-avatar mb-3" alt="Profile Picture">
+                                                    class="chat-profile mb-3" alt="Profile Picture">
                                                 <h4 class="mb-1" id="modalUserName">Select a student</h4>
                                                 <p class="mb-1"><strong>School ID:</strong> <span
                                                         id="modalStudentId">-</span></p>
@@ -652,7 +652,7 @@ ORDER BY
                                     </div>
                                     ${isAdmin ? `
                                         <div class="ms-2">
-                                            <img src="./images/profile_pic.png" 
+                                            <img src="./images/VMC School Logo.png" 
                                                  class="chat-avatar" alt="Admin Profile">
                                         </div>
                                     ` : ''}

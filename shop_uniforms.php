@@ -142,7 +142,7 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
         }
 
         .margin-top {
-            margin-top: 100px;
+            margin-top: 80px;
         }
 
         @media (max-width: 991.98px) {
@@ -406,7 +406,7 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
     </div>
 
     <!--Content -->
-    <div class="container-fluid p-lg-5 p-md-3 p-5 margin-top">
+    <div class="container-fluid p-lg-5 p-md-3 margin-top">
         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
             aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -703,11 +703,11 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
                     if ($result->num_rows > 0):
                         while ($row = $result->fetch_assoc()):
                             ?>
-                            <div class="col-md-4 col-lg-3">
-                                <div class="product-card" onclick="location.href='product_details.php?id=<?= $row['id'] ?>'">
+                            <div class="col-md-4 col-lg-3 d-flex">
+                                <div class="product-card d-flex flex-column w-100" style="height:100%;" onclick="location.href='product_details.php?id=<?= $row['id'] ?>'">
                                     <img src="admin/<?= htmlspecialchars($row['image']) ?>"
                                         alt="<?= htmlspecialchars($row['product_name']) ?>">
-                                    <div class="product-info">
+                                    <div class="product-info d-flex flex-column h-100">
                                         <h3><?= htmlspecialchars($row['product_name']) ?></h3>
                                         <?php if (!empty($row['genders'])): ?>
                                             <p class="mb-1">
@@ -715,7 +715,7 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
                                                 $genders = explode(',', $row['genders']);
                                                 $genders = array_filter($genders); // Remove empty values
                                                 $genders = array_unique($genders); // Remove duplicates
-                                    
+
                                                 if (count($genders) > 0) {
                                                     // Sort genders with Unisex last if present
                                                     usort($genders, function ($a, $b) {
@@ -739,26 +739,41 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
                                         <?php endif; ?>
 
 
-                                        <div class="badges">
+                                        <div class="badges" style="min-height:40px; display:flex; flex-wrap:wrap; align-items:flex-start;">
                                             <?php
                                             // Display tags if they exist
+                                            $tagCount = 0;
                                             if (!empty($row['tags'])) {
                                                 $tags = explode(',', $row['tags']); // Split tags string into array
                                                 foreach ($tags as $tag) {
                                                     $tag = trim($tag); // Remove any whitespace
                                                     if (!empty($tag)) {
-                                                        echo '<span class="badge tag_badge">' . htmlspecialchars($tag) . '</span><br>';
+                                                        $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
+                                                        echo "<span class='badge {$tagClass} me-1 mb-1'>" . htmlspecialchars($tag) . "</span> ";
+                                                        $tagCount++;
                                                     }
                                                 }
                                             }
 
                                             // Display product type
                                             if (!empty($row['type'])) {
-                                                echo '<span class="badge uniform_badge" style="margin-top: 5px;">' . htmlspecialchars($row['type']) . '</span>';
+                                                echo '<span class="badge uniform_badge me-1 mb-1">' . htmlspecialchars($row['type']) . '</span>';
+                                                $tagCount++;
                                             }
+
+                                            /*Add empty badges to pad height if tagCount < 3 (adjust as needed)
+                                            $minTags = 3;
+                                            if ($tagCount < $minTags) {
+                                                for ($i = $tagCount; $i < $minTags; $i++) {
+                                                    echo "<span class='badge invisible me-1 mb-1'>&nbsp;</span> ";
+                                                }
+                                            }*/
                                             ?>
                                         </div>
 
+                                        <!-- Spacer to push price to bottom if few tags -->
+                                        <div style="flex-grow:1;"></div>
+                                        
                                         <div class="price">
                                             ₱<?= number_format($row['price'], 2) ?>
                                         </div>
@@ -810,7 +825,6 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
                 </div>
             </section>
         </div>
-    </div>
     </div>
 
 
@@ -880,38 +894,81 @@ $uniforms_total_pages = ceil($uniforms_total / $items_per_page);
            window.location.href = `product_details.php?id=${productId}`;
         }
 
+        // Bootstrap 5.3.3 alert for favorites with icons
+        function showFavoriteAlert(message, type = 'success') {
+            // Remove any existing alert
+            const existingAlert = document.getElementById('favoriteAlert');
+            if (existingAlert) existingAlert.remove();
+
+            // Choose icon based on type
+            let iconHtml = '';
+            switch (type) {
+            case 'success':
+                iconHtml = '<i class="bi bi-heart-fill text-danger me-2"></i>';
+                break;
+            case 'warning':
+                iconHtml = '<i class="bi bi-heart text-danger me-2"></i>';
+                break;
+            case 'danger':
+                iconHtml = '<i class="bi bi-x-circle-fill text-danger me-2"></i>';
+                break;
+            default:
+                iconHtml = '';
+            }
+
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'favoriteAlert';
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 me-3 mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '250px';
+            alertDiv.innerHTML = `
+            ${iconHtml}${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Auto-dismiss after 2 seconds
+            setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertDiv);
+            bsAlert.close();
+            }, 2000);
+        }
+
         // Toggle favorite function
         function toggleFavorite(button, productId) {
             fetch('toggle_favorite.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productId
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const heartIcon = button.querySelector('i');
-                        if (data.isFavorite) {
-                            heartIcon.classList.remove('bi-heart');
-                            heartIcon.classList.add('bi-heart-fill');
-                            button.classList.add('active');
-                        } else {
-                            heartIcon.classList.remove('bi-heart-fill');
-                            heartIcon.classList.add('bi-heart');
-                            button.classList.remove('active');
-                        }
-                    } else {
-                        alert(data.message || 'Failed to update favorite');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating favorite');
-                });
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                const heartIcon = button.querySelector('i');
+                if (data.isFavorite) {
+                heartIcon.classList.remove('bi-heart');
+                heartIcon.classList.add('bi-heart-fill');
+                button.classList.add('active');
+                showFavoriteAlert('Added to favorites!', 'success');
+                } else {
+                heartIcon.classList.remove('bi-heart-fill');
+                heartIcon.classList.add('bi-heart');
+                button.classList.remove('active');
+                showFavoriteAlert('Removed from favorites.', 'warning');
+                }
+            } else {
+                showFavoriteAlert(data.message || 'Failed to update favorite', 'danger');
+            }
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            showFavoriteAlert('An error occurred while updating favorite', 'danger');
+            });
         }
     </script>
 </body>

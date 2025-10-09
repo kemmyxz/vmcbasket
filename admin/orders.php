@@ -660,30 +660,96 @@ $calendarEvents = getCalendarEvents();
       });
   });
   
-  function updateToPickup(receiptId) {
-      if (confirm('Are you sure you want to mark this order as ready for pickup?')) {
-          fetch('update_order_status.php', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: 'receipt_id=' + encodeURIComponent(receiptId) + '&action=topickup'
-          })
-          .then(response => response.json())
-          .then(data => {  
-              if (data.success) {
-                  alert('Order status updated to "To Pick Up" successfully.');
-                  location.reload();
-              } else {
-                  alert('Error: ' + (data.error || 'Unknown error occurred'));
-              }
-          })
-          .catch(error => {
-              console.error('Error:', error);
-              alert('Error updating order status. Please try again.');
-          });
-      }
-  }
+function showBootstrapAlert(message, type = 'success') {
+    // Remove existing alert if present
+    let existingAlert = document.getElementById('customBootstrapAlert');
+    if (existingAlert) existingAlert.remove();
+
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.id = 'customBootstrapAlert';
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 mt-3 me-3 shadow`;
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.minWidth = '300px';
+     alertDiv.innerHTML = `
+                  <div class="d-flex align-items-center">
+                    <span class="me-2">
+                      ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                        type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                        type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                        '<i class="bi bi-info-circle-fill text-info"></i>'}
+                    </span>
+                    <span>${message}</span>
+                  </div>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+    document.body.appendChild(alertDiv);
+
+    // Auto-dismiss after 2.5 seconds
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+        alertDiv.classList.add('hide');
+        setTimeout(() => alertDiv.remove(), 500);
+    }, 2500);
+}
+
+function updateToPickup(receiptId) {
+    let modal = document.getElementById('confirmPickupModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'confirmPickupModal';
+        modal.className = 'modal fade';
+        modal.tabIndex = -1;
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h4 class="modal-title">Confirmation</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure this item is already paid and ready for pickup?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" id="confirmPickupBtn">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    // Show modal
+    var bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+
+    // Remove previous event listener if any
+    const confirmBtn = document.getElementById('confirmPickupBtn');
+    confirmBtn.onclick = function() {
+        bsModal.hide();
+        fetch('update_order_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'receipt_id=' + encodeURIComponent(receiptId) + '&action=topickup'
+        })
+        .then(response => response.json())
+        .then(data => {  
+            if (data.success) {
+                showBootstrapAlert('Order status updated to "To Pick Up" successfully.', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showBootstrapAlert('Error: ' + (data.error || 'Unknown error occurred'), 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showBootstrapAlert('Error updating order status. Please try again.', 'danger');
+        });
+    };
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get modal element first

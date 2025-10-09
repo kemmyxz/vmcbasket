@@ -534,12 +534,192 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                         </button>
                     <?php endif; ?>
                 <?php endif; ?>
-            <?php elseif($order['status'] == 'ToPickUp'): ?>
-                <button class="btn btn-success btn-sm pickup-btn"
-                        data-receipt="<?= $order['receipt_no'] ?>">
-                    <i class="bi bi-check2-circle"></i> Confirm Pick-up
-                </button>
-            <?php endif; ?>
+           <?php elseif($order['status'] == 'ToPickUp'): ?>
+            <button class="custom-navy-btn btn-sm pickup-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#confirmPickupModal"
+                data-receipt="<?= $order['receipt_no'] ?>"
+                data-products='<?= json_encode($order['items']) ?>'
+                data-total="<?= $order['total'] ?>"
+                data-date="<?= $order['order_date'] ?>">
+                <i class="bi bi-check2-circle"></i> Confirm Pick-up
+            </button>
+        <?php endif; ?>
+
+
+        <!-- Confirm Pick-up Modal -->
+        <div class="modal fade" id="confirmPickupModal" tabindex="-1" aria-labelledby="confirmPickupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content p-2">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="confirmPickupLabel">
+                    <i class="bi bi-check2-circle me-2 text-success"></i> Confirm Pick-up
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body" id="pickupReceiptContent">
+                    <div class="text-center mb-4">
+                    <img src="admin/images/vmc_basket_logo.png" alt="VMC Logo" style="max-width: 100px;">
+                    <h4 class="mt-2 navy-text mb-0">VMC Basket</h4>
+                    <p class="mb-2">Pick-up Confirmation</p>
+                    <p class="text-muted mb-0" id="pickupDateTime"></p>
+                    <hr>
+                </div>
+
+                <div id="pickupReceiptDetails">
+                <!-- JS will inject details here -->
+                </div>
+
+                <!-- QR Code Placeholder -->
+                <div class="text-center my-3" id="pickupQrCodePlaceholder">
+                    <!-- QR code will be displayed here -->
+                    <img src="admin/images/qrdummy.png" alt="QR Code" style="max-width:120px;">
+                    <p class="small text-muted mt-2">Scan this QR code for pick-up verification</p>
+                </div>
+            </div>
+
+            <div class="modal-footer justify-content-end">
+                <!-- PATANGGAL NA LANG IF OKAY NA BACK-END NG QR CODE-->
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="custom-navy-btn" id="confirmPickupBtn">Confirm Pick-up</button>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const pickupModal = document.getElementById('confirmPickupModal');
+        let currentReceiptNo = null;
+
+        // Bootstrap alert helper
+        function showBootstrapAlert(message, type = 'success', duration = 3000) {
+            let alertContainer = document.getElementById('customAlertContainer');
+            if (!alertContainer) {
+            alertContainer = document.createElement('div');
+            alertContainer.id = 'customAlertContainer';
+            alertContainer.style.position = 'fixed';
+            alertContainer.style.top = '24px';
+            alertContainer.style.right = '24px';
+            alertContainer.style.zIndex = '9999';
+            alertContainer.style.width = '350px';
+            alertContainer.style.maxWidth = '90vw';
+            alertContainer.style.pointerEvents = 'none';
+            document.body.appendChild(alertContainer);
+            }
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.role = 'alert';
+            alertDiv.innerHTML = `
+                  <div class="d-flex align-items-center">
+                    <span class="me-2">
+                      ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                        type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                        type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                        '<i class="bi bi-info-circle-fill text-info"></i>'}
+                    </span>
+                    <span>${message}</span>
+                  </div>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+            alertContainer.appendChild(alertDiv);
+
+            setTimeout(() => {
+            alertDiv.classList.remove('show');
+            alertDiv.classList.add('hide');
+            setTimeout(() => alertDiv.remove(), 500);
+            }, duration);
+        }
+
+        document.querySelectorAll('[data-bs-target="#confirmPickupModal"]').forEach(button => {
+            button.addEventListener('click', function() {
+            currentReceiptNo = this.getAttribute('data-receipt');
+            const products = JSON.parse(this.getAttribute('data-products'));
+            const total = this.getAttribute('data-total');
+            const orderDate = this.getAttribute('data-date');
+            const customerName = this.getAttribute('data-name');
+
+            const detailsContainer = pickupModal.querySelector('#pickupReceiptDetails');
+            const currentDateTime = new Date().toLocaleString('en-PH', { hour12: true });
+
+            // Set current time display
+            pickupModal.querySelector('#pickupDateTime').textContent = currentDateTime;
+
+            // Build HTML
+            let html = `
+                <div class="mb-3">
+                <p><strong>Receipt No:</strong> ${currentReceiptNo}</p>
+                <p><strong>Order Date:</strong> ${orderDate}</p>
+                </div>
+                <hr>
+                <div class="mb-2">
+                <h6 class="fw-bold mb-2">Ordered Items:</h6>
+            `;
+
+            products.forEach(product => {
+                html += `
+                <div class="d-flex align-items-center mb-2">
+                <img src="admin/${product.product_image}" alt="${product.product_name}" 
+                    class="img-thumbnail me-3" style="max-width:60px;">
+                <div>
+                    <p class="mb-0 fw-semibold">${product.product_name}</p>
+                    <small class="text-muted">
+                    ${product.size && product.size.trim() !== '' ? `Size: ${product.size} | ` : ''}Qty: ${product.quantity}
+                    </small>
+                </div>
+                </div>
+                `;
+            });
+
+            html += `
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                <span>Total Amount:</span>
+                <span>₱${parseFloat(total).toFixed(2)}</span>
+                </div>
+            `;
+
+            detailsContainer.innerHTML = html;
+
+            // Remove previous event listeners to prevent multiple alerts
+            const confirmBtn = pickupModal.querySelector('#confirmPickupBtn');
+            const newBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+            newBtn.addEventListener('click', function() {
+                if (!currentReceiptNo) return;
+                this.disabled = true;
+                this.innerHTML = 'Processing...';
+
+                fetch('update_order_status.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `receipt_no=${currentReceiptNo}&status=Complete`
+                })
+                .then(response => response.json())
+                .then(data => {
+                if (data.success) {
+                    showBootstrapAlert('Order marked as completed!', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showBootstrapAlert('Error: ' + data.message, 'danger');
+                }
+                })
+                .catch(() => showBootstrapAlert('Error updating order status', 'danger'))
+                .finally(() => {
+                this.disabled = false;
+                this.innerHTML = 'Confirm Pick-up';
+                const modal = bootstrap.Modal.getInstance(pickupModal);
+                modal.hide();
+                });
+            });
+            });
+        });
+        });
+    </script>
+
             
 <?php if($order['status'] == 'Complete'): ?>
     <?php if(!$item['has_review']): ?>
@@ -925,7 +1105,7 @@ class PhotoUploadHandler {
         this.maxFiles = maxFiles;
         this.selectedFiles = [];
         this.allowedTypes = ["image/png", "image/jpeg"];
-        
+
         this.init();
     }
 
@@ -936,9 +1116,9 @@ class PhotoUploadHandler {
 
     handleFileSelect() {
         const newFiles = Array.from(this.fileInput.files);
-        
+
         if (!this.validateFiles(newFiles)) return;
-        
+
         this.addFiles(newFiles);
         this.fileInput.value = "";
         this.renderPreviews();
@@ -947,11 +1127,11 @@ class PhotoUploadHandler {
     validateFiles(files) {
         for (let file of files) {
             if (!this.allowedTypes.includes(file.type)) {
-                alert("Only PNG and JPEG files are allowed.");
+                this.showBootstrapAlert("Only PNG and JPEG files are allowed.", "danger");
                 return false;
             }
             if (this.selectedFiles.length >= this.maxFiles) {
-                alert(`You can upload a maximum of ${this.maxFiles} images.`);
+                this.showBootstrapAlert(`You can upload a maximum of ${this.maxFiles} images.`, "warning");
                 return false;
             }
         }
@@ -968,7 +1148,7 @@ class PhotoUploadHandler {
 
     renderPreviews() {
         this.previewContainer.innerHTML = "";
-        
+
         this.selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -1015,6 +1195,44 @@ class PhotoUploadHandler {
 
     getFiles() {
         return this.selectedFiles;
+    }
+
+    showBootstrapAlert(message, type = "info", duration = 3000) {
+        let alertContainer = document.getElementById("customAlertContainer");
+        if (!alertContainer) {
+            alertContainer = document.createElement("div");
+            alertContainer.id = "customAlertContainer";
+            alertContainer.style.position = "fixed";
+            alertContainer.style.top = "24px";
+            alertContainer.style.right = "24px";
+            alertContainer.style.zIndex = "9999";
+            alertContainer.style.width = "350px";
+            alertContainer.style.maxWidth = "90vw";
+            alertContainer.style.pointerEvents = "none";
+            document.body.appendChild(alertContainer);
+        }
+        const alertDiv = document.createElement("div");
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = "alert";
+        alertDiv.innerHTML = `
+            <div class="d-flex align-items-center">
+                <span class="me-2">
+                    ${type === "success" ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                        type === "danger" ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                        type === "warning" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                        '<i class="bi bi-info-circle-fill text-info"></i>'}
+                </span>
+                <span>${message}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        alertContainer.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.classList.remove("show");
+            alertDiv.classList.add("hide");
+            setTimeout(() => alertDiv.remove(), 500);
+        }, duration);
     }
 }
 
@@ -1458,7 +1676,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Add this to your existing JavaScript code section
+/* Add this to your existing JavaScript code section
 document.addEventListener('DOMContentLoaded', function() {
     // Handle Pick-up confirmation
     document.querySelectorAll('.pickup-btn').forEach(button => {
@@ -1491,7 +1709,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
+*/
 // Add this to your existing JavaScript code
 function calculateAverageRating(productId) {
     fetch(`get_product_rating.php?product_id=${productId}`)

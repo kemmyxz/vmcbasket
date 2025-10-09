@@ -87,7 +87,7 @@ $search = $_GET['search'] ?? '';
         }
 
         .margin-top {
-            margin-top: 100px;
+            margin-top: 80px;
         }
 
         .fav-button.active {
@@ -440,7 +440,7 @@ $search = $_GET['search'] ?? '';
                                                 foreach ($tags as $tag) {
                                                     $tag = trim($tag);
                                                     $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
-                                                    echo "<span class='badge {$tagClass}'>{$tag}</span>";
+                                                    echo "<span class='badge {$tagClass} me-1 mb-1'>{$tag}</span>";
                                                 }
                                             }
 
@@ -536,37 +536,81 @@ $search = $_GET['search'] ?? '';
             window.location.href = `product_details.php?id=${productId}`;
         }
 
+         // Bootstrap 5.3.3 alert for favorites with icons
+        function showFavoriteAlert(message, type = 'success') {
+            // Remove any existing alert
+            const existingAlert = document.getElementById('favoriteAlert');
+            if (existingAlert) existingAlert.remove();
+
+            // Choose icon based on type
+            let iconHtml = '';
+            switch (type) {
+            case 'success':
+                iconHtml = '<i class="bi bi-heart-fill text-danger me-2"></i>';
+                break;
+            case 'warning':
+                iconHtml = '<i class="bi bi-heart text-danger me-2"></i>';
+                break;
+            case 'danger':
+                iconHtml = '<i class="bi bi-x-circle-fill text-danger me-2"></i>';
+                break;
+            default:
+                iconHtml = '';
+            }
+
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'favoriteAlert';
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 me-3 mt-3`;
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '250px';
+            alertDiv.innerHTML = `
+            ${iconHtml}${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Auto-dismiss after 2 seconds
+            setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertDiv);
+            bsAlert.close();
+            }, 2000);
+        }
+
+        // Toggle favorite function
         function toggleFavorite(button, productId) {
             fetch('toggle_favorite.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productId
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const heartIcon = button.querySelector('i');
-                        if (data.isFavorite) {
-                            heartIcon.classList.remove('bi-heart');
-                            heartIcon.classList.add('bi-heart-fill');
-                            button.classList.add('active');
-                        } else {
-                            heartIcon.classList.remove('bi-heart-fill');
-                            heartIcon.classList.add('bi-heart');
-                            button.classList.remove('active');
-                        }
-                    } else {
-                        alert(data.message || 'Failed to update favorite');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating favorite');
-                });
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                const heartIcon = button.querySelector('i');
+                if (data.isFavorite) {
+                heartIcon.classList.remove('bi-heart');
+                heartIcon.classList.add('bi-heart-fill');
+                button.classList.add('active');
+                showFavoriteAlert('Added to favorites!', 'success');
+                } else {
+                heartIcon.classList.remove('bi-heart-fill');
+                heartIcon.classList.add('bi-heart');
+                button.classList.remove('active');
+                showFavoriteAlert('Removed from favorites.', 'warning');
+                }
+            } else {
+                showFavoriteAlert(data.message || 'Failed to update favorite', 'danger');
+            }
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            showFavoriteAlert('An error occurred while updating favorite', 'danger');
+            });
         }
 
     </script>

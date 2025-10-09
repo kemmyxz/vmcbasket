@@ -59,7 +59,7 @@ $rec_result = $stmt->get_result();
     <?php include 'links.php'; ?>
     <style>
         .highlight-yellow {
-            background-color: #fff4bf;
+            background-color: #fff4bf
             padding: 0.3rem 1rem;
             border-radius: 6px;
             border: 1px solid black;
@@ -416,6 +416,8 @@ $rec_result = $stmt->get_result();
         </div>
     </div>
 
+    <!-- Alert container -->
+    <div id="favorite-alert-container" style="position:fixed;top:20px;right:20px;z-index:1050;"></div>
     <!-- HERO SECTION / CAROUSEL -->
     <div id="heroCarousel" class="carousel slide fade-section margin-top" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -483,14 +485,14 @@ $rec_result = $stmt->get_result();
             <div class="row g-4">
                 <?php if ($rec_result && $rec_result->num_rows > 0):
                     while ($rec_row = $rec_result->fetch_assoc()): ?>
-                        <div class="col-md-4 col-lg-3">
-                            <div class="product-card" onclick="location.href='product_details.php?id=<?= $rec_row['id'] ?>'">
+                        <div class="col-md-4 col-lg-3 d-flex">
+                            <div class="product-card d-flex flex-column w-100" style="height:100%; cursor:default;">
                                 <!-- Product Image -->
                                 <img src="admin/<?= htmlspecialchars($rec_row['image']) ?>"
                                     alt="<?= htmlspecialchars($rec_row['product_name']) ?>">
 
                                 <!-- Product Info -->
-                                <div class="product-info">
+                                <div class="product-info d-flex flex-column flex-grow-1">
                                     <h3><?= htmlspecialchars($rec_row['product_name']) ?></h3>
                                     <?php if (!empty($rec_row['genders'])): ?>
                                         <p class="mb-1">
@@ -515,7 +517,7 @@ $rec_result = $stmt->get_result();
                                     <?php endif; ?>
 
                                     <!-- Tags and Type Badges -->
-                                    <div class="badges">
+                                    <div class="badges mb-2" style="min-height:40px; display:flex; flex-wrap:wrap; align-items:flex-start;">
                                         <?php
                                         // Display tags if they exist
                                         if (!empty($rec_row['tags'])) {
@@ -524,7 +526,7 @@ $rec_result = $stmt->get_result();
                                                 $tag = trim($tag);
                                                 if (!empty($tag)) {
                                                     $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
-                                                    echo "<span class='badge {$tagClass}'>" . htmlspecialchars($tag) . "</span> ";
+                                                    echo "<span class='badge {$tagClass} me-1 mb-1'>" . htmlspecialchars($tag) . "</span> ";
                                                 }
                                             }
                                         }
@@ -532,10 +534,13 @@ $rec_result = $stmt->get_result();
                                         // Display type badge
                                         if (!empty($rec_row['type'])) {
                                             $typeClass = strtolower($rec_row['type']) . '_badge';
-                                            echo "<span class='badge {$typeClass}'>" . htmlspecialchars(ucfirst($rec_row['type'])) . "</span>";
+                                            echo "<span class='badge {$typeClass} me-1 mb-1'>" . htmlspecialchars(ucfirst($rec_row['type'])) . "</span>";
                                         }
                                         ?>
                                     </div>
+
+                                    <!-- Spacer to push price to bottom if few tags -->
+                                    <div class="flex-grow-1"></div>
 
                                     <!-- Price -->
                                     <div class="price">
@@ -565,7 +570,6 @@ $rec_result = $stmt->get_result();
                                     </div>
 
                                     <!-- Icon Buttons -->
-
                                     <div class="icon-buttons">
                                         <button class="fav-button <?= $rec_row['is_favorited'] ? 'active' : '' ?>"
                                             onclick="event.stopPropagation(); toggleFavorite(this, <?= $rec_row['id'] ?>)">
@@ -866,7 +870,6 @@ $rec_result = $stmt->get_result();
     <?php include 'footer.php'; ?>
     <?php include 'chat.php'; ?>
 
-
     <!-- Animation Script -->
     <script>
 
@@ -876,40 +879,69 @@ $rec_result = $stmt->get_result();
 
 
         function toggleFavorite(button, productId) {
-
             event.preventDefault();
             event.stopPropagation();
             fetch('toggle_favorite.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productId
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const heartIcon = button.querySelector('i');
-                        // Update button appearance
-                        if (data.isFavorite) {
-                            heartIcon.classList.remove('bi-heart');
-                            heartIcon.classList.add('bi-heart-fill');
-                            button.classList.add('active');
-                        } else {
-                            heartIcon.classList.remove('bi-heart-fill');
-                            heartIcon.classList.add('bi-heart');
-                            button.classList.remove('active');
-                        }
-                    } else {
-                        alert(data.message || 'Failed to update favorite');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating favorite');
-                });
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.success) {
+                const heartIcon = button.querySelector('i');
+                // Update button appearance
+                if (data.isFavorite) {
+                heartIcon.classList.remove('bi-heart');
+                heartIcon.classList.add('bi-heart-fill');
+                button.classList.add('active');
+                showFavoriteAlert(' <i class="bi bi-heart-fill text-danger"></i> Added to favorites!', 'success');
+                } else {
+                heartIcon.classList.remove('bi-heart-fill');
+                heartIcon.classList.add('bi-heart');
+                button.classList.remove('active');
+                showFavoriteAlert(' <i class="bi bi-heart text-danger"></i> Removed from favorites.', 'warning');
+                }
+            } else {
+                showFavoriteAlert(' <i class="bi bi-exclamation-triangle-fill text-danger"></i> ' + (data.message || 'Failed to update favorite'), 'danger');
+            }
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            showFavoriteAlert(' <i class="bi bi-x-circle-fill text-danger"></i> An error occurred while updating favorite', 'danger');
+            });
+        }
+
+        function showFavoriteAlert(message, type) {
+            const container = document.getElementById('favorite-alert-container');
+            // Remove any existing alerts
+            container.innerHTML = '';
+            // Create alert element
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.role = 'alert';
+            alert.style.minWidth = '220px';
+            alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            container.appendChild(alert);
+            // Auto-dismiss after 2 seconds
+            setTimeout(() => {
+            if (alert.parentNode) {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+                setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+                }, 300);
+            }
+            }, 2000);
         }
 
 

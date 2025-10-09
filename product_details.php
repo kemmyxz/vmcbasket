@@ -434,16 +434,38 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
         </button>
       </div>
 
-      <!-- Cart -->
-      <a href="basket.php" class=" basket-btn text-decoration-none">
-        <i class="fas fa-shopping-basket"></i>
-      </a>
-      <!-- Collapsible search bar (mobile) -->
-      <div class="w-100 mt-2 d-none" id="mobileSearchBar">
-        <input type="text" class="form-control search-box" placeholder="Search products here...">
-      </div>
-    </div>
-  </nav>
+            <!-- Cart -->
+            <?php
+            // Fetch basket count for the logged-in user
+            $basket_count = 0;
+            if (isset($_SESSION['user_id'])) {
+                $basket_query = "SELECT SUM(quantity) as total FROM basket WHERE user_id = ?";
+                $basket_stmt = $conn->prepare($basket_query);
+                $basket_stmt->bind_param("i", $_SESSION['user_id']);
+                $basket_stmt->execute();
+                $basket_result = $basket_stmt->get_result();
+                if ($basket_row = $basket_result->fetch_assoc()) {
+                    $basket_count = (int)$basket_row['total'];
+                }
+                $basket_stmt->close();
+            }
+            ?>
+
+            <a href="basket.php" class="basket-btn text-decoration-none position-relative">
+                <i class="fas fa-shopping-basket"></i>
+                <?php if ($basket_count > 0): ?>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">
+                        <?php echo $basket_count; ?>
+                    </span>
+                <?php endif; ?>
+            </a>
+            
+            <!-- Collapsible search bar (mobile) -->
+            <div class="w-100 mt-2 d-none" id="mobileSearchBar">
+                <input type="text" class="form-control search-box" placeholder="Search products here...">
+            </div>
+        </div>
+    </nav>
 
   <!-- Offcanvas Sidebar -->
   <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
@@ -536,7 +558,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
                 // Prepare the body data for AJAX
                 const data = `product_id=${productId}&favorite=${newStatus}`;
-                console.log('Sending data:', data);  // Debugging: check what's being sent
 
                 // Send AJAX request
                 fetch('update_favorites.php', {
@@ -548,22 +569,53 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                 })
                   .then(response => response.json())
                   .then(data => {
-                    console.log('Server response:', data);  // For debugging
                     if (data.success) {
-                      console.log('Favorite updated successfully');
+                      showBootstrapAlert('Favorite updated!', 'success');
                     } else {
-                      console.error('Failed to update favorite:', data.error);
+                      showBootstrapAlert('Failed to update favorite: ' + (data.error || 'Unknown error.'), 'danger');
                     }
                   })
                   .catch(error => {
-                    console.error('Error:', error);
+                    showBootstrapAlert('Error updating favorite.', 'danger');
                   });
               }
 
+              // Bootstrap 5.3.3 custom alert function
+              function showBootstrapAlert(message, type = 'info') {
+                // Remove any existing alert
+                let oldAlert = document.getElementById('custom-bs-alert');
+                if (oldAlert) oldAlert.remove();
 
+                // Create alert element
+                const alertDiv = document.createElement('div');
+                alertDiv.id = 'custom-bs-alert';
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 mt-3 me-3 shadow`;
+                alertDiv.style.zIndex = '9999';
+                alertDiv.style.minWidth = '300px';
+                alertDiv.innerHTML = `
+                  <div class="d-flex align-items-center">
+                    <span class="me-2">
+                      ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                        type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                        type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                        '<i class="bi bi-info-circle-fill text-info"></i>'}
+                    </span>
+                    <span>${message}</span>
+                  </div>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                document.body.appendChild(alertDiv);
+
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                  alertDiv.classList.remove('show');
+                  alertDiv.classList.add('hide');
+                  setTimeout(() => alertDiv.remove(), 500);
+                }, 5000);
+              }
             </script>
           </div>
-
 
           <h2 class="fw-bold text-dark"> ₱ <?= number_format($product1['price'], 2) ?></h2>
 
@@ -581,17 +633,17 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
               foreach ($tags as $tag) {
                 $tag = trim($tag);
                 if (!empty($tag)) {
-                  echo '<span class="badge tag_badge">' . htmlspecialchars($tag) . '</span> ';
+                   $tagClass = strtolower(str_replace(' ', '_', $tag)) . '_badge';
+                    echo "<span class='badge {$tagClass} me-1 mb-1'>" . htmlspecialchars($tag) . "</span> ";
                 }
               }
             }
             
             // Display product type badge
             if ($product1['type']) {
-              echo '<span class="badge uniform_badge">' . htmlspecialchars($product1['type']) . '</span>';
+              $typeClass = strtolower($product1['type']) . '_badge';
+              echo "<span class='badge {$typeClass} me-1 mb-1'>" . htmlspecialchars(ucfirst($product1['type'])) . "</span>";
             }
-
-            
             ?>
           </div>
 
@@ -667,8 +719,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
             <p class="mb-3 text-danger"><i>*Maximum of <?= $product1['max_quantity'] ?> pieces per item</i></p>
           </div>
 
-
-
           <script>
             const quantityContainer = document.getElementById('quantity-control');
             const quantityInput = quantityContainer.querySelector('.quantity-value');
@@ -683,10 +733,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
               const action = btn.getAttribute('data-action');
               let quantity = parseInt(quantityInput.value) || 1;
 
-              // For uniforms, check selected size stock. For supplies, use total stock
-              const selectedButton = document.querySelector('.custom-btn.selected');
-              // const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
-
               if (action === 'decrease' && quantity > 1) {
                 quantity--;
               } else if (action === 'increase' && quantity < max) {
@@ -698,8 +744,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
             // Restrict manual input
             quantityInput.addEventListener('input', () => {
-              const selectedButton = document.querySelector('.custom-btn.selected');
-              // const maxStock = isSupplies ? totalStock : (selectedButton ? parseInt(selectedButton.dataset.stock) : 0);
               let value = parseInt(quantityInput.value.replace(/\D/g, '')) || 1;
 
               if (value < 1) value = 1;
@@ -708,7 +752,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
               quantityInput.value = value;
             });
           </script>
-
 
           <div class="d-flex gap-2">
             <button class="btn btn-outline-dark w-100" onclick="addToBasket()">Add to Basket</button>
@@ -719,13 +762,13 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                 if (!isSupplies) {
                   const selectedButton = document.querySelector('.custom-btn.selected');
                   if (!selectedButton) {
-                    alert('Please select a size first.');
+                    showBootstrapAlert('Please select a size first.', 'warning');
                     return;
                   }
 
                   const stock = parseInt(selectedButton.dataset.stock);
                   if (stock <= 0) {
-                    alert('This size is out of stock.');
+                    showBootstrapAlert('This size is out of stock.', 'danger');
                     return;
                   }
                 }
@@ -739,7 +782,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                   const selectedButton = document.querySelector('.custom-btn.selected');
                   const stock = parseInt(selectedButton.dataset.stock);
                   if (quantity > stock) {
-                    alert('Requested quantity exceeds available stock.');
+                    showBootstrapAlert('Requested quantity exceeds available stock.', 'danger');
                     return;
                   }
                 }
@@ -753,25 +796,24 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                   .then(response => response.json())
                   .then(data => {
                     if (data.success) {
-                      alert('Added to basket!');
-                      window.location.href = 'basket.php';
+                      showBootstrapAlert('Added to basket!', 'success');
+                      setTimeout(() => {
+                        window.location.href = 'basket.php';
+                      }, 1200);
                     } else {
-                      alert('Failed to add to basket: ' + (data.error || 'Unknown error.'));
+                      showBootstrapAlert('Failed to add to basket: ' + (data.error || 'Unknown error.'), 'danger');
                     }
                   })
                   .catch(error => {
-                    console.error('Error:', error);
-                    alert('Something went wrong.');
+                    showBootstrapAlert('Something went wrong.', 'danger');
                   });
               }
             </script>
-
 
             <button class="btn custom-navy-btn w-100" onclick="placeOrder()">Order Now</button>
 
             <script>
               const isUniform = <?= json_encode($is_uniform); ?>;
-
 
               function placeOrder() {
                 // Collect order details first
@@ -784,7 +826,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
 
                 // Size validation - only check for uniforms
                 if (isUniform && !selectedSize) {
-                  alert('Please select a size first.');
+                  showBootstrapAlert('Please select a size first.', 'warning');
                   return;
                 }
 
@@ -813,14 +855,16 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                   })
                   .then(data => {
                     if (data.success) {
-                      window.location.href = 'order_details.php';
+                      showBootstrapAlert('Processing your Order', 'success');
+                      setTimeout(() => {
+                        window.location.href = 'order_details.php';
+                      }, 1200);
                     } else {
-                      alert('Failed to place the order: ' + (data.error || 'Unknown error'));
+                      showBootstrapAlert('Failed to place the order: ' + (data.error || 'Unknown error'), 'danger');
                     }
                   })
                   .catch(error => {
-                    console.error('Error:', error);
-                    alert('Something went wrong while placing the order. Please try again.');
+                    showBootstrapAlert('Something went wrong while placing the order. Please try again.', 'danger');
                   });
               }
             </script>
@@ -963,7 +1007,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
       </div>
     </div>
 
-    <div class="text-end mt-3">
+    <div class="mt-3">
       <?php
       // Get total number of reviews
       $review_count_sql = "SELECT COUNT(*) as count FROM product_reviews WHERE product_id = ?";
@@ -1049,9 +1093,11 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
         });
       </script>
 
-      <a href="#" class="text-primary">
-        See all reviews (<?= $review_count ?>)
-      </a>
+      <div class="text-end mt-3">
+        <a href="#" class="text-primary text-decoration-none d-inline-block">
+          See all reviews (<?= $review_count ?>)
+        </a>
+      </div>
     </div>
     <?php if ($total_pages > 1): ?>
       <nav aria-label="Review pagination" class="mt-4">
@@ -1071,6 +1117,16 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
   <!-- Footer and chat -->
   <?php include 'footer.php'; ?>
   <?php include 'chat.php'; ?>
+
+
+  <script>
+
+    // Run on page load and every 10 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+      checkNewChatMessages();
+      setInterval(checkNewChatMessages, 10000);
+    });
+  </script>
 
 
   <!-- Collapse Search for small device Script -->
