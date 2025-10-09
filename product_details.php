@@ -855,7 +855,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
                   })
                   .then(data => {
                     if (data.success) {
-                      showBootstrapAlert('Processing your Order', 'success');
+                      showBootstrapAlert('Order placed successfully!', 'success');
                       setTimeout(() => {
                         window.location.href = 'order_details.php';
                       }, 1200);
