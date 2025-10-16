@@ -1,5 +1,76 @@
 <?php
 require 'inc/config.php';
+
+// Total Reviews (reviews with non-empty review_text)
+$totalReviewsQuery = "SELECT COUNT(*) AS total_reviews FROM product_reviews WHERE review_text IS NOT NULL AND TRIM(review_text) != ''";
+$totalReviewsResult = mysqli_query($conn, $totalReviewsQuery);
+$totalReviews = ($totalReviewsResult && $row = mysqli_fetch_assoc($totalReviewsResult)) ? (int)$row['total_reviews'] : 0;
+
+// Total Ratings (all rows in product_reviews)
+$totalRatingsQuery = "SELECT COUNT(*) AS total_ratings FROM product_reviews";
+$totalRatingsResult = mysqli_query($conn, $totalRatingsQuery);
+$totalRatings = ($totalRatingsResult && $row = mysqli_fetch_assoc($totalRatingsResult)) ? (int)$row['total_ratings'] : 0;
+
+// Ratings breakdown (count per rating 1-5)
+$ratingsBreakdown = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+$breakdownQuery = "SELECT rating, COUNT(*) as count FROM product_reviews GROUP BY rating";
+$breakdownResult = mysqli_query($conn, $breakdownQuery);
+if ($breakdownResult) {
+    while ($row = mysqli_fetch_assoc($breakdownResult)) {
+        $r = (int)$row['rating'];
+        if ($r >= 1 && $r <= 5) $ratingsBreakdown[$r] = (int)$row['count'];
+    }
+}
+
+// For growth, compute percentage increase compared to previous period (e.g., previous month)
+function getPreviousPeriodCounts($conn, $column = 'created_at', $table = 'product_reviews', $reviewOnly = false) {
+    // Get first day of this month and previous month
+    $firstDayThisMonth = date('Y-m-01');
+    $firstDayPrevMonth = date('Y-m-01', strtotime('-1 month'));
+    $lastDayPrevMonth = date('Y-m-t', strtotime('-1 month'));
+
+    // Build WHERE clause
+    $where = "$column >= '$firstDayPrevMonth' AND $column < '$firstDayThisMonth'";
+    if ($reviewOnly) {
+        $where .= " AND review_text IS NOT NULL AND TRIM(review_text) != ''";
+    }
+
+    $sql = "SELECT COUNT(*) AS cnt FROM $table WHERE $where";
+    $res = mysqli_query($conn, $sql);
+    $row = $res ? mysqli_fetch_assoc($res) : ['cnt' => 0];
+    return (int)$row['cnt'];
+}
+
+// Current period: this month
+$firstDayThisMonth = date('Y-m-01');
+$today = date('Y-m-d');
+
+// Reviews this month
+$reviewsThisMonthQuery = "SELECT COUNT(*) AS cnt FROM product_reviews WHERE created_at >= '$firstDayThisMonth' AND created_at <= '$today' AND review_text IS NOT NULL AND TRIM(review_text) != ''";
+$reviewsThisMonthResult = mysqli_query($conn, $reviewsThisMonthQuery);
+$reviewsThisMonth = ($reviewsThisMonthResult && $row = mysqli_fetch_assoc($reviewsThisMonthResult)) ? (int)$row['cnt'] : 0;
+
+// Ratings this month
+$ratingsThisMonthQuery = "SELECT COUNT(*) AS cnt FROM product_reviews WHERE created_at >= '$firstDayThisMonth' AND created_at <= '$today'";
+$ratingsThisMonthResult = mysqli_query($conn, $ratingsThisMonthQuery);
+$ratingsThisMonth = ($ratingsThisMonthResult && $row = mysqli_fetch_assoc($ratingsThisMonthResult)) ? (int)$row['cnt'] : 0;
+
+// Previous month
+$reviewsPrevMonth = getPreviousPeriodCounts($conn, 'created_at', 'product_reviews', true);
+$ratingsPrevMonth = getPreviousPeriodCounts($conn, 'created_at', 'product_reviews', false);
+
+// Compute growth percentage
+function computeGrowth($current, $previous) {
+    if ($previous == 0) {
+        return $current > 0 ? "100% ⬈" : "0%";
+    }
+    $growth = (($current - $previous) / $previous) * 100;
+    $arrow = $growth >= 0 ? "⬈" : "⬊";
+    return number_format(abs($growth), 1) . "% $arrow";
+}
+
+$reviewsGrowth = computeGrowth($reviewsThisMonth, $reviewsPrevMonth);
+$ratingsGrowth = computeGrowth($ratingsThisMonth, $ratingsPrevMonth);
 ?>
 
 
@@ -142,7 +213,7 @@ require 'inc/config.php';
                     <h2>Ratings & Reviews</h2>
                 </div>
                 <div class="col-12 col-md mb-3">
-                    <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="cus.php" style="gap: 8px;">
+                    <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get" action="ratings.php" style="gap: 8px;">
                         <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
                             <label for="from_month" class="form-label mb-1 mb-sm-0 me-sm-1" style="font-size: 15px;"><strong>From</strong></label>
                             <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="from_month" name="from_month" value="<?= htmlspecialchars($_GET['from_month'] ?? '') ?>">
@@ -160,8 +231,8 @@ require 'inc/config.php';
                         <div class="stat-box text-center">
                         <p class="stat-title">Total Reviews</p>
                         <div class="d-flex flex-row gap-2 justify-content-center align-items-center">
-                            <h2 class="stat-number mb-1">90</h2>
-                            <span class="growth">10.1% ⬈</span>
+                            <h2 class="stat-number mb-1"><?= $totalReviews ?></h2>
+                            <span class="growth"><?= $reviewsGrowth ?></span>
                         </div>
                         <p class="growth-label">Growth in Reviews</p>
                         </div>
@@ -170,19 +241,19 @@ require 'inc/config.php';
                         <div class="stat-box text-center">
                         <p class="stat-title">Total Ratings</p>
                         <div class="d-flex flex-row gap-2 justify-content-center align-items-center">
-                            <h2 class="stat-number mb-1">90</h2>
-                            <span class="growth">10.1% ⬈</span>
+                            <h2 class="stat-number mb-1"><?= $totalRatings ?></h2>
+                            <span class="growth"><?= $ratingsGrowth ?></span>
                         </div>
                         <p class="growth-label">Growth in Ratings</p>
                         </div>
 
                         <!-- Ratings Breakdown -->
                         <div class="ratings-breakdown">
-                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 5</span><div class="bar bg-success" style="width:60%"></div><span>30</span></div>
-                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 4</span><div class="bar bg-warning" style="width:50%"></div><span>25</span></div>
-                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 3</span><div class="bar bg-primary" style="width:40%"></div><span>20</span></div>
-                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 2</span><div class="bar bg-orange" style="width:20%"></div><span>10</span></div>
-                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 1</span><div class="bar bg-danger" style="width:10%"></div><span>5</span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 5</span><div class="bar bg-success" style="width:<?= $totalRatings ? round($ratingsBreakdown[5]/$totalRatings*100) : 0 ?>%"></div><span><?= $ratingsBreakdown[5] ?></span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 4</span><div class="bar bg-warning" style="width:<?= $totalRatings ? round($ratingsBreakdown[4]/$totalRatings*100) : 0 ?>%"></div><span><?= $ratingsBreakdown[4] ?></span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 3</span><div class="bar bg-primary" style="width:<?= $totalRatings ? round($ratingsBreakdown[3]/$totalRatings*100) : 0 ?>%"></div><span><?= $ratingsBreakdown[3] ?></span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 2</span><div class="bar bg-orange" style="width:<?= $totalRatings ? round($ratingsBreakdown[2]/$totalRatings*100) : 0 ?>%"></div><span><?= $ratingsBreakdown[2] ?></span></div>
+                            <div class="rating-row"><span><i class="bi bi-star-fill"></i> 1</span><div class="bar bg-danger" style="width:<?= $totalRatings ? round($ratingsBreakdown[1]/$totalRatings*100) : 0 ?>%"></div><span><?= $ratingsBreakdown[1] ?></span></div>
                         </div>
                     </div>
                 </div>
@@ -190,40 +261,48 @@ require 'inc/config.php';
                     <strong>Total Ratings & Reviews: 100</strong>
                 </div>
 
-                 <!-- Bulk Delete Button (hidden by default) -->
-                <div id="bulkDeleteContainer" style="display:none; margin-bottom: 16px;">
-                    <button id="bulkDeleteBtn" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Delete Selected
-                    </button>
-                </div>
 
                 <!-- TABLE -->
                 <div class="table-responsive">
                     <table class="table table-container text-center">
                         <thead>
                             <tr>
-                                <th>
-                                    <input type="checkbox" id="selectAllProducts" title="Select All" class="custom-checkbox">
-                                </th>
+
                                 <th>#</th>
                                 <th>Product Name</th>
                                 <th>Student Name</th>
                                 <th>Ratings & Reviews</th>
                                 <th>Photos</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="align-middle">
                             <?php
 
                             
-                            // Query to get reviews with product and user information
+                            // Get filter values
+                            $from_month = isset($_GET['from_month']) ? $_GET['from_month'] : '';
+                            $to_month = isset($_GET['to_month']) ? $_GET['to_month'] : '';
+
+                            // Build WHERE clause for filtering
+                            $where = "1";
+                            if ($from_month) {
+                                $from_date = $from_month . "-01";
+                                $where .= " AND pr.created_at >= '$from_date'";
+                            }
+                            if ($to_month) {
+                                // Get last day of the selected month
+                                $to_date = date('Y-m-t', strtotime($to_month . "-01"));
+                                $where .= " AND pr.created_at <= '$to_date'";
+                            }
+
+                            // Query to get reviews with product and user information (with filter)
                             $query = "SELECT pr.*, p.product_name, CONCAT(u.student_fname, ' ', u.student_lname) as student_name, 
                                      GROUP_CONCAT(ri.image_path) as review_images
                                      FROM product_reviews pr
                                      JOIN products p ON pr.product_id = p.id
                                      JOIN users u ON pr.user_id = u.id
                                      LEFT JOIN review_images ri ON pr.id = ri.review_id
+                                     WHERE $where
                                      GROUP BY pr.id
                                      ORDER BY pr.created_at DESC";
                             
@@ -234,9 +313,6 @@ require 'inc/config.php';
                                 $images = $row['review_images'] ? explode(',', $row['review_images']) : [];
                                 ?>
                                 <tr>
-                                    <td>
-                                        <input type="checkbox" class="custom-checkbox product-checkbox" value="<?= $row['id']; ?>">
-                                    </td>
                                     <td><?php echo $counter++; ?></td>
                                     <td class="text-start"><?php echo htmlspecialchars($row['product_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['student_name']); ?></td>
@@ -259,14 +335,6 @@ require 'inc/config.php';
                                                 class='thumbnail-img' alt='Review Photo' data-index='$index'>";
                                             }
                                             ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <button type="button" class="btn btn-danger delete-review" 
-                                                    data-review-id="<?php echo $row['id']; ?>">
-                                                <i class="bi bi-trash text-light"></i>
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -327,177 +395,8 @@ function showBootstrapAlert(message, type = 'success', timeout = 3000) {
     }, timeout);
 }
 
-// Delete review functionality
-document.querySelectorAll('.delete-review').forEach(button => {
-    button.addEventListener('click', function() {
-        const reviewId = this.getAttribute('data-review-id');
-        const row = this.closest('tr');
 
-        // Create confirmation modal
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal fade';
-        modalDiv.tabIndex = -1;
-        modalDiv.innerHTML = `
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h4 class="modal-title">Confirm Delete</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this review?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modalDiv);
-        const bsModal = new bootstrap.Modal(modalDiv);
-        bsModal.show();
 
-        modalDiv.querySelector('#confirmDeleteBtn').addEventListener('click', function() {
-            fetch('delete_review.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `review_id=${reviewId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    row.remove();
-                    showBootstrapAlert('Review deleted successfully', 'success');
-                    // Renumber table rows
-                    const rows = document.querySelectorAll('table tbody tr');
-                    rows.forEach((tr, idx) => {
-                        const numCell = tr.querySelector('td:nth-child(2)');
-                        if(numCell) numCell.textContent = idx + 1;
-                    });
-                } else {
-                    showBootstrapAlert(data.message || 'Error deleting review', 'danger');
-                }
-                bsModal.hide();
-                modalDiv.remove();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showBootstrapAlert('Error deleting review: ' + error.message, 'danger');
-                bsModal.hide();
-                modalDiv.remove();
-            });
-        });
-
-        // Remove modal from DOM when closed
-        modalDiv.addEventListener('hidden.bs.modal', function () {
-            modalDiv.remove();
-        });
-    });
-});
-
-// Delete all reviews functionality
-const deleteAllBtn = document.getElementById('deleteAllBtn');
-if (deleteAllBtn) {
-    deleteAllBtn.addEventListener('click', function() {
-        if(confirm('Are you sure you want to delete ALL reviews? This action cannot be undone.')) {
-            fetch('delete_all_reviews.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    // Remove all rows from the table
-                    const tbody = document.querySelector('table tbody');
-                    tbody.innerHTML = '';
-                    showBootstrapAlert('All reviews deleted successfully', 'success');
-                } else {
-                    showBootstrapAlert(data.message || 'Error deleting all reviews', 'danger');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showBootstrapAlert('Error deleting all reviews: ' + error.message, 'danger');
-            });
-        }
-    });
-}
-</script>
-
-<script>
-//Multiple delete functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const selectAll = document.getElementById('selectAllProducts');
-    const checkboxes = document.querySelectorAll('.product-checkbox');
-    const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
-    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-
-    // Select/Deselect all checkboxes
-    selectAll.addEventListener('change', function() {
-        checkboxes.forEach(cb => cb.checked = selectAll.checked);
-        toggleBulkDelete();
-    });
-
-    // If any checkbox is changed, update selectAll and bulk delete button
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', function() {
-            selectAll.checked = Array.from(checkboxes).every(cb => cb.checked);
-            toggleBulkDelete();
-        });
-    });
-
-    function toggleBulkDelete() {
-        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        bulkDeleteContainer.style.display = anyChecked ? 'block' : 'none';
-    }
-
-    // Helper to get icon HTML based on alert type
-    function getAlertIcon(type) {
-        switch(type) {
-            case 'success': return '<i class="bi bi-check-circle-fill me-2"></i>';
-            case 'danger':  return '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
-            case 'warning': return '<i class="bi bi-exclamation-circle-fill me-2"></i>';
-            case 'info':    return '<i class="bi bi-info-circle-fill me-2"></i>';
-            default:        return '';
-        }
-    }
-
-    // Override showBootstrapAlert to include icon
-    window.showBootstrapAlert = function(message, type = 'success', timeout = 3000) {
-        document.querySelectorAll('.custom-bs-alert').forEach(el => el.remove());
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} custom-bs-alert position-fixed top-0 end-0 m-3 fade show`;
-        alertDiv.role = 'alert';
-        alertDiv.style.zIndex = 9999;
-        alertDiv.innerHTML = `
-            ${getAlertIcon(type)}${message}
-            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
-        document.body.appendChild(alertDiv);
-        setTimeout(() => {
-            alertDiv.classList.remove('show');
-            alertDiv.classList.add('hide');
-            setTimeout(() => alertDiv.remove(), 500);
-        }, timeout);
-    };
-
-    // Bulk delete action with modal confirmation
-     bulkDeleteBtn.addEventListener('click', function() {
-        const selectedIds = Array.from(checkboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
-        if (selectedIds.length === 0) return;
-        if (confirm('Are you sure you want to delete the selected products?')) {
-            // TODO: Send selectedIds to server for deletion (AJAX or form)
-            alert('Selected IDs: ' + selectedIds.join(', '));
-        }
-     });
-});
 
     // Photo Viewer Modal (single initialization)
     let currentImages = [];

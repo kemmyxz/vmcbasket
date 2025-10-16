@@ -35,16 +35,23 @@ $total_pages = ceil($total_orders / $items_per_page);
 
 // Modify your existing orders query to include LIMIT and OFFSET
 $orders_sql = "
-    SELECT o.*, p.image as product_image, p.product_name, r.order_status, r.receipt_id,
+           SELECT o.*, 
+           p.image as product_image, 
+           p.product_name, 
+           r.order_status, 
+           r.receipt_id,
+           v.id as product_variant_id,  
            CASE WHEN rv.id IS NOT NULL THEN 1 ELSE 0 END as has_review,
            CASE WHEN ori.id IS NOT NULL THEN 1 ELSE 0 END as has_receipt
     FROM orders o
     LEFT JOIN products p ON o.product_id = p.id
+    LEFT JOIN product_variants v 
+        ON o.product_id = v.product_id 
     LEFT JOIN order_receipt r ON o.receipt_no = r.receipt_id
     LEFT JOIN product_reviews rv ON o.id = rv.order_id
     LEFT JOIN order_receipts_images ori ON r.receipt_id = ori.receipt_id
     WHERE o.user_id = ? AND o.receipt_no IS NOT NULL 
-    GROUP BY o.receipt_no
+    GROUP BY o.id
     ORDER BY o.order_date DESC, o.receipt_no DESC
     LIMIT ? OFFSET ?";
 
@@ -573,7 +580,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                 </div>
 
                 <!-- QR Code Placeholder -->
-                <div class="text-center my-3" id="pickupQrCodePlaceholder">
+                <div class="text-center my-3" id="pickupQrCode">
                     <!-- QR code will be displayed here -->
                     <img src="admin/images/qrdummy.png" alt="QR Code" style="max-width:120px;">
                     <p class="small text-muted mt-2">Scan this QR code for pick-up verification</p>
@@ -587,133 +594,127 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
         <script>
         document.addEventListener('DOMContentLoaded', function() {
-        const pickupModal = document.getElementById('confirmPickupModal');
-        let currentReceiptNo = null;
+            const pickupModal = document.getElementById('confirmPickupModal');
+            let currentReceiptNo = null;
 
-        // Bootstrap alert helper
-        function showBootstrapAlert(message, type = 'success', duration = 3000) {
-            let alertContainer = document.getElementById('customAlertContainer');
-            if (!alertContainer) {
-            alertContainer = document.createElement('div');
-            alertContainer.id = 'customAlertContainer';
-            alertContainer.style.position = 'fixed';
-            alertContainer.style.top = '24px';
-            alertContainer.style.right = '24px';
-            alertContainer.style.zIndex = '9999';
-            alertContainer.style.width = '350px';
-            alertContainer.style.maxWidth = '90vw';
-            alertContainer.style.pointerEvents = 'none';
-            document.body.appendChild(alertContainer);
-            }
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-            alertDiv.role = 'alert';
-            alertDiv.innerHTML = `
-                  <div class="d-flex align-items-center">
-                    <span class="me-2">
-                      ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
-                        type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
-                        type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
-                        '<i class="bi bi-info-circle-fill text-info"></i>'}
-                    </span>
-                    <span>${message}</span>
-                  </div>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-            alertContainer.appendChild(alertDiv);
-
-            setTimeout(() => {
-            alertDiv.classList.remove('show');
-            alertDiv.classList.add('hide');
-            setTimeout(() => alertDiv.remove(), 500);
-            }, duration);
-        }
-
-        document.querySelectorAll('[data-bs-target="#confirmPickupModal"]').forEach(button => {
-            button.addEventListener('click', function() {
-            currentReceiptNo = this.getAttribute('data-receipt');
-            const products = JSON.parse(this.getAttribute('data-products'));
-            const total = this.getAttribute('data-total');
-            const orderDate = this.getAttribute('data-date');
-            const customerName = this.getAttribute('data-name');
-
-            const detailsContainer = pickupModal.querySelector('#pickupReceiptDetails');
-            const currentDateTime = new Date().toLocaleString('en-PH', { hour12: true });
-
-            // Set current time display
-            pickupModal.querySelector('#pickupDateTime').textContent = currentDateTime;
-
-            // Build HTML
-            let html = `
-                <div class="mb-3">
-                <p><strong>Receipt No:</strong> ${currentReceiptNo}</p>
-                <p><strong>Order Date:</strong> ${orderDate}</p>
-                </div>
-                <hr>
-                <div class="mb-2">
-                <h6 class="fw-bold mb-2">Ordered Items:</h6>
-            `;
-
-            products.forEach(product => {
-                html += `
-                <div class="d-flex align-items-center mb-2">
-                <img src="admin/${product.product_image}" alt="${product.product_name}" 
-                    class="img-thumbnail me-3" style="max-width:60px;">
-                <div>
-                    <p class="mb-0 fw-semibold">${product.product_name}</p>
-                    <small class="text-muted">
-                    ${product.size && product.size.trim() !== '' ? `Size: ${product.size} | ` : ''}Qty: ${product.quantity}
-                    </small>
-                </div>
-                </div>
-                `;
-            });
-
-            html += `
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between fw-bold">
-                <span>Total Amount:</span>
-                <span>₱${parseFloat(total).toFixed(2)}</span>
-                </div>
-            `;
-
-            detailsContainer.innerHTML = html;
-
-            // Remove previous event listeners to prevent multiple alerts
-            const confirmBtn = pickupModal.querySelector('#confirmPickupBtn');
-            const newBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
-
-            newBtn.addEventListener('click', function() {
-                if (!currentReceiptNo) return;
-                this.disabled = true;
-                this.innerHTML = 'Processing...';
-
-                fetch('update_order_status.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `receipt_no=${currentReceiptNo}&status=Complete`
-                })
-                .then(response => response.json())
-                .then(data => {
-                if (data.success) {
-                    showBootstrapAlert('Order marked as completed!', 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showBootstrapAlert('Error: ' + data.message, 'danger');
+            // Bootstrap alert helper
+            function showBootstrapAlert(message, type = 'success', duration = 3000) {
+                let alertContainer = document.getElementById('customAlertContainer');
+                if (!alertContainer) {
+                    alertContainer = document.createElement('div');
+                    alertContainer.id = 'customAlertContainer';
+                    alertContainer.style.position = 'fixed';
+                    alertContainer.style.top = '24px';
+                    alertContainer.style.right = '24px';
+                    alertContainer.style.zIndex = '9999';
+                    alertContainer.style.width = '350px';
+                    alertContainer.style.maxWidth = '90vw';
+                    alertContainer.style.pointerEvents = 'none';
+                    document.body.appendChild(alertContainer);
                 }
-                })
-                .catch(() => showBootstrapAlert('Error updating order status', 'danger'))
-                .finally(() => {
-                this.disabled = false;
-                this.innerHTML = 'Confirm Pick-up';
-                const modal = bootstrap.Modal.getInstance(pickupModal);
-                modal.hide();
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `
+                      <div class="d-flex align-items-center">
+                        <span class="me-2">
+                          ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
+                            type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                            type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                            '<i class="bi bi-info-circle-fill text-info"></i>'}
+                        </span>
+                        <span>${message}</span>
+                      </div>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                alertContainer.appendChild(alertDiv);
+
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    alertDiv.classList.add('hide');
+                    setTimeout(() => alertDiv.remove(), 500);
+                }, duration);
+            }
+
+            document.querySelectorAll('[data-bs-target="#confirmPickupModal"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    currentReceiptNo = this.getAttribute('data-receipt');
+                    const products = JSON.parse(this.getAttribute('data-products'));
+                    const total = this.getAttribute('data-total');
+                    const orderDate = this.getAttribute('data-date');
+                    const customerName = this.getAttribute('data-name');
+
+                    const detailsContainer = pickupModal.querySelector('#pickupReceiptDetails');
+                    const currentDateTime = new Date().toLocaleString('en-PH', { hour12: true });
+
+                    // Set current time display
+                    pickupModal.querySelector('#pickupDateTime').textContent = currentDateTime;
+
+                    // Build HTML
+                    let html = `
+                        <div class="mb-3">
+                        <p><strong>Receipt No:</strong> ${currentReceiptNo}</p>
+                        <p><strong>Order Date:</strong> ${orderDate}</p>
+                        </div>
+                        <hr>
+                        <div class="mb-2">
+                        <h6 class="fw-bold mb-2">Ordered Items:</h6>
+                    `;
+
+                    products.forEach(product => {
+                        html += `
+                        <div class="d-flex align-items-center mb-2">
+                        <img src="admin/${product.product_image}" alt="${product.product_name}" 
+                            class="img-thumbnail me-3" style="max-width:60px;">
+                        <div>
+                            <p class="mb-0 fw-semibold">${product.product_name}</p>
+                            <small class="text-muted">
+                            ${product.size && product.size.trim() !== '' ? `Size: ${product.size} | ` : ''}Qty: ${product.quantity}
+                            </small>
+                        </div>
+                        </div>
+                        `;
+                    });
+
+                    html += `
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                        <span>Total Amount:</span>
+                        <span>₱${parseFloat(total).toFixed(2)}</span>
+                        </div>
+                    `;
+
+                    detailsContainer.innerHTML = html;
+
+                    // --- QR CODE GENERATION ---
+                   
+ let qrContentArr = [];
+        products.forEach(product => {
+            // Log each product's variant ID
+            console.log('Product:', product.product_name, 'Variant ID:', product.product_variant_id);
+            
+            const variantId = product.product_variant_id;
+            if (!variantId) {
+                console.error('Missing variant ID for:', product);
+            }
+            qrContentArr.push(`${variantId},${currentReceiptNo},${product.quantity}`);
+        });
+        
+        const qrContent = qrContentArr.join('|');
+        console.log('QR Content:', qrContent);
+
+        // Generate QR code
+        const qrDiv = pickupModal.querySelector('#pickupQrCode');
+        qrDiv.innerHTML = '';
+        new QRCode(qrDiv, {
+            text: qrContent,
+            width: 120,
+            height: 120,
+        });
+                    // --- END QR CODE GENERATION ---
                 });
             });
-            });
-        });
         });
     </script>
 
@@ -787,7 +788,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         
         <!-- Left Side: Product Info -->
         <div class="product-info p-4 text-start">
-          <img src="./Images/41's Aniv Shirt (Front).png" alt="VMC Shirt" class="img-fluid mb-3" />
+          <img src=" " alt="VMC Shirt" class="img-fluid mb-3" />
           <h5 class="mb-1">VMC 41st Anniversary Shirt</h5>
           <p class="text-muted mb-0">Size: L</p>
         </div>
@@ -1166,14 +1167,12 @@ class PhotoUploadHandler {
 
 // Initialize photo upload handlers
 document.addEventListener("DOMContentLoaded", function () {
-    // Initialize for review modal
-    const reviewPhotoUpload = new PhotoUploadHandler(
-        document.querySelector("#rateReviewModal .photo-upload-section")
-    );
+  
 
     // Initialize for return/refund modal
     const returnPhotoUpload = new PhotoUploadHandler(
-        document.querySelector("#returnRequestModal .photo-upload-section")
+        document.querySelector("#returnRequestModal .photo-upload-section"),
+        document.querySelector("#rateReviewModal .photo-upload-section")
     );
 
     // Reset handlers when modals are closed
@@ -1291,23 +1290,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const template = document.getElementById('productReviewTemplate');
 
     // When "Rate & Review" button is clicked
-    document.querySelectorAll('[data-bs-target="#rateReviewModal"]').forEach(button => {
-        button.addEventListener('click', function() {
-            const products = JSON.parse(this.getAttribute('data-products'));
-            
-            // Clear previous reviews
-            productReviewsContainer.innerHTML = '';
-            
-            // Create review forms for each product
-            products.forEach(product => {
-                const reviewElement = createProductReviewElement(product);
-                productReviewsContainer.appendChild(reviewElement);
-            });
-
-            // Initialize functionality for all new review forms
-            initializeReviewForms();
+document.querySelectorAll('[data-bs-target="#rateReviewModal"]').forEach(button => {
+    button.addEventListener('click', function() {
+        const products = JSON.parse(this.getAttribute('data-products'));
+        
+        // Clear previous reviews
+        productReviewsContainer.innerHTML = '';
+        
+        // Create review forms for each product
+        products.forEach(product => {
+            const reviewElement = createProductReviewElement(product);
+            productReviewsContainer.appendChild(reviewElement);
         });
+
+        // Initialize functionality for all new review forms
+        initializeReviewForms();
     });
+});
 
     function createProductReviewElement(product) {
         const clone = template.content.cloneNode(true);

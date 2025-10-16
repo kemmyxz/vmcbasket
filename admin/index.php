@@ -51,12 +51,6 @@ function getDashboardStats() {
     $result = $conn->query($sql);
     $stats['active_students'] = $result->fetch_assoc()['total'];
     
-    // New Messages
-    $sql = "SELECT COUNT(*) as total FROM inquiries 
-            WHERE DATE(created_at) = CURDATE()";
-    $result = $conn->query($sql);
-    $stats['new_messages'] = $result->fetch_assoc()['total'];
-    
     // New Reviews
     $sql = "SELECT COUNT(*) as total FROM product_reviews 
             WHERE DATE(created_at) = CURDATE()";
@@ -66,27 +60,49 @@ function getDashboardStats() {
     return $stats;
 }
 
-// Get low stock product
-function getLowStockProduct() {
+// Get all low stock products (stock <= 5)
+function getLowStockProducts() {
     global $conn;
-    
-    $sql = "SELECT p.product_name, pv.stock 
-            FROM products p 
-            JOIN product_variants pv ON p.id = pv.product_id 
-            WHERE pv.stock <= 50 
-            ORDER BY pv.stock ASC 
-            LIMIT 1";
-            
+    $sql = "SELECT p.product_name, p.dr_number, pv.stock, p.image
+            FROM products p
+            JOIN product_variants pv ON p.id = pv.product_id
+            WHERE pv.stock <= 5
+            ORDER BY pv.stock ASC";
     $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc();
+    $products = [];
+    while ($row = $result->fetch_assoc()) {
+        $products[] = $row;
     }
-    return ['product_name' => 'No products', 'stock' => 0];
+    return $products;
 }
-
+    // New Messages
+function getRecentMessages($limit = 5) {
+    global $conn;
+    $sql = "SELECT i.*, u.student_fname, u.student_lname, u.photo
+            FROM (
+                SELECT *
+                FROM inquiries
+                WHERE sender = 'user'
+                ORDER BY created_at DESC
+            ) i
+            JOIN users u ON i.user_id = u.id
+            GROUP BY i.user_id
+            ORDER BY i.created_at DESC
+            LIMIT ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $messages = [];
+    while ($row = $result->fetch_assoc()) {
+        $messages[] = $row;
+    }
+    return $messages;
+}
+$recentMessages = getRecentMessages(5);
 // Get the stats
 $dashboardStats = getDashboardStats();
-$lowStock = getLowStockProduct();
+$lowStockProducts = getLowStockProducts();
 
 // Include calendar events
 include 'get_calendar_events.php';
@@ -489,20 +505,22 @@ $chartData = getBestSellers();
                             </div>
                             <div class="card-body p-0">
                                 <ul class="list-group list-group-flush">
+                                    <?php foreach($lowStockProducts as $product): ?>
                                     <li class="list-group-item d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center">
-                                        <img src="images/pencil.png" alt="Pencil" width="35" class="me-2">
+                                        <img src="<?php echo htmlspecialchars($product['image'] ?? 'images/default.png'); ?>" alt="<?php echo htmlspecialchars($product['product_name']); ?>" width="35" class="me-2">
                                             <div>
-                                                <span class="fw-semibold text-danger">Pencil</span><br>
-                                                <small class="text-muted">D.R. No: DR1234677</small>
+                                                <span class="fw-semibold text-danger"><?php echo $product['product_name']; ?></span><br>
+                                                <small class="text-muted">D.R. No: <?php echo $product['dr_number']; ?></small>
                                             </div>
                                         </div>
-                                        <span class="text-danger fw-semibold">10pc</span>
+                                        <span class="text-danger fw-semibold"><?php echo $product['stock']; ?>pc</span>
                                     </li>
+                                    <?php endforeach; ?>
                                 </ul>
                             </div>
                             <div class="card-footer text-center bg-white">
-                                <a href="#" class="text-danger fw-semibold text-decoration-none small">See All <i class="bi bi-chevron-right"></i></a>
+                                <a href="prod.php" class="text-danger fw-semibold text-decoration-none small">See All <i class="bi bi-chevron-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -532,29 +550,40 @@ $chartData = getBestSellers();
                     </div>-->
 
                     <!-- Student Messages -->
-                     <div class="col-md-5">
-                        <div class="dashboard-card card low-stock-card shadow-sm h-100">
-                            <div class="card-header student-messages text-white fw-semibold text-center">
-                                Student Messages
+<div class="col-md-5">
+    <div class="dashboard-card card low-stock-card shadow-sm h-100">
+        <div class="card-header student-messages text-white fw-semibold text-center">
+            Student Messages
+        </div>
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+                <?php if (!empty($recentMessages)): ?>
+                    <?php foreach ($recentMessages as $msg): ?>
+                        <li class="list-group-item d-flex align-items-center">
+                            <div class="me-2">
+                                <img src="./uploads/<?php echo htmlspecialchars($msg['photo'] ?? 'images/profile_pic.png'); ?>" class="chat-avatar" alt="Profile Picture" width="35" height="35">
                             </div>
-                            <div class="card-body p-0">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="me-2">
-                                            <img src="images/profile_pic.png" class="chat-avatar" alt="Profile Picture">
-                                        </div>
-                                        <div>
-                                            <strong>Name</strong>
-                                            <div class="small text-muted">Subject: Complain</div>
-                                        </div>
-                                    </li>
-                                </ul>
+                            <div>
+                                <strong><?php echo htmlspecialchars($msg['student_fname'] . ' ' . $msg['student_lname']); ?></strong>
+                                <div class="small text-muted" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    <?php echo htmlspecialchars(mb_strimwidth($msg['message'], 0, 40, "...")); ?>
+                                </div>
+                                <div class="small text-secondary">
+                                    <?php echo date('M d, H:i', strtotime($msg['created_at'])); ?>
+                                </div>
                             </div>
-                            <div class="card-footer text-center bg-white">
-                                <a href="chat.php" class="fw-semibold text-decoration-none small">See All <i class="bi bi-chevron-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
+                        </li>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <li class="list-group-item text-center text-muted">No messages yet.</li>
+                <?php endif; ?>
+            </ul>
+        </div>
+        <div class="card-footer text-center bg-white">
+            <a href="chat.php" class="fw-semibold text-decoration-none small">See All <i class="bi bi-chevron-right"></i></a>
+        </div>
+    </div>
+</div>
 
                     <!-- Ratings & Reviews
                     <div class="col-md-3">

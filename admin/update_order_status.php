@@ -18,11 +18,24 @@ try {
         $stmt->bind_param('s', $receipt_id);
         
         if ($stmt->execute()) {
-            // Also update the status in orders table if needed
             $stmt2 = $conn->prepare("UPDATE orders SET status = 'ToPickUp' WHERE receipt_no = ?");
             $stmt2->bind_param('s', $receipt_id);
             $stmt2->execute();
             
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Failed to update order status']);
+        }
+    } elseif ($action === 'cancelled') {
+        // Update order status to Cancelled
+        $stmt = $conn->prepare("UPDATE order_receipt SET order_status = 'Cancelled' WHERE receipt_id = ?");
+        $stmt->bind_param('s', $receipt_id);
+
+        if ($stmt->execute()) {
+            $stmt2 = $conn->prepare("UPDATE orders SET status = 'Cancelled' WHERE receipt_no = ?");
+            $stmt2->bind_param('s', $receipt_id);
+            $stmt2->execute();
+
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'error' => 'Failed to update order status']);
