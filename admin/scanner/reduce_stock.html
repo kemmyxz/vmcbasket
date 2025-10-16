@@ -94,30 +94,127 @@
       let isProcessing = false;
       let isScanning = false;
 
+      // Update the processQRCode function:
+      async function processQRCode(decodedText) {
+          if (isProcessing) return;
+          isProcessing = true;
+      
+          try {
+              const qrData = JSON.parse(decodedText);
+              console.log('Processing QR data:', qrData);
+      
+              if (!qrData.receipt_id || !Array.isArray(qrData.items)) {
+                  throw new Error("Invalid QR code format - missing receipt_id or items array");
+              }
+      
+              if (qrData.items.length === 0) {
+                  throw new Error("QR code contains no items to process");
+              }
+      
+              // Process each item in the receipt
+              const results = [];
+              for (const item of qrData.items) {
+                  // Validate item structure
+                  if (!item.variant_id) {
+                      console.error('Invalid item:', item);
+                      throw new Error(`Missing variant_id in item data`);
+                  }
+      
+                  if (!item.quantity || item.quantity < 1) {
+                      console.error('Invalid quantity:', item);
+                      throw new Error(`Invalid quantity for variant ${item.variant_id}`);
+                  }
+      
+                  try {
+                      console.log(`Processing variant ID: ${item.variant_id}, Quantity: ${item.quantity}`);
+                      
+                      const response = await fetch("process_reduction.php", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                              variant_id: parseInt(item.variant_id),
+                              quantity: parseInt(item.quantity),
+                              receipt_id: qrData.receipt_id
+                          })
+                      });
+      
+                      const data = await response.json();
+                      console.log('Server response:', data);
+      
+                      if (!data.success) {
+                          throw new Error(data.message || 'Unknown error occurred');
+                      }
+                      
+                      results.push(data);
+                  } catch (itemError) {
+                      console.error('Item processing error:', itemError);
+                      throw new Error(`Failed to process variant ID ${item.variant_id}: ${itemError.message}`);
+                  }
+              }
+      
+              if (results.length > 0) {
+                  showMultipleSuccess(results);
+              } else {
+                  throw new Error("No items were successfully processed");
+              }
+          } catch (error) {
+              console.error('QR processing error:', error);
+              showError(`Error: ${error.message}`);
+          } finally {
+              isProcessing = false;
+          }
+      }     
+           
+      
       function showError(message) {
-        document.getElementById("result").innerHTML = `
-      <div class="alert alert-danger">
-          Error: ${message}
-      </div>`;
-      }
-
+          const errorDiv = document.getElementById("result");
+          errorDiv.innerHTML = `
+              <div class="alert alert-danger">
+                  <h5 class="alert-heading">
+                      <i class="bi bi-exclamation-triangle"></i> Error Occurred
+                  </h5>
+                  <hr>
+                  <p class="mb-2"><strong>Error Details:</strong></p>
+                  <p class="text-danger">${message}</p>
+                  <div class="mt-3">
+                      <p class="mb-1"><strong>Troubleshooting Steps:</strong></p>
+                      <ul class="mb-2">
+                          <li>Verify that the QR code is from a valid receipt</li>
+                          <li>Check if the product variants exist in the system</li>
+                          <li>Try rescanning the QR code</li>
+                      </ul>
+                      <small class="text-muted d-block">If the problem persists, please note down the error message and contact the system administrator.</small>
+                  </div>
+              </div>
+              <button class="btn btn-primary mt-2" onclick="startScanner()">
+                  Try Again
+              </button>
+          `;
+      
+          // Stop the scanner when showing an error
+          stopScanner();
+      
+          // Log the error for debugging
+          console.error('Scanner Error:', message);
+      }   
+      
       function showSuccess(data) {
         lastScannedCode = data.variant_id;
         lastScanTime = Date.now();
 
         const timestamp = new Date().toLocaleString();
         document.getElementById("result").innerHTML = `
-      <div class="alert alert-success">
-          <h5 class="alert-heading"><i class="bi bi-check-circle"></i> Stock Updated Successfully!</h5>
-          <hr>
-          <p><strong>Product:</strong> ${data.product_name}</p>
-          <p><strong>Stock Deducted:</strong> -1 unit</p>
-          <p><strong>New Stock Level:</strong> ${data.new_stock} units</p>
-          <small class="text-muted">Transaction completed at ${timestamp}</small>
-      </div>
-      <button class="btn btn-primary mt-2" id="scanAgainBtn" disabled>
-          Scan Another Code
-      </button>
+    <div class="alert alert-success">
+        <h5 class="alert-heading"><i class="bi bi-check-circle"></i> Stock Updated Successfully!</h5>
+        <hr>
+        <p><strong>Product:</strong> ${data.product_name}</p>
+        <p><strong>Stock Deducted:</strong> -${data.quantity} units</p>
+        <p><strong>New Stock Level:</strong> ${data.new_stock} units</p>
+        <small class="text-muted">Transaction completed at ${timestamp}</small>
+    </div>
+    <button class="btn btn-primary mt-2" id="scanAgainBtn" disabled>
+        Scan Another Code
+    </button>
     `;
 
         stopScanner(); // ✅ stop preview after success
@@ -148,43 +245,115 @@
         audio.play().catch((e) => console.log("Audio play failed:", e));
       }
 
-      async function processQRCode(decodedText) {
-        if (isProcessing) return;
+      // Add new function to show multiple items success
+      function showMultipleSuccess(results) {
+        const timestamp = new Date().toLocaleString();
+        let itemsHtml = results
+          .map(
+            (data) => `
+        <div class="mb-2">
+            <p><strong>Product:</strong> ${data.product_name}</p>
+            <p><strong>Stock Deducted:</strong> -${data.quantity} units</p>
+            <p><strong>New Stock Level:</strong> ${data.new_stock} units</p>
+        </div>`
+          )
+          .join("<hr>");
 
-        isProcessing = true;
+        document.getElementById("result").innerHTML = `
+        <div class="alert alert-success">
+            <h5 class="alert-heading"><i class="bi bi-check-circle"></i> Stock Updated Successfully!</h5>
+            <hr>
+            ${itemsHtml}
+            <small class="text-muted">Transaction completed at ${timestamp}</small>
+        </div>
+        <button class="btn btn-primary mt-2" id="scanAgainBtn" disabled>
+            Scan Another Code
+        </button>
+    `;
 
-        try {
-          const response = await fetch("process_reduction.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ variant_id: decodedText }),
-          });
+        stopScanner();
+        const scanAgainBtn = document.getElementById("scanAgainBtn");
+        let countdown = 1;
 
-          const contentType = response.headers.get("content-type");
-          if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("Server response was not JSON");
-          }
+        const timer = setInterval(() => {
+          countdown--;
+          scanAgainBtn.textContent = `Scan Another Code (${countdown}s)`;
 
-          const data = await response.json();
-
-          if (data.success) {
-            showSuccess(data);
-          } else {
-            showError(data.message || "Unknown error occurred");
+          if (countdown <= 0) {
+            clearInterval(timer);
+            scanAgainBtn.textContent = "Scan Another Code";
+            scanAgainBtn.disabled = false;
             isProcessing = false;
           }
-        } catch (error) {
-          showError(error.message || "Failed to process QR code");
-          isProcessing = false;
-        }
+        }, 1000);
+
+        scanAgainBtn.onclick = () => {
+          document.getElementById("result").innerHTML = "";
+          startScanner();
+        };
+
+        const audio = new Audio("../../assets/success.mp3");
+        audio.play().catch((e) => console.log("Audio play failed:", e));
       }
 
+      // Replace the existing onScanSuccess function with:
       function onScanSuccess(decodedText, decodedResult) {
-        if (!decodedText || isNaN(decodedText)) {
-          showError("Invalid QR code format");
-          return;
-        }
-        processQRCode(decodedText);
+          try {
+              console.log('Raw QR code content:', decodedText);
+              
+              // Check if the content is a number (legacy format)
+              if (/^\d+$/.test(decodedText)) {
+                  // Handle legacy numeric QR code
+                  processLegacyQRCode(decodedText);
+                  return;
+              }
+              
+              // Handle JSON format QR code
+              if (!decodedText.startsWith('{') || !decodedText.endsWith('}')) {
+                  throw new Error("Invalid QR code format: Content must be JSON data");
+              }
+              
+              const cleanedText = decodedText.trim();
+              const qrData = JSON.parse(cleanedText);
+              
+              if (!qrData.receipt_id || !Array.isArray(qrData.items)) {
+                  throw new Error("QR code missing required fields");
+              }
+              
+              processQRCode(cleanedText);
+          } catch (error) {
+              showError(`Error: ${error.message}`);
+          }
+      }
+
+      // Add new function to handle legacy numeric QR codes
+      async function processLegacyQRCode(variantId) {
+          if (isProcessing) return;
+          isProcessing = true;
+
+          try {
+              const response = await fetch("process_reduction.php", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                      variant_id: parseInt(variantId),
+                      quantity: 1  // Default quantity for legacy codes
+                  })
+              });
+
+              const data = await response.json();
+              console.log('Server response:', data);
+
+              if (!data.success) {
+                  throw new Error(data.message);
+              }
+
+              showSuccess(data);
+          } catch (error) {
+              showError(`Error processing item: ${error.message}`);
+          } finally {
+              isProcessing = false;
+          }
       }
 
       // Start scanner (hide QR icon, show/hide buttons)

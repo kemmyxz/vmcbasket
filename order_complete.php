@@ -2,111 +2,44 @@
 require('admin/inc/config.php');
 session_start();
 
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'error' => 'User not logged in']);
+// Check if there's a completed order
+if (!isset($_SESSION['last_receipt_no']) || !isset($_SESSION['checkout_products'])) {
+    header('Location: basket.php');
     exit;
 }
 
-// Check if this is an online payment order and verify receipt upload
-if (isset($_POST['payment_method']) && $_POST['payment_method'] === 'Send Online Receipt') {
-    if (!isset($_SESSION['receipt_image'])) {
-        echo json_encode(['success' => false, 'error' => 'Receipt upload required for online payment']);
-        exit;
-    }
-    
-    // Move the receipt information to the order
-    $receipt_image = $_SESSION['receipt_image'];
-    unset($_SESSION['receipt_image']); // Clear from session after use
-}
+$receiptNo = $_SESSION['last_receipt_no'];
+$products = $_SESSION['checkout_products'];
 
-// Get the item count from session
-$limit = isset($_SESSION['item_count']) ? (int)$_SESSION['item_count'] : 0;
-
-// Create an array to store all orders with their product details
-$orders = [];
-
-// Generate a unique receipt number based on the user ID and current time
-$userId = $_SESSION['user_id'];
-$receiptNo = date('YmdHis') . $userId;
-
-// Start a database transaction
-$conn->begin_transaction();
-
-try {
-    // Step 1: Insert into order_receipt with the generated receipt number
-    $stmt = $conn->prepare("INSERT INTO order_receipt (receipt_id) VALUES (?)");
-    $stmt->bind_param("s", $receiptNo);
-    $stmt->execute();
-
-    // Step 2: Update ONLY the selected orders (those without a receipt number) for this user
-    $stmt = $conn->prepare("
-        UPDATE orders 
-        SET receipt_no = ? 
-        WHERE user_id = ? 
-        AND receipt_no IS NULL 
-        AND status = 'Pending'
-        AND order_date = CURDATE()
-        ORDER BY id DESC 
-        LIMIT ?
-    ");
-    $stmt->bind_param("sii", $receiptNo, $userId, $limit);
-    $stmt->execute();
-
-    // Step 3: Fetch ONLY the orders that were just updated with the new receipt number
-    $stmt = $conn->prepare("
-        SELECT o.*, p.product_name, p.price, p.image 
-        FROM orders o
-        JOIN products p ON o.product_id = p.id
-        WHERE o.user_id = ? 
-        AND o.receipt_no = ?
-        ORDER BY o.id DESC
-    ");
-    $stmt->bind_param("is", $userId, $receiptNo);
-    $stmt->execute();
-    $order_result = $stmt->get_result();
-
-    while ($row = $order_result->fetch_assoc()) {
-        // Calculate total for this order
-        $total = $row['price'] * $row['quantity'];
-        
-        // Add order and product details to the orders array
-        $orders[$row['receipt_no']][] = [
-            'order' => [
-                'id' => $row['id'],
-                'quantity' => $row['quantity'],
-                'size' => $row['size'],
-                'order_date' => $row['order_date'],
-                'payment_method' => $row['payment_method']
-            ],
-            'product' => [
-                'product_name' => $row['product_name'],
-                'price' => $row['price'],
-                'image' => $row['image']
-            ],
-            'total' => $total
-        ];
-    }
-
-    // Commit transaction
-    $conn->commit();
-
-} catch (Exception $e) {
-  $conn->rollback();
-  echo json_encode(['error' => $e->getMessage()]);
-  exit;
-}
+$stmt = $conn->prepare("
+    SELECT o.*, u.student_fname, u.student_lname, 
+           p.type as product_type
+    FROM orders o
+    JOIN users u ON o.user_id = u.id
+    JOIN products p ON o.product_id = p.id
+    WHERE o.receipt_no = ?
+");
+$stmt->bind_param("s", $receiptNo);
+$stmt->execute();
+$result = $stmt->get_result();
+$orders = $result->fetch_all(MYSQLI_ASSOC);
 
 if (empty($orders)) {
-    echo "<h2 class='text-center mt-5'>No orders found. <a href='shop_uniforms.php' class='btn btn-primary ms-2'>Go to Shop</a></h2>";
+    header('Location: basket.php');
     exit;
 }
+
+// Get payment method from the first order (all orders in same receipt have same payment method)
+$paymentMethod = $products[0]['payment_method'] ?? $orders[0]['payment_method'];
+$orderDate = $products[0]['order_date'] ?? $orders[0]['order_date'];
+$customerName = $orders[0]['student_fname'] . ' ' . $orders[0]['student_lname'];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VMC Basket- Order Placed</title>
@@ -262,80 +195,102 @@ if (empty($orders)) {
   </div>
 
   <div class="d-flex justify-content-center p-4">
-    <div class="card shadow-lg ">
+    <div class="card shadow-lg">
       <div class="card-body text-center">
 
         <div class="order-container mt-2">
-            <?php foreach ($orders as $receiptNo => $orderDataArray): ?>
-                <h4 class="text-center fw-bold">Receipt No: 
-                    <a href="#" class="text-decoration-none order-title"><?= $receiptNo ?></a>
-                </h4>
-                <div class="table-responsive">
-                  <table class="table mt-3 mb-2">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th>Description</th>
-                        <th>Unit Price</th>
-                        <th>Qty.</th>
-                        <th>Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <?php foreach ($orderDataArray as $orderData): ?>
-                        <tr>
-                          <td><img src="admin/<?= htmlspecialchars($orderData['product']['image']) ?>" alt="Product" width="60"></td>
-                          <td>
-                            <div class="fw-bold"><?= htmlspecialchars($orderData['product']['product_name']) ?></div>
-                            <div class="text-muted" style="font-size: 0.85rem;">Size: <?= htmlspecialchars($orderData['order']['size']) ?></div>
-                          </td>
-                          <td>₱ <?= number_format($orderData['product']['price'], 2) ?></td>
-                          <td><?= $orderData['order']['quantity'] ?></td>
-                          <td>₱ <?= number_format($orderData['total'], 2) ?></td>
-                        </tr>
-                      <?php endforeach; ?>
-                      <?php 
-                        // Get the first order's date and payment method since all orders in the same receipt have same values
-                        $firstOrder = reset($orderDataArray);
-                      ?>
-                      <tr>
-                        <td><small class="fw-bold text-start">Order Date</small></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                          <small><?= date('M d, Y', strtotime($firstOrder['order']['order_date'])) ?></small>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><small class="fw-bold text-start">Payment</small></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                          <small><?= htmlspecialchars($firstOrder['order']['payment_method']) ?></small>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td><h5 class="fw-bold text-start total-text">Total:</h5></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                          <p class="total-text">₱ <?= number_format(array_sum(array_column($orderDataArray, 'total')), 2) ?></p>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              <?php endforeach; ?>
+                    <h4 class="text-center fw-bold">Receipt No: 
+                        <a href="#" class="text-decoration-none order-title"><?= htmlspecialchars($receiptNo) ?></a>
+                    </h4>
+                    
+                    <div class="table-responsive">
+                        <table class="table mt-3 mb-2">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Description</th>
+                                    <th>Unit Price</th>
+                                    <th>Qty.</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                $totalAmount = 0;
+                                foreach ($orders as $order): 
+                                    $subtotal = $order['price'] * $order['quantity'];
+                                    $totalAmount += $subtotal;
+                                ?>
+                                    <tr>
+                                        <td><img src="admin/<?= htmlspecialchars($order['image']) ?>" alt="Product" width="60"></td>
+                                                                            
+                                        <td>
+                                            <div class="fw-bold"><?= htmlspecialchars($order['product_name']) ?></div>
+                                            <?php if ($order['product_type'] === 'Uniform' && !empty($order['size']) && $order['size'] !== 'N/A'): ?>
+                                                <div class="text-muted" style="font-size: 0.85rem;">Size: <?= htmlspecialchars($order['size']) ?></div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>₱ <?= number_format($order['price'], 2) ?></td>
+                                        <td><?= $order['quantity'] ?></td>
+                                        <td>₱ <?= number_format($subtotal, 2) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
 
-            <a href="purchase_history.php"><button class="custom-navy-btn mt-3">View My Purchase</button></a>
-        </div>
+                                <tr>
+                                    <td><small class="fw-bold text-start">Order Date</small></td>
+                                    <td colspan="3"></td>
+                                    <td><small><?= date('M d, Y', strtotime($orderDate)) ?></small></td>
+                                </tr>
+                                <tr>
+                                    <td><small class="fw-bold text-start">Payment</small></td>
+                                    <td colspan="3"></td>
+                                    <td><small><?= htmlspecialchars($paymentMethod) ?></small></td>
+                                </tr>
+                                <tr>
+                                    <td><h5 class="fw-bold text-start total-text">Total:</h5></td>
+                                    <td colspan="3"></td>
+                                    <td><p class="total-text">₱ <?= number_format($totalAmount, 2) ?></p></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <a href="purchase_history.php" class="custom-navy-btn mt-3">View My Purchase</a>
+                </div>
       </div>
     </div>
   </div>
 
-</body>
+  <?php
+    // Clear checkout session data
+    unset($_SESSION['checkout_products']);
+    unset($_SESSION['last_receipt_no']);
+    ?>
 
+  <script>
+    // Prevent back button
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function() {
+        window.history.pushState(null, null, window.location.href);
+        window.location.href = 'purchase_history.php';
+    };
+
+    // Prevent browser back button
+    window.addEventListener('load', function() {
+        window.history.forward();
+    });
+
+    // Disable back button in browser
+    window.onunload = function() {
+        null;
+    };
+
+    // If user tries to leave the page
+    window.onbeforeunload = function() {
+        window.setTimeout(function() {
+            window.location = 'purchase_history.php';
+        }, 0);
+    };
+</script>
+</body>
 </html>

@@ -31,7 +31,7 @@ CREATE TABLE orders (
     quantity INT NOT NULL,
     customer_name VARCHAR(255) NOT NULL,
     school_id VARCHAR(20) NOT NULL,
-    mail VARCHAR(255) AFTER school_id,
+    email VARCHAR(255) AFTER school_id,
     phone VARCHAR(15) AFTER email,
     price DECIMAL(10,2) NOT NULL,
     order_date DATE NOT NULL DEFAULT CURRENT_DATE,

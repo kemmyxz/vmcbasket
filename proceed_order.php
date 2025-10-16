@@ -1,44 +1,76 @@
 <?php
 require 'admin/inc/config.php';
+session_start();
 
 // Get products data
-function getProducts()
-{
-  global $conn;
-  $products = [];
-  session_start(); // Must be called before accessing $_SESSION
-
-  $limit = isset($_SESSION['item_count']) ? (int) $_SESSION['item_count'] : 0;
-
-  if ($limit <= 0) {
-    return ['error' => 'Invalid item count'];
-  }
-
-  // Query to fetch products and their quantities from the orders table
-  $stmt = $conn->prepare("SELECT orders.product_name, orders.quantity, orders.price, orders.image, orders.size 
-                          FROM orders ORDER BY orders.id DESC LIMIT ?");
-  if (!$stmt) {
-    return ['error' => $conn->error];
-  }
-
-  $stmt->bind_param("i", $limit);
-  $stmt->execute();
-  $result = $stmt->get_result();
-
-  if ($result === false) {
-    return ['error' => $conn->error];
-  }
-
-  if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-      $row['image'] = !empty($row['image'])
-        ? 'admin/' . $row['image']
-        : 'admin/images/default.png';
-      $products[] = $row;
+function getProducts() {
+    global $conn;
+    
+    if (!isset($_SESSION['selected_items']) || empty($_SESSION['selected_items'])) {
+        return ['error' => 'No items selected'];
     }
-  }
 
-  return $products;
+    if (!isset($_SESSION['user_id'])) {
+        return ['error' => 'User not logged in'];
+    }
+
+    $products = [];
+    $basketIds = array_map('intval', $_SESSION['selected_items']);
+    $placeholders = str_repeat('?,', count($basketIds) - 1) . '?';
+    
+       
+    $sql = "SELECT b.id, b.product_id, b.product_name, b.quantity, b.price, b.size, 
+            b.image, p.product_name as original_name, p.type as product_type,
+            u.student_fname, u.student_lname, u.student_mname, u.student_no,
+            u.email, u.phone_number, u.year_level
+            FROM basket b 
+            JOIN products p ON b.product_id = p.id 
+            JOIN users u ON b.user_id = u.id
+            WHERE b.id IN ($placeholders) AND b.user_id = ?";
+            
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        return ['error' => $conn->error];
+    }
+
+    // Add user_id to the parameters
+    $params = $basketIds;
+    $params[] = $_SESSION['user_id'];
+    $types = str_repeat('i', count($basketIds)) . 'i';
+    
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+        // Get the first row for user information
+        $firstRow = $result->fetch_assoc();
+        
+        // Store user information in session
+        $_SESSION['order_user_info'] = [
+            'full_name' => $firstRow['student_fname'] . ' ' . 
+                         $firstRow['student_mname'] . ' ' . 
+                         $firstRow['student_lname'],
+            'student_no' => $firstRow['student_no'],
+            'email' => $firstRow['email'],
+            'phone_number' => $firstRow['phone_number'],
+            'year_level' => $firstRow['year_level']
+        ];
+
+        // Reset result pointer
+        $result->data_seek(0);
+        
+        // Process products
+        while ($row = $result->fetch_assoc()) {
+            $row['total_price'] = $row['price'] * $row['quantity'];
+            $products[] = $row;
+        }
+        
+        // Store complete product details in session
+        $_SESSION['checkout_products'] = $products;
+    }
+
+    return $products;
 }
 
 // Get the products before HTML output
@@ -295,17 +327,18 @@ $products = getProducts();
   <div class="container p-5">
 
     <!-- Return Button -->
+   
     <div class="order-header">
-      <button class="btn btn-circle" onclick="window.history.back();">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
-          viewBox="0 0 16 16">
-          <path fill-rule="evenodd"
-            d="M15 8a.5.5 0 0 1-.5.5H2.707l4.147 4.146a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z" />
-        </svg>
-      </button>
-      <h2>
-          <span class="highlight-blue">Order Details</span>
-      </h2>
+        <a href="basket.php" class="btn btn-circle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left"
+                viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                    d="M15 8a.5.5 0 0 1-.5.5H2.707l4.147 4.146a.5.5 0 0 1-.708.708l-5-5a.5.5 0 0 1 0-.708l5-5a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z" />
+            </svg>
+        </a>
+        <h2>
+            <span class="highlight-blue">Order Details</span>
+        </h2>
     </div>
    
     <!-- Order Details -->
@@ -323,44 +356,43 @@ $products = getProducts();
           
           <tbody>
             <?php if (isset($products['error'])): ?>
-              <tr>
-                <td colspan="4" class="text-danger">Error: <?php echo htmlspecialchars($products['error']); ?></td>
-              </tr>
-            <?php elseif (!empty($products)): ?>
-              <?php
-              $total = 0; // Initialize total
-              $totalItems = 0; // Initialize total items
-              ?>
-              <?php foreach ($products as $product): ?>
-                <?php
-                // Example values; update as needed with real quantity logic
-                $itemQuantity = $product['quantity'];// Assuming quantity is passed from the form
-                $subtotal = $product['price'] * $itemQuantity;
-                $total += $subtotal; // Add to total
-                $totalItems += $itemQuantity; // Add to total items
-                ?>
                 <tr>
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <img src="<?php echo htmlspecialchars($product['image']); ?>" class="product-img me-2"
-                        alt="Product" />
-                      <div>
-                        <strong><?php echo htmlspecialchars($product['product_name']); ?></strong><br />
-                        <?php if (!empty($order['size']) && $order['size'] !== 'N/A'): ?>
-                            Size: <?php echo htmlspecialchars($order['size']); ?>
-                        <?php endif; ?>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="text-center">₱ <?php echo number_format($product['price'], 2); ?></td>
-                  <td class="text-center"><?php echo $itemQuantity; ?></td>
-                  <td class="text-end">₱ <?php echo number_format($subtotal, 2); ?></td>
+                    <td colspan="4" class="text-danger">Error: <?php echo htmlspecialchars($products['error']); ?></td>
                 </tr>
-              <?php endforeach; ?>
+            <?php elseif (!empty($products)): ?>
+                <?php
+                $total = 0;
+                $totalItems = 0;
+                ?>
+                <?php foreach ($products as $product): ?>
+                    <?php
+                    $subtotal = $product['price'] * $product['quantity'];
+                    $total += $subtotal;
+                    $totalItems += $product['quantity'];
+                    ?>
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="./admin/<?php echo htmlspecialchars($product['image']); ?>" 
+                                     class="product-img me-2" 
+                                     alt="Product" />
+                                <div>
+                                    <strong><?php echo htmlspecialchars($product['product_name']); ?></strong><br />
+                                    <?php if ($product['product_type'] === 'Uniform' && !empty($product['size']) && $product['size'] !== 'N/A'): ?>
+                                        <small class="text-muted">Size: <?php echo htmlspecialchars($product['size']); ?></small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">₱ <?php echo number_format($product['price'], 2); ?></td>
+                        <td class="text-center"><?php echo $product['quantity']; ?></td>
+                        <td class="text-end">₱ <?php echo number_format($subtotal, 2); ?></td>
+                    </tr>
+                <?php endforeach; ?>
             <?php else: ?>
-              <tr>
-                <td colspan="4">No featured products available.</td>
-              </tr>
+                <tr>
+                    <td colspan="4">No items selected for purchase.</td>
+                </tr>
             <?php endif; ?>
           </tbody>
 
@@ -451,10 +483,13 @@ $products = getProducts();
     </div>
 
       <hr class="order-line">
+
       <div class="d-flex justify-content-end mt-2">
-        <button class="btn btn-outline-danger me-2 btn-cancel " onclick="window.history.back();">Cancel</button>
-        <a href="order_complete.php"><button class="custom-navy-btn " type="submit">Proceed to Order</button></a>
-    </div>
+          <a href="basket.php" class="btn btn-outline-danger me-2 btn-cancel">Cancel</a>
+          <a href="order_complete.php">
+              <button class="custom-navy-btn" type="submit">Proceed to Order</button>
+          </a>
+      </div>
   </div>
 
  <script>
@@ -499,44 +534,51 @@ $products = getProducts();
     }
 
     // Add validation before form submission
-document.querySelector('a[href="order_complete.php"]').addEventListener('click', function(e) {
-    const onlinePaymentSelected = document.querySelector('input[name="paymentMethod"][value="Send Online Receipt"]').checked;
-    const hasUploadedReceipt = document.querySelector('#previewContainer img') !== null;
+document.querySelector('a[href="order_complete.php"]').addEventListener('click', async function(e) {
+    e.preventDefault();
+    
+    try {
+        const onlinePaymentSelected = document.querySelector('input[name="paymentMethod"][value="Send Online Receipt"]').checked;
+        const hasUploadedReceipt = document.querySelector('#previewContainer img') !== null;
 
-    if (onlinePaymentSelected && !hasUploadedReceipt) {
-        e.preventDefault();
-        alert('Please upload your GCash e-receipt before proceeding with the order.');
-        return false;
-    }
-    
-    // If receipt is uploaded for online payment or if it's cash payment, proceed with form submission
-    const formData = new FormData();
-    
-    if (onlinePaymentSelected && hasUploadedReceipt) {
-        // Get the receipt image file
-        const receiptFile = document.querySelector('#gcashReceiptInput').files[0];
-        formData.append('receipt_image', receiptFile);
-        
-        // Send the receipt first
-        fetch('upload_receipt.php', {
+        if (onlinePaymentSelected && !hasUploadedReceipt) {
+            alert('Please upload your GCash e-receipt before proceeding with the order.');
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append('payment_method', onlinePaymentSelected ? 'Send Online Receipt' : 'Cash (Pay at the Counter)');
+
+        // If online payment, append receipt file
+        if (onlinePaymentSelected && hasUploadedReceipt) {
+            const receiptFile = document.querySelector('#gcashReceiptInput').files[0];
+            if (receiptFile) {
+                formData.append('receipt_image', receiptFile);
+            }
+        }
+
+        // Process the order
+        const response = await fetch('process_order.php', {
             method: 'POST',
             body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Only proceed to order_complete.php if upload was successful
-                window.location.href = 'order_complete.php';
-            } else {
-                alert('Error uploading receipt: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error uploading receipt');
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
         
-        e.preventDefault(); // Prevent default navigation
+        if (!data.success) {
+            throw new Error(data.message || 'Order processing failed');
+        }
+
+        // If everything is successful, redirect to order completion page
+        window.location.href = 'order_complete.php';
+
+    } catch (error) {
+        console.error('Error during order processing:', error);
+        alert('Order processing failed: ' + error.message);
     }
 });
 
@@ -606,6 +648,26 @@ document.addEventListener("DOMContentLoaded", function () {
             handleFile(files[0]);
         }
     });
+});
+
+// Prevent using browser back button
+window.history.pushState(null, null, window.location.href);
+window.onpopstate = function () {
+    window.history.pushState(null, null, window.location.href);
+    window.location.href = 'basket.php';
+};
+
+// Confirm before leaving page
+window.addEventListener('beforeunload', function (e) {
+    if (!window.submitClicked) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
+// Set flag when proceeding with order
+document.querySelector('.custom-navy-btn').addEventListener('click', function() {
+    window.submitClicked = true;
 });
   </script>
 

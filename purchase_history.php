@@ -94,6 +94,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <title>VMC Basket-My Purchase</title>
     <?php include 'links.php';?>
     <style>
@@ -579,11 +580,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                 </div>
             </div>
 
-            <div class="modal-footer justify-content-end">
-                <!-- PATANGGAL NA LANG IF OKAY NA BACK-END NG QR CODE-->
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="custom-navy-btn" id="confirmPickupBtn">Confirm Pick-up</button>
-            </div>
+
             </div>
         </div>
         </div>
@@ -773,76 +770,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
 
 <!------------------------ MODALS ----------------------------------------------------------->
-<!-- SEND E-RECEIPT MODAL-->
-<div class="modal fade" id="gcashUploadModal" tabindex="-1" aria-labelledby="gcashUploadLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content gcash-modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title d-flex align-items-center" id="gcashUploadLabel">
-          <img src="./admin/images/Gcash-icon.png" alt="Receipt Icon" class="me-2 gcash-logo">
-          Upload E-Receipt from GCash
-        </h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
 
-      <div class="modal-body d-flex p-0">
-        
-        <!-- Left Side: INSTRUCTIONS -->
-        <div class="instruction-box p-4">
-        <ol class="ps-3 instruction-list">
-            <h5 class="fw-bold content-title mb-3">Steps to Confirm Your Payment:</h5>
-              <li>Scan the QR code or manually enter the phone number for the <strong>VMC Official GCash Account</strong>.</li>
-              <li>Complete your payment through GCash.</li>
-              <li>Take a screenshot of the E-receipt from your GCash transaction.</li>
-              <li>
-                Upload the screenshot directly here to confirm your payment.
-                <br><small class="text-muted">• Ensure the screenshot clearly displays all important details of your payment (e.g., <em>transaction date, amount paid, reference number</em>).</small>
-              </li>
-              <li>This uploaded screenshot will serve as <strong>proof</strong> that your payment has been completed successfully through the online method.</li>
-            </ol>
-          </div>
-
-        <!-- Right Side: GCASH QR CODE -->
-            <div class="review-form flex-grow-1 p-4">
-                <h5 class="fw-bold mb-3 content-title">VMC Official GCash Account:</h5>
-                <img src="./admin/images/GCashAcc.jpg" alt="GCash QR Code" class="img-fluid qr-img mb-2">
-            </div>
-        </div>
-        <hr>
-
-        <!-- Upload Section -->
-        <div class="upload-section p-4">
-            <h5 class="content-title fw-bold">Upload Here</h5>
-            <p class="text-muted mb-3">Select and upload (1) image</p>
-
-            <label for="gcashReceiptInput" class="upload-box border rounded p-4 text-center position-relative d-block" id="dropArea">
-                <input type="file" id="gcashReceiptInput" class="d-none" accept=".jpg,.jpeg,.png">
-
-                <!-- This part will be hidden when image is uploaded -->
-                <div id="uploadPrompt">
-                <i class="bi bi-upload fs-1 mb-2"></i>
-                <p class="mb-1 fw-medium">Choose a file or drag & drop it here.</p>
-                <small class="text-muted">JPG, JPEG, PNG formats, up to 50MB</small><br>
-                <span class="btn btn-outline-secondary mt-2">Browse File</span>
-                </div>
-
-                <!-- Preview container -->
-                <div id="previewContainer" class="mt-3"></div>
-            </label>
-        </div>
-
-
-        <hr>
-        <!-- Footer -->
-            <div class="modal-footer d-flex justify-content-end align-items-center">
-                <button class="btn btn-outline-danger w-25" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary w-25">Send E-Receipt</button>
-            </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- RETURN REFUND MODAL -->
 <div class="modal fade" id="returnRequestModal" tabindex="-1" aria-labelledby="returnRequestLabel" aria-hidden="true">
@@ -1258,139 +1186,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// UPLOAD G-CASH E-RECEIPT FUNCTIONALITY
-document.addEventListener("DOMContentLoaded", function () {
-  const fileInput = document.getElementById("gcashReceiptInput");
-  const dropArea = document.getElementById("dropArea");
-  const uploadPrompt = document.getElementById("uploadPrompt");
-  const previewContainer = document.getElementById("previewContainer");
-  const allowedExtensions = ["jpg", "jpeg", "png"];
-
-  function resetUpload() {
-    fileInput.value = "";
-    previewContainer.innerHTML = "";
-    uploadPrompt.style.display = "block";
-  }
-
-  function handleFile(file) {
-    const fileExtension = file.name.split(".").pop().toLowerCase();
-
-    if (!allowedExtensions.includes(fileExtension)) {
-      alert("Invalid file type. Please upload a JPG, JPEG, or PNG image.");
-      return;
-    }
-
-    if (file.size > 50 * 1024 * 1024) {
-      alert("File is too large. Please upload an image up to 50MB.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      uploadPrompt.style.display = "none";
-      previewContainer.innerHTML = `
-        <img src="${e.target.result}" class="img-fluid rounded mb-3" style="max-height: 250px;" alt="Uploaded Preview">
-        <br>
-        <button type="button" class="btn btn-danger btn-sm" id="removeImageBtn">Remove Image</button>
-      `;
-      document.getElementById("removeImageBtn").addEventListener("click", resetUpload);
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // On input change
-  fileInput.addEventListener("change", function () {
-    if (fileInput.files.length > 0) {
-      handleFile(fileInput.files[0]);
-    }
-  });
-
-  // Drag & Drop Events
-  ;["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-    dropArea.addEventListener(eventName, e => e.preventDefault());
-    dropArea.addEventListener(eventName, e => e.stopPropagation());
-  });
-
-  dropArea.addEventListener("dragover", () => dropArea.classList.add("bg-light"));
-  dropArea.addEventListener("dragleave", () => dropArea.classList.remove("bg-light"));
-
-  dropArea.addEventListener("drop", e => {
-    dropArea.classList.remove("bg-light");
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    if (files.length > 0) {
-      handleFile(files[0]);
-    }
-  });
-});
-
-// E-Receipt Upload Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const gcashModal = document.getElementById('gcashUploadModal');
-    const fileInput = document.getElementById('gcashReceiptInput');
-    const uploadPrompt = document.getElementById('uploadPrompt');
-    const previewContainer = document.getElementById('previewContainer');
-    
-    let currentReceiptNo = null;
-
-    // When upload button is clicked
-    document.querySelectorAll('[data-bs-target="#gcashUploadModal"]').forEach(button => {
-        button.addEventListener('click', function() {
-            currentReceiptNo = this.getAttribute('data-receipt');
-            resetUpload();
-        });
-    });
-
-    // Send E-Receipt button click handler
-    gcashModal.querySelector('.btn-primary').addEventListener('click', function() {
-        if (!fileInput.files.length) {
-            alert('Please select an e-receipt image to upload');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('receipt_no', currentReceiptNo);
-        formData.append('receipt_image', fileInput.files[0]);
-
-        // Show loading state
-        this.disabled = true;
-        this.innerHTML = 'Uploading...';
-
-        fetch('upload_receipt.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('E-Receipt uploaded successfully');
-                location.reload(); // Refresh page to show updated status
-            } else {
-                alert('Error uploading e-receipt: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error uploading e-receipt');
-        })
-        .finally(() => {
-            // Reset button state
-            this.disabled = false;
-            this.innerHTML = 'Send E-Receipt';
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(gcashModal);
-            modal.hide();
-        });
-    });
-
-    function resetUpload() {
-        fileInput.value = '';
-        previewContainer.innerHTML = '';
-        uploadPrompt.style.display = 'block';
-    }
-});
-
 // Cancel Order Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const cancelModal = document.getElementById('cancelOrderModal');
@@ -1676,40 +1471,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-/* Add this to your existing JavaScript code section
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle Pick-up confirmation
-    document.querySelectorAll('.pickup-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            if (confirm('Confirm that you have picked up this order?')) {
-                const receiptNo = this.getAttribute('data-receipt');
-                
-                // Send AJAX request to update order status
-                fetch('update_order_status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `receipt_no=${receiptNo}&status=Complete`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Order status updated successfully');
-                        location.reload(); // Refresh page to show updated status
-                    } else {
-                        alert('Error updating order status: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error updating order status');
-                });
-            }
-        });
-    });
-});
-*/
+
 // Add this to your existing JavaScript code
 function calculateAverageRating(productId) {
     fetch(`get_product_rating.php?product_id=${productId}`)

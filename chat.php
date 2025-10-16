@@ -48,3 +48,49 @@ ini_set('display_errors', 1);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="chat.js"></script>
 
+<script>
+let chatInitialized = false;
+
+function chatInit() {
+    if (chatInitialized) return;
+    
+    const chatToggleBtn = document.getElementById('chatToggleBtn');
+    const chatBox = document.getElementById('chatBox');
+    const closeChat = document.getElementById('closeChat');
+    
+    chatToggleBtn?.addEventListener('click', () => {
+        chatBox.classList.toggle('show');
+        loadChatMessages(); // Load messages when chat is opened
+    });
+    
+    closeChat?.addEventListener('click', () => {
+        chatBox.classList.remove('show');
+    });
+    
+    chatInitialized = true;
+    console.log('Chat initialized');
+}
+
+function checkNewChatMessages() {
+    if (!document.getElementById('chatBox').classList.contains('show')) {
+        return; // Don't check if chat is closed
+    }
+    loadChatMessages();
+}
+
+function loadChatMessages() {
+    // Fetch messages from server
+    fetch('get_messages.php')
+        .then(response => response.json())
+        .then(messages => {
+            const chatBody = document.getElementById('chatBody');
+            // Update chat messages
+            // ... message display logic ...
+        })
+        .catch(error => console.error('Error loading messages:', error));
+}
+
+// Initialize chat when document is ready
+document.addEventListener('DOMContentLoaded', chatInit);
+</script>
+

@@ -594,7 +594,8 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     const checkbox = document.querySelector(`.basket-checkbox[data-id="${itemId}"]`);
                     if (checkbox) {
                         checkbox.dataset.quantity = newQuantity;
-                        recalculateTotal(); // Recalculate the total after quantity update
+                        // Call the now globally available recalculateTotal function
+                        recalculateTotal();
                     }
                     showBootstrapAlert('Quantity updated!', 'success');
                 } else {
@@ -868,36 +869,48 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <?php include 'footer.php'; ?>
     <?php include 'chat.php'; ?>
 
-
-
-</script>
 <script>
-    function recalculateTotal() {
-        let totalItems = 0;
-        let subtotal = 0;
+function recalculateTotal() {
+    let totalItems = 0;
+    let subtotal = 0;
+    
+    // Get all checkboxes
+    const checkboxes = document.querySelectorAll('.basket-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            const price = parseFloat(checkbox.dataset.price);
+            const quantity = parseInt(checkbox.dataset.quantity);
+            subtotal += price * quantity;
+            totalItems += quantity;
+        }
+    });
 
-        document.querySelectorAll('.basket-checkbox').forEach(checkbox => {
-            if (checkbox.checked) {
-                const price = parseFloat(checkbox.dataset.price);
-                const quantity = parseInt(checkbox.dataset.quantity);
-                subtotal += price * quantity;
-                totalItems += quantity;
-            }
-        });
+    // Safely update DOM elements with null checks
+    const totalItemsElement = document.getElementById('total-items');
+    const subtotalElement = document.getElementById('subtotal-amount');
+    const totalElement = document.getElementById('total-amount');
 
-        // Update the Order Summary
-        document.getElementById('total-items').textContent = totalItems;
-        document.getElementById('subtotal-amount').textContent = subtotal.toFixed(2);
-        document.getElementById('total-amount').textContent = subtotal.toFixed(2);
+    if (totalItemsElement) {
+        totalItemsElement.textContent = totalItems;
     }
+    if (subtotalElement) {
+        subtotalElement.textContent = subtotal.toFixed(2);
+    }
+    if (totalElement) {
+        totalElement.textContent = subtotal.toFixed(2);
+    }
+}
 
+document.addEventListener('DOMContentLoaded', function() {
     // Attach event listeners to all checkboxes
     document.querySelectorAll('.basket-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', recalculateTotal);
     });
 
-    // Recalculate once at start just in case
+    // Initial calculation
     recalculateTotal();
+});
 </script>
 </body>
 

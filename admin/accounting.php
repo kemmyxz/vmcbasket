@@ -2,9 +2,11 @@
 require('inc/config.php');
 
 // Fetch all products
-$sql = "SELECT p.*, pv.size, pv.stock, p.image 
-        FROM products p 
-        LEFT JOIN product_variants pv ON p.id = pv.product_id";
+$sql = "SELECT p.*, pv.id as variant_id, 
+       CASE WHEN p.type = 'Supplies' THEN 'default' ELSE pv.size END as size,
+       pv.stock
+FROM products p 
+LEFT JOIN product_variants pv ON p.id = pv.product_id";
 $result = $conn->query($sql);
 
 $products = [];
@@ -16,11 +18,15 @@ while ($row = $result->fetch_assoc()) {
             'price' => $row['price'],
             'type' => $row['type'],
             'image' => $row['image'],
-            'sizes' => []
+            'variants' => []
         ];
     }
     if ($row['size']) {
-        $products[$row['id']]['sizes'][] = $row['size'];
+        $products[$row['id']]['variants'][] = [
+            'variant_id' => $row['variant_id'],
+            'size' => $row['size'],
+            'stock' => $row['stock']
+        ];
     }
 }
 ?>
@@ -190,7 +196,7 @@ while ($row = $result->fetch_assoc()) {
                                             <option value="<?= $product['id'] ?>" 
                                                     data-type="<?= $product['type'] ?>"
                                                     data-price="<?= $product['price'] ?>"
-                                                    data-sizes='<?= json_encode($product['sizes']) ?>'>
+                                                    data-variants='<?= json_encode($product['variants']) ?>'>
                                                 <?= htmlspecialchars($product['name']) ?>
                                             </option>
                                         <?php endforeach; ?>
@@ -201,11 +207,8 @@ while ($row = $result->fetch_assoc()) {
                                     <label class="form-label">Size</label>
                                     <select class="form-select" name="size[]">
                                         <option value="" disabled selected>Select Size</option>
-                                        <option value="Small">S</option>
-                                        <option value="Medium">M</option>
-                                        <option value="Large">L</option>
-                                        <option value="XL">XL</option>
                                     </select>
+                                    <input type="hidden" name="variant_id[]" class="variant-id">
                                 </div>
 
                                 <div class="col-md-3 d-flex align-items-end">
@@ -301,34 +304,36 @@ while ($row = $result->fetch_assoc()) {
 <script>
 
         function generateQRCode(receiptData) {
-        // Clear previous QR code
-        const qrcodeDiv = document.getElementById('qrcode');
-        if (qrcodeDiv) {
-            qrcodeDiv.innerHTML = '';
-            
-            // Format the receipt data for QR code
-            const qrData = {
-                receiptId: receiptData.receiptId,
-                customerName: receiptData.customerName,
-                paymentMode: receiptData.paymentMode,
-                total: receiptData.total,
-                date: receiptData.date,
-                items: receiptData.items
-            };
-            
-            // Create QR code
-            new QRCode(qrcodeDiv, {
-                text: JSON.stringify(qrData),
-                width: 128,
-                height: 128,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        } else {
-            console.error('QR code container not found');
-        }
+    const qrcodeDiv = document.getElementById('qrcode');
+    if (qrcodeDiv) {
+        qrcodeDiv.innerHTML = '';
+        
+        console.log('Items before QR generation:', receiptData.items); // Debug log
+        
+        // Format the receipt data for QR code
+        const qrData = {
+            receipt_id: receiptData.receiptId,
+            items: receiptData.items.map(item => ({
+                variant_id: parseInt(item.variantId), // Convert to integer
+                quantity: item.quantity
+            }))
+        };
+        
+        console.log('QR Data:', qrData); // Debug log
+        
+        // Create QR code
+        new QRCode(qrcodeDiv, {
+            text: JSON.stringify(qrData),
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    } else {
+        console.error('QR code container not found');
     }
+}
     
     $(document).ready(function () {
     // Generate Receipt ID
@@ -355,7 +360,7 @@ while ($row = $result->fetch_assoc()) {
             const selectedOption = $(this).find(':selected');
             const type = selectedOption.data('type');
             const price = selectedOption.data('price');
-            const sizes = selectedOption.data('sizes');
+            const variants = selectedOption.data('variants');
             const row = $(this).closest('.product-item');
             
             // Update price
@@ -363,23 +368,34 @@ while ($row = $result->fetch_assoc()) {
             
             // Handle size field
             const sizeSelect = row.find('select[name="size[]"]');
+            const variantIdInput = row.find('.variant-id');
+            
             if (type === 'Supplies') {
                 sizeSelect.prop('disabled', true).val('');
                 sizeSelect.closest('.col-md-2').hide();
+                variantIdInput.val(''); // Clear variant ID
             } else {
                 sizeSelect.prop('disabled', false).empty();
                 sizeSelect.closest('.col-md-2').show();
                 
-                // Add size options
+                // Add only the size options from variants
                 sizeSelect.append('<option value="" disabled selected>Select Size</option>');
-                sizes.forEach(size => {
-                    sizeSelect.append(`<option value="${size}">${size}</option>`);
-                });
+                if (variants) {
+                    const parsedVariants = typeof variants === 'string' ? JSON.parse(variants) : variants;
+                    parsedVariants.forEach(variant => {
+                        sizeSelect.append(`
+                            <option value="${variant.size}" 
+                                    data-variant-id="${variant.variant_id}">
+                                ${variant.size}
+                            </option>
+                        `);
+                    });
+                }
             }
 
-            // Update all selects to disable already selected products
-            updateProductSelectOptions();
-
+            // Clear variant ID when product changes
+            variantIdInput.val('');
+            
             // Update total
             calculateTotal();
         });
@@ -438,7 +454,7 @@ while ($row = $result->fetch_assoc()) {
                             <option value="${product.id}" 
                                     data-type="${product.type}"
                                     data-price="${product.price}"
-                                    data-sizes='${JSON.stringify(product.sizes)}'>
+                                    data-variants='${JSON.stringify(product.variants)}'>
                                 ${product.name}
                             </option>
                         `).join('')}
@@ -449,6 +465,7 @@ while ($row = $result->fetch_assoc()) {
                     <select class="form-select" name="size[]">
                         <option value="" disabled selected>Select Size</option>
                     </select>
+                    <input type="hidden" name="variant_id[]" class="variant-id">
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
                     <div class="w-100">
@@ -509,14 +526,71 @@ while ($row = $result->fetch_assoc()) {
         }
     });
 
-    // Also update options if user clears a select2 selection
+
     $(document).on('change', '.product-select', function() {
-        updateProductSelectOptions();
+        const selectedOption = $(this).find(':selected');
+        const type = selectedOption.data('type');
+        const price = selectedOption.data('price');
+        const variants = selectedOption.data('variants');
+        const row = $(this).closest('.product-item');
+        
+        // Update price
+        row.find('input[name="price[]"]').val(price);
+        
+        // Handle size field and variant ID
+        const sizeSelect = row.find('select[name="size[]"]');
+        const variantIdInput = row.find('.variant-id');
+        
+        if (type === 'Supplies') {
+            sizeSelect.prop('disabled', true).val('');
+            sizeSelect.closest('.col-md-2').hide();
+            
+            // For supplies, get the first variant ID (if exists)
+            if (variants) {
+                const parsedVariants = typeof variants === 'string' ? JSON.parse(variants) : variants;
+                if (parsedVariants.length > 0) {
+                    variantIdInput.val(parsedVariants[0].variant_id);
+                }
+            }
+        } else {
+            sizeSelect.prop('disabled', false).empty();
+            sizeSelect.closest('.col-md-2').show();
+            
+            // Add size options from variants
+            sizeSelect.append('<option value="" disabled selected>Select Size</option>');
+            if (variants) {
+                const parsedVariants = typeof variants === 'string' ? JSON.parse(variants) : variants;
+                parsedVariants.forEach(variant => {
+                    sizeSelect.append(`
+                        <option value="${variant.size}" 
+                                data-variant-id="${variant.variant_id}">
+                            ${variant.size}
+                        </option>
+                    `);
+                });
+                variantIdInput.val(''); // Clear variant ID until size is selected
+            }
+        }
+        
+        // Update total
+        calculateTotal();
+    });
+
+    // Add this size select change handler after the product select change handler
+    $(document).on('change', 'select[name="size[]"]', function() {
+        const selectedOption = $(this).find(':selected');
+        const variantId = selectedOption.data('variant-id');
+        const row = $(this).closest('.product-item');
+        
+        // Update hidden variant ID input
+        row.find('.variant-id').val(variantId);
+        console.log('Selected variant ID:', variantId); // Debug log
     });
 
     // Submit button handler
     $('#submitBtn').on('click', function() {
         const receiptId = generateReceiptId();
+        const orderId = `ORDER-${receiptId}`; // Generate order ID
         let receiptHTML = '';
         let isValid = true;
 
@@ -525,7 +599,6 @@ while ($row = $result->fetch_assoc()) {
         const paymentMode = $('#paymentMode').val();
         const currentDate = new Date().toLocaleString();
         const items = [];
-        
 
         // Validations
         if (!customerName) {
@@ -574,12 +647,9 @@ while ($row = $result->fetch_assoc()) {
             const subtotalDisplay = isNaN(subtotal) ? '₱ 0.00' : `₱ ${subtotal.toFixed(2)}`;
 
             items.push({
-            product: productName,
-            size: size,
-            price: price,
-            quantity: quantity,
-            subtotal: subtotal
-        });
+                variantId: $(this).find('.variant-id').val(), // Get variant ID from hidden input
+                quantity: quantity
+            });
 
             receiptHTML += `
             <tr>
@@ -611,9 +681,10 @@ while ($row = $result->fetch_assoc()) {
             return;
         }
 
-        // Generate QR code with receipt data
+        // Generate QR code with receipt and order data
     const receiptData = {
         receiptId: receiptId,
+        orderId: orderId, // Include order ID in QR data
         customerName: customerName,
         paymentMode: paymentMode,
         date: currentDate,

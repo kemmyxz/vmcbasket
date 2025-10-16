@@ -816,56 +816,52 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
               const isUniform = <?= json_encode($is_uniform); ?>;
 
               function placeOrder() {
-                // Collect order details first
-                const productId = <?= $product1['id']; ?>;
-                const selectedSize = isUniform ?
-                  (document.querySelector('.custom-btn.selected')?.textContent.trim() || '') :
-                  'N/A'; // Use N/A for supplies
-                const quantity = document.querySelector('.quantity-value')?.value || 1;
-                const price = <?php echo floatval($product1['price']); ?>;
+                // Size validation for uniforms
+                if (isUniform) {
+                    const selectedButton = document.querySelector('.custom-btn.selected');
+                    if (!selectedButton) {
+                        showBootstrapAlert('Please select a size first.', 'warning');
+                        return;
+                    }
 
-                // Size validation - only check for uniforms
-                if (isUniform && !selectedSize) {
-                  showBootstrapAlert('Please select a size first.', 'warning');
-                  return;
+                    const stock = parseInt(selectedButton.dataset.stock);
+                    if (stock <= 0) {
+                        showBootstrapAlert('This size is out of stock.', 'danger');
+                        return;
+                    }
                 }
 
-                // Create form data with all required fields
-                const formData = new URLSearchParams();
-                formData.append('product_id', productId);
-                formData.append('size', selectedSize);
-                formData.append('quantity', quantity);
-                formData.append('product_name', '<?php echo addslashes($product1['product_name']); ?>');
-                formData.append('image', '<?php echo addslashes($product1['image']); ?>');
-                formData.append('price', price);
+                const selectedSize = isUniform ? 
+                    document.querySelector('.custom-btn.selected').dataset.size : 
+                    'N/A';
+                const quantity = parseInt(document.querySelector('.quantity-value').value) || 1;
 
-                // Send order details via fetch
-                fetch('order_details.php', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  },
-                  body: formData.toString()
+                // Store order details in session via AJAX
+                fetch('store_temp_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_id: <?= $product1['id'] ?>,
+                        product_name: '<?= addslashes($product1['product_name']) ?>',
+                        size: selectedSize,
+                        quantity: quantity,
+                        price: <?= $product1['price'] ?>,
+                        image: '<?= addslashes($product1['image']) ?>'
+                    })
                 })
-                  .then(response => {
-                    if (!response.ok) {
-                      throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                  })
-                  .then(data => {
+                .then(response => response.json())
+                .then(data => {
                     if (data.success) {
-                      showBootstrapAlert('Order placed successfully!', 'success');
-                      setTimeout(() => {
                         window.location.href = 'order_details.php';
-                      }, 1200);
                     } else {
-                      showBootstrapAlert('Failed to place the order: ' + (data.error || 'Unknown error'), 'danger');
+                        throw new Error(data.error || 'Failed to process order');
                     }
-                  })
-                  .catch(error => {
-                    showBootstrapAlert('Something went wrong while placing the order. Please try again.', 'danger');
-                  });
+                })
+                .catch(error => {
+                    showBootstrapAlert(error.message || 'Something went wrong while placing the order. Please try again.', 'danger');
+                });
               }
             </script>
           </div>

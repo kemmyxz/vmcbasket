@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 02, 2025 at 08:29 PM
+-- Generation Time: Oct 10, 2025 at 12:38 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -62,7 +62,7 @@ CREATE TABLE `basket` (
 --
 
 INSERT INTO `basket` (`id`, `product_id`, `product_name`, `price`, `image`, `size`, `quantity`, `user_id`) VALUES
-(339, 73, 'Elementary - Senior HS Pants', 250.00, 'uploads/1759414581_68de893578e92.png', NULL, 7, 12);
+(346, 79, 'BSBA Blouse ', 250.00, 'uploads/1759648333_68e21a4d67cc6.png', NULL, 1, 12);
 
 -- --------------------------------------------------------
 
@@ -96,8 +96,14 @@ CREATE TABLE `favorites` (
 --
 
 INSERT INTO `favorites` (`id`, `user_id`, `product_id`, `favorite`) VALUES
-(28, 12, 73, 1),
-(29, 12, 75, 1);
+(32, 12, 79, 1),
+(34, 12, 83, 1),
+(35, 12, 84, 0),
+(36, 12, 80, 1),
+(37, 12, 81, 1),
+(38, 80, 87, 1),
+(39, 80, 84, 1),
+(40, 80, 85, 1);
 
 -- --------------------------------------------------------
 
@@ -107,24 +113,25 @@ INSERT INTO `favorites` (`id`, `user_id`, `product_id`, `favorite`) VALUES
 
 CREATE TABLE `inquiries` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `message` text NOT NULL,
-  `is_admin` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `is_read` tinyint(1) DEFAULT 0
+  `is_read` tinyint(1) DEFAULT 0,
+  `sender` enum('user','admin') DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `inquiries`
 --
 
-INSERT INTO `inquiries` (`id`, `user_id`, `message`, `is_admin`, `created_at`, `is_read`) VALUES
-(5, 12, 'PASSED CAPSTONE', 0, '2025-05-19 01:24:30', 1),
-(6, 12, 'fdfdf', 0, '2025-10-02 16:34:24', 1),
-(7, 12, 'hvgh', 1, '2025-10-02 17:27:06', 0),
-(8, 12, 'vdvdv', 1, '2025-10-02 17:32:33', 1),
-(9, 12, 'gdfgdfg', 0, '2025-10-02 17:42:09', 1),
-(10, 12, 'nvnnb', 1, '2025-10-02 18:28:39', 1);
+INSERT INTO `inquiries` (`id`, `user_id`, `message`, `created_at`, `is_read`, `sender`) VALUES
+(35, 12, 'sadasd', '2025-10-04 14:30:22', 1, 'user'),
+(36, 12, 'dsads', '2025-10-04 14:30:30', 1, 'admin'),
+(37, 12, 'dsad', '2025-10-07 06:48:12', 1, 'admin'),
+(38, 12, 'pogi ako', '2025-10-07 07:06:25', 1, 'user'),
+(39, 12, 'ganda ni kath', '2025-10-07 07:56:04', 1, 'user'),
+(40, 12, 'heelo', '2025-10-07 07:56:15', 1, 'admin'),
+(41, 80, 'hello', '2025-10-07 14:04:36', 1, 'user');
 
 -- --------------------------------------------------------
 
@@ -142,15 +149,34 @@ CREATE TABLE `orders` (
   `phone` varchar(15) DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `order_date` date NOT NULL DEFAULT curdate(),
-  `status` enum('Pending','To Pick Up','Complete','Cancelled','Refunded') NOT NULL DEFAULT 'Pending',
   `user_id` int(11) DEFAULT NULL,
   `product_id` int(11) NOT NULL,
   `size` varchar(20) DEFAULT NULL,
   `total_price` decimal(10,2) NOT NULL,
   `image` varchar(255) NOT NULL,
   `receipt_no` varchar(50) DEFAULT NULL,
-  `payment_method` enum('Cash (Pay at the Counter)','Send Online Receipt') NOT NULL DEFAULT 'Cash (Pay at the Counter)'
+  `payment_method` enum('Cash (Pay at the Counter)','Send Online Receipt') NOT NULL DEFAULT 'Cash (Pay at the Counter)',
+  `status` enum('Pending','ToPickUp','Complete','Cancelled','Refunded') NOT NULL DEFAULT 'Pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `product_name`, `quantity`, `customer_name`, `school_id`, `email`, `phone`, `price`, `order_date`, `user_id`, `product_id`, `size`, `total_price`, `image`, `receipt_no`, `payment_method`, `status`) VALUES
+(630, '\n                                                VMC Lace                                            ', 1, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 83, 'N/A', 250.00, 'uploads/1759817937_68e4b0d1aeb23.png', 'VMC-20251009-150947-805', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(631, '\n                                                VMC Lace                                            ', 1, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 83, 'N/A', 250.00, 'uploads/1759817937_68e4b0d1aeb23.png', 'VMC-20251009-151157-904', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(632, '\n                                                Elementary - Senior HS Pants                                            ', 2, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 80, 'XS', 500.00, 'uploads/1759733587_68e36753e126e.png', 'VMC-20251009-153524-012', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(633, '\n                                                VMC Lace                                            ', 2, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 83, 'N/A', 500.00, 'uploads/1759817937_68e4b0d1aeb23.png', 'VMC-20251009-154310-308', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(634, '\n                                                Crayola-8                                            ', 2, 'Kem', '', NULL, NULL, 40.00, '2025-10-09', NULL, 84, 'N/A', 80.00, 'uploads/1759819474_68e4b6d2367c0.png', 'VMC-20251009-155108-186', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(635, '\n                                                Elementary - Senior HS Pants                                            ', 2, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 80, 'XL', 500.00, 'uploads/1759733587_68e36753e126e.png', 'VMC-20251009-155305-111', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(636, '\n                                                BSBA Blouse                                             ', 2, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 79, 'XS', 500.00, 'uploads/1759648333_68e21a4d67cc6.png', 'VMC-20251009-162725-844', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(637, 'VMC Lace', 1, 'Kathleen Mae', '123859', 'nicolaskathleen@gmail.com', '09123456782', 250.00, '2025-10-09', 80, 83, 'N/A', 250.00, 'uploads/1759817937_68e4b0d1aeb23.png', '2025100911133480', 'Cash (Pay at the Counter)', 'Complete'),
+(638, '\n                                                BSBA Blouse                                             ', 2, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 79, '2XL', 500.00, 'uploads/1759648333_68e21a4d67cc6.png', 'VMC-20251009-172402-307', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(639, '\n                                                VMC Lace                                            ', 2, 'Kem', '', NULL, NULL, 250.00, '2025-10-09', NULL, 83, 'N/A', 500.00, 'uploads/1759817937_68e4b0d1aeb23.png', 'VMC-20251009-172746-136', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(640, 'Crayola-8', 1, 'Kathleen Mae', '123859', 'nicolaskathleen@gmail.com', '09123456782', 40.00, '2025-10-09', 80, 84, 'N/A', 40.00, 'uploads/1759819474_68e4b6d2367c0.png', '2025100911332980', 'Cash (Pay at the Counter)', 'Pending'),
+(641, '1/4 paper', 1, 'Kathleen Mae', '123859', 'nicolaskathleen@gmail.com', '09123456782', 15.00, '2025-10-09', 80, 85, 'N/A', 15.00, 'uploads/1759819514_68e4b6faee163.png', '2025100911331580', 'Cash (Pay at the Counter)', 'ToPickUp'),
+(642, 'Crayola-8', 1, 'Kathleen Mae', '123859', 'nicolaskathleen@gmail.com', '09123456782', 40.00, '2025-10-09', 80, 84, 'N/A', 40.00, 'uploads/1759819474_68e4b6d2367c0.png', '2025100911371880', 'Send Online Receipt', 'Pending');
 
 -- --------------------------------------------------------
 
@@ -168,135 +194,20 @@ CREATE TABLE `order_receipt` (
 --
 
 INSERT INTO `order_receipt` (`receipt_id`, `order_status`) VALUES
-('2025051405130612', 'Cancelled'),
-('2025051406175012', 'Pending'),
-('2025051408341612', 'Pending'),
-('2025051408351212', 'ToPickUp'),
-('2025051417142212', 'Pending'),
-('2025051417171312', 'Complete'),
-('2025051421085312', 'Complete'),
-('2025051500334012', 'Cancelled'),
-('2025051500362412', 'Complete'),
-('2025051500365312', 'ToPickUp'),
-('2025051500483012', 'Complete'),
-('2025051500492112', 'Cancelled'),
-('2025051500542412', 'Pending'),
-('2025051511552612', 'Cancelled'),
-('2025051713320312', 'Pending'),
-('2025051713321712', 'Cancelled'),
-('2025051715093412', 'Cancelled'),
-('2025051715425112', 'Cancelled'),
-('2025051717352212', 'Pending'),
-('2025051717353612', 'Pending'),
-('2025051717354912', 'Cancelled'),
-('2025051718034612', 'Cancelled'),
-('2025051718054212', 'Complete'),
-('2025051718091212', 'ToPickUp'),
-('2025051718104112', 'Complete'),
-('2025051718123612', 'Pending'),
-('2025051718135712', 'Complete'),
-('2025051718262512', 'Pending'),
-('2025051719170412', 'Pending'),
-('2025051719171312', 'Complete'),
-('2025051719174812', 'Pending'),
-('2025051719182412', 'Complete'),
-('2025051719202012', 'Complete'),
-('2025051719213612', 'Pending'),
-('2025051719225112', 'Complete'),
-('2025051719234712', 'Complete'),
-('2025051719241212', 'Complete'),
-('2025051720132112', 'Complete'),
-('2025051720332112', 'Complete'),
-('2025051721494312', 'Complete'),
-('2025051721540512', 'Complete'),
-('2025051722103812', 'Complete'),
-('2025051722105112', 'Complete'),
-('2025051722105712', 'Complete'),
-('2025051804520912', 'Pending'),
-('2025051804523512', 'Pending'),
-('2025051804524012', 'Pending'),
-('2025051804524112', 'Pending'),
-('2025051804532112', 'Pending'),
-('2025051804540812', 'Pending'),
-('2025051804553412', 'Complete'),
-('2025051804573712', 'Cancelled'),
-('2025051805201358', 'Pending'),
-('2025051805201758', 'Pending'),
-('2025051805202058', 'Pending'),
-('2025051805203158', 'Cancelled'),
-('2025051805211358', 'Complete'),
-('2025051805212958', 'Complete'),
-('2025051805215558', 'Complete'),
-('2025051805553858', 'Complete'),
-('2025051805575558', 'Cancelled'),
-('2025051806023358', 'Complete'),
-('2025051806024458', 'Complete'),
-('2025051806081458', 'Complete'),
-('2025051806093858', 'Complete'),
-('2025051806094958', 'Complete'),
-('2025051806095758', 'Complete'),
-('2025051806134658', 'Complete'),
-('2025051806144458', 'Complete'),
-('2025051806165658', 'Complete'),
-('2025051806195758', 'Pending'),
-('2025051806272358', 'Complete'),
-('2025051806293658', 'Complete'),
-('2025051806294558', 'Complete'),
-('2025051806300058', 'Complete'),
-('2025051807054258', 'Pending'),
-('2025051807054858', 'Pending'),
-('2025051807060058', 'Complete'),
-('2025051807060658', 'Complete'),
-('2025051809474758', 'Complete'),
-('2025051809475358', 'Pending'),
-('2025051809561658', 'Complete'),
-('2025051809583258', 'Complete'),
-('2025051810335158', 'Pending'),
-('2025051810341158', 'Complete'),
-('2025051813105458', 'Complete'),
-('2025051813113458', 'Complete'),
-('2025051813202958', 'Pending'),
-('2025051813214958', 'Cancelled'),
-('2025051814030058', 'Complete'),
-('2025051815480158', 'Pending'),
-('2025051815482158', 'Pending'),
-('2025051816221158', 'Pending'),
-('2025051816223958', 'Pending'),
-('2025051816225958', 'Pending'),
-('2025051817112558', 'Complete'),
-('2025051817114758', 'Cancelled'),
-('2025051817120858', 'Complete'),
-('2025051817225858', 'Cancelled'),
-('2025051817244358', 'Pending'),
-('2025051817245458', 'Cancelled'),
-('2025051821334958', 'Pending'),
-('2025051821362558', 'Pending'),
-('2025051903244612', 'Pending'),
-('2025051903253412', 'Pending'),
-('2025051903260512', 'Complete'),
-('2025051903311812', 'Pending'),
-('2025051903324558', 'Complete'),
-('2025051905314658', 'Cancelled'),
-('2025051905320858', 'Complete'),
-('2025051906102958', 'Pending'),
-('2025051910140058', 'Pending'),
-('2025051910321358', 'Complete'),
-('2025051910352358', 'Complete'),
-('Receipt ID:', 'Pending'),
-('VMC-20250518-181549-825', 'Pending'),
-('VMC-20250518-181720-081', 'Pending'),
-('VMC-20250518-182526-405', 'Pending'),
-('VMC-20250518-183628-535', 'Pending'),
-('VMC-20250518-183724-786', 'Pending'),
-('VMC-20250518-184039-589', 'Pending'),
-('VMC-20250518-184345-329', 'Pending'),
-('VMC-20250518-185247-076', 'Pending'),
-('VMC-20250518-190237-410', 'Complete'),
-('VMC-20250518-190530-531', 'Complete'),
-('VMC-20250518-191006-074', 'Complete'),
-('VMC-20250518-191423-950', 'Complete'),
-('VMC-20250518-192014-790', 'Complete'),
-('VMC-20250519-164637-900', 'Complete');
+('2025100911133480', 'Complete'),
+('2025100911331580', 'ToPickUp'),
+('2025100911332980', 'Pending'),
+('2025100911333180', 'Pending'),
+('2025100911371880', 'Pending'),
+('VMC-20251009-150947-805', 'ToPickUp'),
+('VMC-20251009-151157-904', 'ToPickUp'),
+('VMC-20251009-153524-012', 'ToPickUp'),
+('VMC-20251009-154310-308', 'ToPickUp'),
+('VMC-20251009-155108-186', 'ToPickUp'),
+('VMC-20251009-155305-111', 'ToPickUp'),
+('VMC-20251009-162725-844', 'Complete'),
+('VMC-20251009-172402-307', 'Complete'),
+('VMC-20251009-172746-136', 'Complete');
 
 -- --------------------------------------------------------
 
@@ -308,28 +219,16 @@ CREATE TABLE `order_receipts_images` (
   `id` int(11) NOT NULL,
   `receipt_id` varchar(255) DEFAULT NULL,
   `image_path` varchar(255) NOT NULL,
-  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `uploaded_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `order_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `order_receipts_images`
 --
 
-INSERT INTO `order_receipts_images` (`id`, `receipt_id`, `image_path`, `uploaded_at`) VALUES
-(1, '2025051500365312', 'admin/uploads/receipts/receipt_2025051500365312_1747301777.jpg', '2025-05-15 09:36:17'),
-(2, '2025051408351212', 'admin/uploads/receipts/receipt_2025051408351212_1747302475.jpg', '2025-05-15 09:47:55'),
-(3, '2025051511552612', 'admin/uploads/receipts/receipt_2025051511552612_1747302944.jpg', '2025-05-15 09:55:44'),
-(4, '2025051713321712', 'admin/uploads/receipts/receipt_2025051713321712_1747481648.jpg', '2025-05-17 11:34:08'),
-(5, '2025051718091212', 'admin/uploads/receipts/receipt_2025051718091212_1747499464.png', '2025-05-17 16:31:04'),
-(6, '2025051719182412', 'admin/uploads/receipts/receipt_2025051719182412_1747503425.png', '2025-05-17 17:37:05'),
-(7, '2025051817112558', 'admin/uploads/receipts/receipt_2025051817112558_1747581199.jpg', '2025-05-18 15:13:19'),
-(8, '2025051817112558', 'admin/uploads/receipts/receipt_2025051817112558_1747581281.png', '2025-05-18 15:14:41'),
-(9, '2025051817245458', 'admin/uploads/receipts/receipt_2025051817245458_1747582007.jpeg', '2025-05-18 15:26:47'),
-(10, '2025051821334958', 'admin/uploads/receipts/receipt_2025051821334958_1747596849.png', '2025-05-18 19:34:09'),
-(11, '2025051903311812', 'admin/uploads/receipts/receipt_2025051903311812_1747618287.png', '2025-05-19 01:31:27'),
-(12, '2025051903324558', 'admin/uploads/receipts/receipt_2025051903324558_1747618382.png', '2025-05-19 01:33:02'),
-(13, '2025051910140058', 'admin/uploads/receipts/receipt_2025051910140058_1747642677.png', '2025-05-19 08:17:57'),
-(14, '2025051910321358', 'admin/uploads/receipts/receipt_2025051910321358_1747643542.png', '2025-05-19 08:32:22');
+INSERT INTO `order_receipts_images` (`id`, `receipt_id`, `image_path`, `uploaded_at`, `order_id`) VALUES
+(49, NULL, 'admin/uploads/receipts/receipt_80_1760002638.png', '2025-10-09 09:37:18', 642);
 
 -- --------------------------------------------------------
 
@@ -357,9 +256,16 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `product_name`, `dr_number`, `price`, `type`, `date_modified`, `admin_handled`, `image`, `qr_code`, `rating`, `tags`, `max_quantity`) VALUES
-(73, 'Elementary - Senior HS Pants', 'DR123456', 250.00, 'Uniform', '2025-10-02', '', 'uploads/1759414581_68de893578e92.png', NULL, NULL, 'Pre school', 5),
-(74, 'Art Paper', 'DR1234670', 10.00, 'Supplies', '2025-10-02', '', 'uploads/1759414631_68de8967dc966.png', NULL, NULL, 'Paper Products', 1000),
-(75, 'BSED Polo', 'DR123456', 250.00, 'Uniform', '2025-10-02', '', 'uploads/1759420048_68de9e90415e0.png', NULL, NULL, 'BS Secondary Education', 5);
+(79, 'BSBA Blouse ', 'DR123456', 250.00, 'Uniform', '2025-10-05', '', 'uploads/1759648333_68e21a4d67cc6.png', NULL, NULL, 'BS Hotel and Restaurant Management', 3),
+(80, 'Elementary - Senior HS Pants', 'DR123456', 250.00, 'Uniform', '2025-10-06', '', 'uploads/1759733587_68e36753e126e.png', NULL, NULL, 'Elementary', 3),
+(81, 'Basic Education PE Shirt', 'DR123456', 250.00, 'Uniform', '2025-10-06', '', 'uploads/1759733665_68e367a115ea8.png', NULL, NULL, 'Elementary', 3),
+(82, 'BSTM Blouse', 'DR123456', 250.00, 'Uniform', '2025-10-06', '', 'uploads/1759737087_68e374ff01ab4.png', NULL, NULL, 'Kindergarten, Elementary, Junior High School, BS Tourism Management', 3),
+(83, 'VMC Lace', 'DR123456', 250.00, 'Supplies', '2025-10-07', '', 'uploads/1759817937_68e4b0d1aeb23.png', NULL, 5, 'School Merchandise', 2),
+(84, 'Crayola-8', 'DR123456', 40.00, 'Supplies', '2025-10-07', '', 'uploads/1759819474_68e4b6d2367c0.png', NULL, NULL, 'Art Supplies', 100),
+(85, '1/4 paper', 'DR123456', 15.00, 'Supplies', '2025-10-07', '', 'uploads/1759819514_68e4b6faee163.png', NULL, NULL, 'Paper Products', 10),
+(86, 'Ballpen', 'DR123456', 15.00, 'Supplies', '2025-10-07', '', 'uploads/1759826815_68e4d37fb2530.png', NULL, NULL, 'Writing Tools', 5),
+(87, 'Clay', 'DR123456', 45.00, 'Supplies', '2025-10-07', '', 'uploads/1759826842_68e4d39a9ecbe.png', NULL, NULL, 'Art Supplies', 5),
+(88, 'Cartolina', 'DR123456', 45.00, 'Supplies', '2025-10-07', '', 'uploads/1759826861_68e4d3ad45329.png', NULL, NULL, 'Paper Products', 5);
 
 -- --------------------------------------------------------
 
@@ -377,6 +283,13 @@ CREATE TABLE `product_reviews` (
   `is_anonymous` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_reviews`
+--
+
+INSERT INTO `product_reviews` (`id`, `order_id`, `product_id`, `user_id`, `rating`, `review_text`, `is_anonymous`, `created_at`) VALUES
+(31, 559, 83, 80, 5, '', 1, '2025-10-07 13:22:15');
 
 -- --------------------------------------------------------
 
@@ -398,14 +311,25 @@ CREATE TABLE `product_variants` (
 --
 
 INSERT INTO `product_variants` (`id`, `product_id`, `size`, `gender`, `stock`, `last_updated`) VALUES
-(144, 73, 'XS', 'Unisex', 100, '2025-10-02 14:16:21'),
-(145, 73, 'Small', 'Unisex', 100, '2025-10-02 14:16:21'),
-(146, 73, 'Medium', 'Unisex', 100, '2025-10-02 14:16:21'),
-(147, 74, '', '', 100, '2025-10-02 14:17:11'),
-(148, 75, 'XS', 'Male', 50, '2025-10-02 15:47:28'),
-(149, 75, 'XS', 'Female', 50, '2025-10-02 15:47:28'),
-(150, 75, 'Small', 'Male', 50, '2025-10-02 15:47:28'),
-(151, 75, 'Small', 'Female', 50, '2025-10-02 15:47:28');
+(156, 79, 'XS', 'Unisex', 90, '2025-10-09 08:59:08'),
+(157, 79, 'Medium', 'Unisex', 97, '2025-10-08 01:21:51'),
+(158, 79, '2XL', 'Unisex', 98, '2025-10-09 09:27:17'),
+(159, 80, 'XS', 'Male', 19, '2025-10-07 14:26:36'),
+(160, 80, 'XS', 'Female', 20, '2025-10-06 06:53:07'),
+(161, 80, 'XL', 'Male', 10, '2025-10-06 06:53:07'),
+(162, 80, 'XL', 'Female', 30, '2025-10-06 06:53:07'),
+(163, 81, 'XS', 'Female', 4, '2025-10-06 06:54:25'),
+(164, 81, 'Small', 'Female', 5, '2025-10-06 06:54:25'),
+(165, 82, 'XS', 'Male', 20, '2025-10-06 07:51:27'),
+(166, 82, 'XS', 'Female', 22, '2025-10-06 07:51:27'),
+(167, 82, 'Small', 'Male', 23, '2025-10-06 07:51:27'),
+(168, 82, 'Small', 'Female', 233, '2025-10-06 07:51:27'),
+(169, 83, '', '', 94, '2025-10-09 09:28:36'),
+(170, 84, '', '', 60, '2025-10-07 14:26:48'),
+(171, 85, '', '', 98, '2025-10-08 01:48:06'),
+(172, 86, '', '', 100, '2025-10-07 08:46:55'),
+(173, 87, '', '', 99, '2025-10-07 14:23:11'),
+(174, 88, '', '', 100, '2025-10-07 08:47:41');
 
 -- --------------------------------------------------------
 
@@ -471,7 +395,7 @@ CREATE TABLE `users` (
   `otp` varchar(100) DEFAULT NULL,
   `otp_expiry` datetime DEFAULT NULL,
   `last_activity` timestamp NULL DEFAULT NULL,
-  `active_status` enum('Active','Disable') DEFAULT 'Active'
+  `active_status` enum('Active','Disabled') DEFAULT 'Active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -479,14 +403,15 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `student_no`, `student_pass`, `created_at`, `updated_at`, `student_fname`, `student_lname`, `student_mname`, `email`, `phone_number`, `year_level`, `birthday`, `photo`, `otp`, `otp_expiry`, `last_activity`, `active_status`) VALUES
-(12, '220787', '$2y$10$VTvMMMyLFgb.8RPClIAZg.lp6TYTDpxIuVb4NOHSeCgbhVA8qiXEu', '2025-04-15 03:08:11', '2025-10-02 16:37:33', 'Patrick', 'francisco', 'balderas', 'lopanggokem@gmail.com', '01234567899', 'Bachelor of Science in Criminology', '2003-11-11', '1747080600_Fati\'s Logo.png', NULL, NULL, '2025-10-02 16:37:33', 'Active'),
-(65, '123956', '$2y$10$jQiC0RdawTdwcZMwl4xN0eKbZn/Pop/YOfY/Cq4LxOfb5iTkaxpuq', '2025-10-02 08:23:59', '2025-10-02 08:23:59', 'Janella', 'Clare', 'Gomez', 'gomezjanella@gmail.com', '09123456789', 'Elementary Grade 6', '2002-05-15', 'profile_pic.png', NULL, NULL, '2025-10-02 08:23:59', 'Active'),
-(66, '123557', '$2y$10$tv8o2jwWmmL2u40TKiv0fusixJgIl/dRVEd1nYsoX9Jd.KHQG1QD6', '2025-10-02 08:23:59', '2025-10-02 08:23:59', 'Fatima', 'Valencia', 'Balderas', 'fatimavbalderas@gmail.com', '09123456780', 'Junior High School Grade 10', '2003-03-22', 'profile_pic.png', NULL, NULL, '2025-10-02 08:23:59', 'Active'),
-(67, '123458', '$2y$10$f7m6qO.dMCGJZwu3X8J3HOKj2jkJLoBNIsXHqT28CmKAogLiyQJ2.', '2025-10-02 08:23:59', '2025-10-02 08:23:59', 'Raiza', 'Reign', 'Quimpano', 'raizaquimpano@gmail.com', '09123456781', 'Senior High School Grade 12', '2004-11-10', 'profile_pic.png', NULL, NULL, '2025-10-02 08:23:59', 'Active'),
-(68, '123859', '$2y$10$mp.oNr5UWA5jQiE3D81D9OLfcpHHhLftbhei2hdJNvbTy3vi9t/Ti', '2025-10-02 08:23:59', '2025-10-02 16:37:17', 'Kathleen', 'Mae', 'Nicolas', 'nicolaskathleen@gmail.com', '09123456782', 'Bachelor of Science in Information System - 1st Year', '2001-08-25', 'profile_pic.png', NULL, NULL, '2025-10-02 16:37:17', 'Active'),
-(69, '123750', '$2y$10$80oKCQAZiBPkWwH9WB4WYOyngnyXJM5b5Ov4MeVoMq/DXAHOV6ggC', '2025-10-02 08:24:00', '2025-10-02 08:24:00', 'Heather', 'Mae', 'Alcober', 'hthralcober@gmail.com', '09123456783', 'Bachelor of Science in Business Administration - 1st Year', '2002-01-30', 'profile_pic.png', NULL, NULL, '2025-10-02 08:24:00', 'Active'),
-(70, '123470', '$2y$10$kt.UN7QAinKeQDU5AW6bLO5E.0N.g2b9teTBuJAOpJzFXpk.ImmiG', '2025-10-02 08:24:00', '2025-10-02 08:24:00', 'Sharica', 'White', 'Banania', 'bananiasharica@gmail.com', '09123456784', 'Senior High School Grade 11', '2003-07-19', 'profile_pic.png', NULL, NULL, '2025-10-02 08:24:00', 'Active'),
-(73, '111111', '$2y$10$Of4.bjHhqdnr5DfJagPKx.2hMWYqRt3YsKZ/v/7c1pevBMx66Z/Fa', '2025-10-02 08:33:11', '2025-10-02 08:33:11', 'Kathleen', 'Entic', 'Nicolas', 'lopanggokem@gmail.com', '09318734292', 'Bachelor of Science in Information System - 3rd Year', '2003-06-14', 'profile_pic.png', NULL, NULL, '2025-10-02 08:33:11', 'Active');
+(12, '220787', '$2y$10$VTvMMMyLFgb.8RPClIAZg.lp6TYTDpxIuVb4NOHSeCgbhVA8qiXEu', '2025-04-15 03:08:11', '2025-10-05 06:32:12', 'Patrick', 'francisco', 'balderas', 'lopanggokem@gmail.com', '01234567899', 'Bachelor of Science in Criminology', '2003-11-11', '1759645932_SDO-VAL-Logo.png', NULL, NULL, '2025-10-05 06:31:59', 'Active'),
+(73, '111111', '$2y$10$Of4.bjHhqdnr5DfJagPKx.2hMWYqRt3YsKZ/v/7c1pevBMx66Z/Fa', '2025-10-02 08:33:11', '2025-10-02 08:33:11', 'Kathleen', 'Entic', 'Nicolas', 'lopanggokem@gmail.com', '09318734292', 'Bachelor of Science in Information System - 3rd Year', '2003-06-14', 'profile_pic.png', NULL, NULL, '2025-10-02 08:33:11', 'Active'),
+(77, '123956', '$2y$10$RFO1pTg9VnhBeCnaaJWz/urSxqe73MzX0.KSN2EliemQE7WYZ6qGu', '2025-10-06 07:37:55', '2025-10-06 07:37:55', 'Janella', 'Clare', 'Gomez', 'gomezjanella@gmail.com', '09123456789', 'Elementary Grade 6', '2002-05-15', 'profile_pic.png', NULL, NULL, '2025-10-06 07:37:55', 'Active'),
+(78, '123557', '$2y$10$6h/w0aHB7TNNU/WIJaOYPe4Y/lfPGK9XdtlE14Q7CpZmKefDvco3K', '2025-10-06 07:37:55', '2025-10-06 07:37:55', 'Fatima', 'Valencia', 'Balderas', 'fatimavbalderas@gmail.com', '09123456780', 'Junior High School Grade 10', '2003-03-22', 'profile_pic.png', NULL, NULL, '2025-10-06 07:37:55', 'Active'),
+(79, '123458', '$2y$10$0PmRzfUKasHHKqx5TasQUOSW/bA63hXo1SQWRbt8Skm9Qt40vYX7m', '2025-10-06 07:37:55', '2025-10-06 07:38:02', 'Raiza', 'Reign', 'Quimpano', 'raizaquimpano@gmail.com', '09123456781', 'Senior High School Grade 12', '2004-11-10', 'profile_pic.png', NULL, NULL, '2025-10-06 07:37:55', 'Disabled'),
+(80, '123859', '$2y$10$SjiCowApsULj7p/fJyEO3Oih1f0Jt59GzOQ/s4hEaujff3Y9T9zSW', '2025-10-06 07:37:55', '2025-10-07 13:56:11', 'Kathleen', 'Mae', 'Nicolas', 'nicolaskathleen@gmail.com', '09123456782', 'Bachelor of Science in Hotel and Restaurant Management - 1st Year', '2001-08-25', '1759845371_photo_6242454177410303577_y.jpg', NULL, NULL, '2025-10-07 11:44:52', 'Active'),
+(81, '123750', '$2y$10$eYvphdhjAG9at6o4KNxLYe5EO3ZXwe1qgv.R/ADRMH691NTVbVBly', '2025-10-06 07:37:55', '2025-10-06 07:37:55', 'Heather', 'Mae', 'Alcober', 'hthralcober@gmail.com', '09123456783', 'Bachelor of Science in Business Administration - 1st Year', '2002-01-30', 'profile_pic.png', NULL, NULL, '2025-10-06 07:37:55', 'Active'),
+(82, '123470', '$2y$10$w8z0Hsti8XcFittCs.2GIehXtlK9FJ2xA6X.zlHwy0qa2ifPTK/ja', '2025-10-06 07:37:55', '2025-10-06 07:37:55', 'Sharica', 'White', 'Banania', 'bananiasharica@gmail.com', '09123456784', 'Senior High School Grade 11', '2003-07-19', 'profile_pic.png', NULL, NULL, '2025-10-06 07:37:55', 'Active'),
+(83, '333333', '$2y$10$CNHkVPnKjVxs4YL5TCi.ven2s2k4w79T6fcwR0mJd7CZlCrp3ol5S', '2025-10-06 07:45:55', '2025-10-06 07:45:55', 'KEMBERLY', 'ENTIC', 'LOPANGGO', 'lopanggokem@gmail.com', '09318734292', 'Bachelor of Science in Criminology - 1st Year', '2003-06-14', 'profile_pic.png', NULL, NULL, '2025-10-06 07:45:55', 'Active');
 
 --
 -- Indexes for dumped tables
@@ -545,7 +470,8 @@ ALTER TABLE `order_receipt`
 --
 ALTER TABLE `order_receipts_images`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `receipt_id` (`receipt_id`);
+  ADD KEY `receipt_id` (`receipt_id`),
+  ADD KEY `order_id` (`order_id`);
 
 --
 -- Indexes for table `products`
@@ -608,7 +534,7 @@ ALTER TABLE `admin_login`
 -- AUTO_INCREMENT for table `basket`
 --
 ALTER TABLE `basket`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=340;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=369;
 
 --
 -- AUTO_INCREMENT for table `chat_notifications`
@@ -620,43 +546,43 @@ ALTER TABLE `chat_notifications`
 -- AUTO_INCREMENT for table `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `inquiries`
 --
 ALTER TABLE `inquiries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=547;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=643;
 
 --
 -- AUTO_INCREMENT for table `order_receipts_images`
 --
 ALTER TABLE `order_receipts_images`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `product_reviews`
 --
 ALTER TABLE `product_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `product_variants`
 --
 ALTER TABLE `product_variants`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
 
 --
 -- AUTO_INCREMENT for table `restock_history`
@@ -680,7 +606,7 @@ ALTER TABLE `sales`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- Constraints for dumped tables
@@ -716,7 +642,8 @@ ALTER TABLE `orders`
 -- Constraints for table `order_receipts_images`
 --
 ALTER TABLE `order_receipts_images`
-  ADD CONSTRAINT `order_receipts_images_ibfk_1` FOREIGN KEY (`receipt_id`) REFERENCES `order_receipt` (`receipt_id`);
+  ADD CONSTRAINT `order_receipts_images_ibfk_1` FOREIGN KEY (`receipt_id`) REFERENCES `order_receipt` (`receipt_id`),
+  ADD CONSTRAINT `order_receipts_images_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `product_reviews`

@@ -117,7 +117,7 @@ while ($row = $results->fetch_assoc()) {
         $stmt->bind_param("s", $receipt_id);
         $stmt->execute();
         $result_image = $stmt->get_result();
-        $image_path = $result_image->fetch_assoc()['image_path'] ?? null;
+        $image_path = $result_image->fetch_assoc()['image_path'];
         
         $grouped_orders[$receipt_id] = [
             'receipt_id' => $receipt_id,
@@ -141,7 +141,7 @@ while ($row = $results->fetch_assoc()) {
         'quantity' => $row['quantity'],
         'price' => $row['price'],
         'subtotal' => $subtotal,
-        'image' => $row['product_image']
+        'image' => $row['product_image'] // Add this line
     ];
     $grouped_orders[$receipt_id]['total_amount'] += $subtotal;
 }
@@ -500,7 +500,7 @@ $calendarEvents = getCalendarEvents();
                                   data-payment="<?= htmlspecialchars($order['payment_method']) ?>"
                                   data-products='<?= json_encode($order['products']) ?>'
                                   data-total="<?= $order['total_amount'] ?>"
-                                  data-receipt-images='<?= htmlspecialchars($order['receipt_image']) ?>'>
+                                  data-receipt-image='<?= htmlspecialchars($order['receipt_image']) ?>'>
                                 <i class="bi bi-file-text me-2"></i>View Details
                               </button>
                               </li>
@@ -625,14 +625,19 @@ $calendarEvents = getCalendarEvents();
           </div>
 
           <!-- Online Receipt Section -->
-          <div class="online-receipt-section">
-            <hr>
-            <h5 class="mb-3 fw-bold">Online Payment Receipt</h5>
-            <div class="text-center">
-              <img id="receiptImage" src="./uploads/receipts/sample_receipt.jpg" alt="Receipt" class="img-fluid"
-                style="max-height: 400px;">
-            </div>
-          </div>
+   
+<div class="online-receipt-section">
+  <hr>
+  <h5 class="mb-3 fw-bold">Online Payment Receipt</h5>
+  <div class="text-center">
+    <img id="receiptImage" 
+         src="uploads/receipts/<?= basename($order['receipt_image']) ?>" 
+         alt="Receipt" 
+         class="img-fluid"
+         style="max-height: 400px;"
+         onerror="this.onerror=null; this.src='images/no-receipt.png';">
+  </div>
+</div>
 
         </div>
 
@@ -816,15 +821,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     
         // Update receipt image
-        const receiptImageElement = document.getElementById('receiptImage');
-        if (receiptImageElement) {
-            if (receiptImage) {
-                receiptImageElement.src = receiptImage;
-                receiptImageElement.style.display = 'block';
-            } else {
-                receiptImageElement.style.display = 'none';
-            }
+         
+    const receiptImageElement = document.getElementById('receiptImage');
+    if (receiptImageElement) {
+        if (receiptImage) {
+            // Use the correct path relative to admin folder
+            receiptImageElement.src = 'uploads/receipts/' + receiptImage.split('/').pop();
+            receiptImageElement.style.display = 'block';
+        } else {
+            receiptImageElement.src = 'images/no-receipt.png';
+            receiptImageElement.style.display = 'block';
         }
+    }
+    
     
         // Update visibility of receipt sections
         const receiptSection = orderModal.querySelector('.online-receipt-section');
