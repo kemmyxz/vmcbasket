@@ -109,7 +109,7 @@ strong {
 /*tables*/
 .table-responsive,
 .container {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   max-width: 100%;
   overflow-x: auto;
   padding: 16px;
@@ -524,7 +524,7 @@ input[type="number"] {
 .chat-section .row {
   height: 600px;
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   padding: 5px;
 }
 
@@ -680,6 +680,10 @@ input[type="number"] {
   padding: 8px 12px;
   font-size: 22px;
   cursor: pointer;
+}
+
+.chat-height {
+  margin-top: 30px;
 }
 
 /* Responsive styles */

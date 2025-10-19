@@ -236,7 +236,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
 
             <!-- Sidebar -->
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
-
+                
                 <div class="text-center py-3 d-none d-md-block">
                     <img src="images/vmc_basket_logo.png" alt="VMC Logo" class="vmc-logo img-fluid">
                 </div>
@@ -627,7 +627,7 @@ $total_products = $total_products_result->fetch_assoc()['total'];
                                 </th>
                                 <th>#</th>
                                 <th>Image</th>
-                                <th>Product Details</th>
+                                <th>Order Details</th>
                                 <th>Price</th>
                                 <th>Stock</th>
 

@@ -370,7 +370,7 @@ $calendarEvents = getCalendarEvents();
 
             <!-- Content Area -->
             <!-- Title Page and Search -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
                         <input type="text" id="searchInput" class="form-control" placeholder="Search orders...">
@@ -384,13 +384,19 @@ $calendarEvents = getCalendarEvents();
                     <form class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center" method="get"
                         action="orders.php" style="gap: 8px;">
                         <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center w-100">
+                            <!-- NOTE: inputs now return values in YYYY-MM format.
+                                 Update backend to convert them to full date ranges:
+                                 Example in PHP:
+                                 if (!empty($_GET['from_date'])) $from_date = $_GET['from_date'] . '-01';
+                                 if (!empty($_GET['to_date']))   $to_date   = date('Y-m-t', strtotime($_GET['to_date'] . '-01'));
+                            -->
                             <label for="from_date" class="form-label mb-1 mb-sm-0 me-sm-1"
                                 style="font-size: 15px;"><strong>From</strong></label>
-                            <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="from_date"
+                            <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="from_date"
                                 name="from_date" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
                             <label for="to_date" class="form-label mb-1 mb-sm-0 ms-sm-2 me-sm-1"
                                 style="font-size: 15px;"><strong>To</strong></label>
-                            <input type="date" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date"
+                            <input type="month" class="form-control date-filter mb-2 mb-sm-0" id="to_date" name="to_date"
                                 value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
                             <button type="submit" class="admin-btn ms-sm-2">Filter</button>
                         </div>

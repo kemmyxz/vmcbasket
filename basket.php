@@ -865,9 +865,6 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 </div>
 </div>
 
-    <!-- Footer and chat -->
-    <?php include 'footer.php'; ?>
-    <?php include 'chat.php'; ?>
 
 <script>
 function recalculateTotal() {

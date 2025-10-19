@@ -170,10 +170,10 @@ while ($row = $result->fetch_assoc()) {
         </nav>
 
             <!-- Content Area -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
                 
                 <!-- Content -->
-                <div class="container p-5 overflow-hidden position-relative">
+                <div class="container p-5 overflow-hidden position-relative mt-5">
                     <div class="bottom-label text-start p-3 position-absolute top-0 start-0 w-100">
                         <h2>Receipt Form</h2>
                         <p>Receipt for Walk-in Students</p>

@@ -174,9 +174,10 @@ ORDER BY
             </nav>
 
             <!-- Title Page and Search -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5 content">
-                <div class="mt-2 d-flex flex-row align-items-center">
-                    <h2 class="mb-0">Chats</h2>
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
+                <div class="d-flex justify-content-end mb-5"> </div>
+                <div class="mt-2 mb-3">
+                    <h2>Chats</h2>
                 </div>
 
                 <!-- Main Chat Section -->

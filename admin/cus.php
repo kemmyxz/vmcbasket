@@ -315,7 +315,7 @@ for ($i = 1; $i <= $total_pages; $i++) {
       <!-- Alert outside modal (for CSV validation) -->
       <div id="csv-alert-placeholder"></div>
       <!-- Title Page and Search -->
-      <main class="col-md-9 ms-sm-auto col-lg-10 content p-4">
+      <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
         <div class="d-flex justify-content-end mb-5">
           <div class="search-container">
             <input type="text" class="form-control" placeholder="Search...">
@@ -1107,46 +1107,112 @@ for ($i = 1; $i <= $total_pages; $i++) {
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-    const bulkDisableBtn = document.getElementById('bulkDisableBtn');
-    
-    if (bulkDisableBtn) {
-        bulkDisableBtn.addEventListener('click', function() {
-            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
-                .map(checkbox => checkbox.value);
+      const bulkDisableBtn = document.getElementById('bulkDisableBtn');
+      if (!bulkDisableBtn) return;
 
-            if (selectedIds.length === 0) {
-                alert('Please select at least one account to disable');
-                return;
+      // Create confirmation modal (Bootstrap 5.3.3) if not already in DOM
+      if (!document.getElementById('bulkDisableConfirmModal')) {
+        const modalHtml = `
+          <div class="modal fade" id="bulkDisableConfirmModal" tabindex="-1" aria-labelledby="bulkDisableConfirmLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                  <h4 class="modal-title" id="bulkDisableConfirmLabel">Confirm Bulk Disable</h4>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bulk-disable-modal-body">
+                  <!-- Filled dynamically -->
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" id="bulkDisableConfirmBtn" class="btn btn-danger">Yes, Disable</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+      }
+
+      const modalEl = document.getElementById('bulkDisableConfirmModal');
+      const bsModal = new bootstrap.Modal(modalEl);
+      const confirmBtn = modalEl.querySelector('#bulkDisableConfirmBtn');
+      const modalBody = modalEl.querySelector('.bulk-disable-modal-body');
+      let pendingIds = [];
+
+      bulkDisableBtn.addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked'))
+          .map(cb => cb.value);
+
+        if (selectedIds.length === 0) {
+          // Reuse page-level showAlert helper (default target 'csv-alert-placeholder')
+          if (typeof showAlert === 'function') {
+            showAlert('⚠️ Please select at least one account to disable.', 'warning', 'csv-alert-placeholder');
+          } else {
+            alert('Please select at least one account to disable');
+          }
+          return;
+        }
+
+        pendingIds = selectedIds;
+        modalBody.innerHTML = `
+          <p>Are you sure you want to disable the selected <strong>${selectedIds.length}</strong> account(s)?</p>
+          <p class="small text-muted mb-0">This action will mark the accounts as Disabled.</p>
+        `;
+        bsModal.show();
+      });
+
+      confirmBtn.addEventListener('click', function() {
+        if (!pendingIds.length) return;
+
+        // disable button and show spinner
+        confirmBtn.disabled = true;
+        const originalText = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+
+        const formData = new FormData();
+        formData.append('action', 'bulk_disable');
+        formData.append('ids', JSON.stringify(pendingIds));
+
+        fetch('update_student_status.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = originalText;
+          bsModal.hide();
+
+          if (data && data.success) {
+            if (typeof showAlert === 'function') {
+              showAlert('✅ Selected accounts have been disabled.', 'success', 'csv-alert-placeholder');
+            } else {
+              alert('Selected accounts have been disabled');
             }
-
-            if (confirm('Are you sure you want to disable the selected accounts?')) {
-                // Create form data
-                const formData = new FormData();
-                formData.append('action', 'bulk_disable');
-                formData.append('ids', JSON.stringify(selectedIds));
-
-                // Send AJAX request
-                fetch('update_student_status.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Selected accounts have been disabled');
-                        location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while processing your request');
-                });
+            setTimeout(() => location.reload(), 4000);
+          } else {
+            const msg = (data && data.message) ? data.message : 'Unable to process request.';
+            if (typeof showAlert === 'function') {
+              showAlert('❌ Error: ' + msg, 'danger', 'csv-alert-placeholder');
+            } else {
+              alert('Error: ' + msg);
             }
+          }
+        })
+        .catch(error => {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = originalText;
+          bsModal.hide();
+          console.error('Error:', error);
+          if (typeof showAlert === 'function') {
+            showAlert('❌ An error occurred while processing your request.', 'danger', 'csv-alert-placeholder');
+          } else {
+            alert('An error occurred while processing your request');
+          }
         });
-    }
-});
+      });
+    });
   </script>
 </body>
 

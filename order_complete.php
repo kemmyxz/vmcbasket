@@ -80,6 +80,26 @@ $customerName = $orders[0]['student_fname'] . ' ' . $orders[0]['student_lname'];
     .thankyou-title {
       font-size: 3rem;
       color: #333;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      box-sizing: border-box;
+      border-right: .12em solid rgba(0, 0, 0, 0.75); /* caret */
+      width: 0;
+      /* play typing once and keep the final state, start caret blink only after typing finishes */
+      animation: typing 2.2s steps(10, end) forwards,
+           blink-caret .75s step-end infinite 2.2s;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 10ch; } /* adjust ch value to match text length if needed */
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: rgba(0, 0, 0, 0.75); }
     }
 
     .thankyou-section p {
@@ -255,7 +275,7 @@ $customerName = $orders[0]['student_fname'] . ' ' . $orders[0]['student_lname'];
                         </table>
                     </div>
 
-                    <a href="purchase_history.php" class="custom-navy-btn mt-3">View My Purchase</a>
+                    <a href="purchase_history.php" class="custom-navy-btn mt-3 text-decoration-none">View My Purchase</a>
                 </div>
       </div>
     </div>

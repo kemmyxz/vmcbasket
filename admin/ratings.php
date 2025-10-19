@@ -201,7 +201,7 @@ $ratingsGrowth = computeGrowth($ratingsThisMonth, $ratingsPrevMonth);
 
             <!-- Content Area -->
              <!-- Title Page and Search -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 content p-5">
+            <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
                 <div class="d-flex justify-content-end mb-5">
                     <div class="search-container">
                         <input type="text" class="form-control" placeholder="Search...">

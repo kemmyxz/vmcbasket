@@ -97,10 +97,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $conn->commit();
-        echo "<script>
-            alert('Stock updated successfully!');
-            window.location.href='prod.php';
-        </script>";
+        // Show a Bootstrap 5.3.3 styled alert and automatically navigate back to the previous page
+        echo '<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <title>Restock</title>
+        </head>
+        <body>
+            <div class="container py-5">
+            <div class="alert alert-success" role="alert">
+                Stock updated successfully! Redirecting...
+            </div>
+            </div>
+
+            <script>
+            // After a short delay, go back to the previous page (or history.back if no referrer)
+            setTimeout(function() {
+                if (document.referrer && document.referrer !== window.location.href) {
+                window.location.href = document.referrer;
+                } else {
+                window.history.back();
+                }
+            }, 1400); // 1.4 seconds to allow user to see the alert briefly
+            </script>
+        </body>
+        </html>';
     } catch (Exception $e) {
         $conn->rollback();
         echo "<script>
