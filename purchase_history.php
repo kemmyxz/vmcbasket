@@ -855,12 +855,10 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                             <input class="form-check-input" type="checkbox" id="returnReason3">
                             <label class="form-check-label" for="returnReason3">Missing Parts or Accessories</label>
                         </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="returnReasonOther">
-                            <label class="form-check-label" for="returnReasonOther">Others</label>
-                        </div>
 
-                        <textarea class="form-control mt-2" placeholder="Please state the reason."></textarea>
+
+                        <label for="returnOtherReason" class="form-label mt-2">Other reason</label>
+                        <textarea id="returnOtherReason" name="other_reason" class="form-control mt-2" placeholder="Please state the reason."></textarea>
 
                         <!-- Photo Upload -->
                         <div class="mb-3 photo-upload-section">

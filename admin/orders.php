@@ -235,7 +235,7 @@ $calendarEvents = getCalendarEvents();
             color: #D85600;
         }
 
-        .Return {
+        .Refund {
             background-color: #ADB6F4;
             color: #4400FF;
         }
@@ -427,8 +427,8 @@ $calendarEvents = getCalendarEvents();
                             class="tab-button <?= ($_GET['status'] ?? '') === 'Complete' ? 'active' : '' ?>">Completed</a>
                         <a href="orders.php?status=Cancelled"
                             class="tab-button <?= ($_GET['status'] ?? '') === 'Cancelled' ? 'active' : '' ?>">Cancelled</a>
-                        <a href="orders.php?status=Return"
-                            class="tab-button <?= ($_GET['status'] ?? '') === 'Return' ? 'active' : '' ?>">Returned</a>
+                        <a href="orders.php?status=Refund Requested"
+                            class="tab-button <?= ($_GET['status'] ?? '') === 'Refund Requested' ? 'active' : '' ?>">Refund Requested</a>
                         <a href="orders.php?status=Refunded"
                             class="tab-button curve-tab <?= ($_GET['status'] ?? '') === 'Refunded' ? 'active' : '' ?>">Refunded</a>
                     </div>
@@ -485,12 +485,12 @@ $calendarEvents = getCalendarEvents();
                                                 <?php endforeach; ?>
                                             </div>
                                             <div class="mt-2">
-                                                <strong class="text-start">Total Amount:
+                                                <strong>Total Amount:
                                                 </strong>₱<?= number_format($order['total_amount'], 2) ?>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-start">
+                                    <td>
                                         <strong>Receipt No.: </strong><?= $order['receipt_id'] ?><br>
                                         <strong>Student Name: </strong><?= $order['customer_name'] ?><br>
                                         <strong>Customer Type:
@@ -498,7 +498,7 @@ $calendarEvents = getCalendarEvents();
                                         <strong>Date Ordered: </strong><?= $order['date_ordered'] ?><br>
 
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <?php
                                         // Break long payment method text for better table fit
                                         $mop = $order['payment_method'];
@@ -515,7 +515,7 @@ $calendarEvents = getCalendarEvents();
                                         ?>
                                         <br>
                                     </td>
-                                    <td><span
+                                    <td class="text-center"><span
                                             class="status-badge <?= $order['order_status'] ?>"><?= $order['order_status'] ?></span>
                                     </td>
                                     <td>
@@ -525,10 +525,9 @@ $calendarEvents = getCalendarEvents();
                                                 aria-expanded="false" style="font-size: 1.5rem; color: #333;">
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
-                                            <ul class="dropdown-menu"
-                                                aria-labelledby="actionDropdown<?= $order['receipt_id'] ?>">
+                                            <ul class="dropdown-menu" aria-labelledby="actionDropdown<?= $order['receipt_id'] ?>">
                                                 <li>
-                                                    <button class="dropdown-item view-details" data-bs-toggle="modal"
+                                                    <button class="dropdown-item view-details" type="button" data-bs-toggle="modal"
                                                         data-bs-target="#orderDetailsModal"
                                                         data-receipt-id="<?= $order['receipt_id'] ?>"
                                                         data-customer="<?= htmlspecialchars($order['customer_name']) ?>"
@@ -541,28 +540,32 @@ $calendarEvents = getCalendarEvents();
                                                         <i class="bi bi-file-text me-2"></i>View Details
                                                     </button>
                                                 </li>
+
                                                 <?php if ($order['order_status'] == 'Refund Requested'): ?>
-                                                    <button class="dropdown-item approve-refund" 
-                                                        data-receipt-id="<?= $order['receipt_id'] ?>"
-                                                        data-products='<?= json_encode($order['products']) ?>'>
-                                                        <i class="bi bi-check-circle me-2"></i>Approve Refund
-                                                    </button>
+                                                    <li>
+                                                        <button class="dropdown-item approve-refund" type="button"
+                                                            data-receipt-id="<?= $order['receipt_id'] ?>"
+                                                            data-products='<?= json_encode($order['products']) ?>'>
+                                                            <i class="bi bi-check-circle me-2"></i>Approve Refund
+                                                        </button>
+                                                    </li>
+                                                <?php endif; ?>
+
+                                                <?php
+                                                // Place "To Pick Up" inside dropdown when applicable
+                                                if (
+                                                    ($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending')
+                                                    || ($order['payment_method'] == 'Send Online Receipt' && $order['order_status'] == 'ToPickUp')
+                                                ): ?>
+                                                    <li>
+                                                        <button class="dropdown-item topickup-order" type="button"
+                                                            data-receipt-id="<?= $order['receipt_id'] ?>">
+                                                            <i class="bi bi-check-circle me-2"></i>To Pick Up
+                                                        </button>
+                                                    </li>
                                                 <?php endif; ?>
                                             </ul>
                                         </div>
-                                        <br>
-                                        <?php if (
-                                            ($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending')
-                                            || ($order['payment_method'] == 'Send Online Receipt' && $order['order_status'] == 'ToPickUp')
-                                        ): ?>
-
-                                            <?php if ($order['payment_method'] == 'Cash (Pay at the Counter)' && $order['order_status'] == 'Pending'): ?>
-                                                <button class="bi bi-check-circle btn btn-success topickup-order"
-                                                    data-receipt-id="<?= $order['receipt_id'] ?>" style="border-radius: 5px;">
-                                                    To Pick Up
-                                                </button>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -1111,13 +1114,112 @@ $calendarEvents = getCalendarEvents();
         document.addEventListener('DOMContentLoaded', function() {
     // Handle refund approval
     document.querySelectorAll('.approve-refund').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const receiptId = this.getAttribute('data-receipt-id');
-            const products = JSON.parse(this.getAttribute('data-products'));
-            
-            if (confirm('Are you sure you want to approve this refund request? This will update product stock quantities.')) {
-                approveRefund(receiptId, products);
+            const products = JSON.parse(this.getAttribute('data-products') || '[]');
+
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('refundDetailsModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'refundDetailsModal';
+                modal.className = 'modal fade';
+                modal.tabIndex = -1;
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Refund Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Receipt No.:</strong> <span id="refundReceiptId"></span></p>
+                                <div class="table-responsive shadow-none mb-2">
+                                    <table class="table table-sm text-center vertical-align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Image</th>
+                                                <th>Product</th>
+                                                <th>Qty</th>
+                                                <th>Price</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="refundProducts"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                                <td id="refundTotalAmount">₱0.00</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                <div class="mb-2">
+                                    <p><strong>Reason for Return</strong></p>
+                                    <p id="refundNotes"></p>
+                                </div>
+                                <div class="mb-2">
+                                    <p><strong>Photos</strong></p>
+                                    <p id="refundPhotos"></p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" id="refundApproveBtn" class="btn btn-success">Approve Refund</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
             }
+
+            // Populate modal contents
+            const refundReceiptEl = modal.querySelector('#refundReceiptId');
+            const refundProductsTbody = modal.querySelector('#refundProducts');
+            const refundTotalEl = modal.querySelector('#refundTotalAmount');
+            const refundNotesEl = modal.querySelector('#refundNotes');
+
+            refundReceiptEl.textContent = receiptId;
+            refundNotesEl.value = '';
+
+            let total = 0;
+            refundProductsTbody.innerHTML = products.map(p => {
+                const img = p.image ? `<img src="${p.image}" alt="${p.product_name}" style="width:50px;height:50px;object-fit:cover;border:1px solid #ddd;">` : '';
+                const price = parseFloat(p.price || 0);
+                const qty = parseInt(p.quantity || 0, 10);
+                const subtotal = parseFloat(p.subtotal || (price * qty));
+                total += subtotal;
+                return `<tr>
+                            <td>${img}</td>
+                            <td>${p.product_name || 'N/A'}</td>
+                            <td>${qty}</td>
+                            <td>₱${price.toFixed(2)}</td>
+                            <td>₱${subtotal.toFixed(2)}</td>
+                        </tr>`;
+            }).join('');
+
+            refundTotalEl.textContent = '₱' + total.toFixed(2);
+
+            // Show modal
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+
+            // Wire approve button (replace previous handler to avoid duplicates)
+            const approveBtn = modal.querySelector('#refundApproveBtn');
+            approveBtn.onclick = function () {
+                approveBtn.disabled = true;
+                const notes = (refundNotesEl.value || '').trim();
+
+                // pass notes if needed by backend: we attach to products object for now
+                const payloadProducts = products.map(p => Object.assign({}, p));
+
+                // Optionally include notes in the approve action by adding to the request body
+                // approveRefund currently sends receiptId and products; you can adjust backend to accept notes.
+                approveRefund(receiptId, payloadProducts.concat([{ _notes: notes }]));
+
+                // hide modal after calling
+                bsModal.hide();
+            };
         });
     });
 

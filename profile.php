@@ -441,6 +441,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
 
                 <div class="row mb-3">
+                      <div class="col-md-12 mb-2">
+                        <label class="form-label">Year-level</label>
+                        <div class="input-group">
+                            <input  id="year" name="year_level" class="form-control"
+                                value="<?php echo $user['year_level']; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
+                            <!-- <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button> -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
                     <div class="col-md-6 mb-2">
                         <label class="form-label">Email</label>
                         <div class="input-group">
@@ -466,16 +477,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input type="date" name="birthday" class="form-control"
                                 value="<?php echo $user['birthday']; ?>" required>
                             <button class="changebtn" type="button" onclick="enableEdit('dob', this)">Change</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                      <div class="col-md-12 mb-2">
-                        <label class="form-label">Year-level</label>
-                        <div class="input-group">
-                            <input  id="year" name="year_level" class="form-control"
-                                value="<?php echo $user['year_level']; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
-                            <!-- <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button> -->
                         </div>
                     </div>
                 </div>
