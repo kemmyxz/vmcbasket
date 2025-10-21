@@ -541,7 +541,13 @@ $calendarEvents = getCalendarEvents();
                                                         <i class="bi bi-file-text me-2"></i>View Details
                                                     </button>
                                                 </li>
-
+                                                <?php if ($order['order_status'] == 'Refund Requested'): ?>
+                                                    <button class="dropdown-item approve-refund" 
+                                                        data-receipt-id="<?= $order['receipt_id'] ?>"
+                                                        data-products='<?= json_encode($order['products']) ?>'>
+                                                        <i class="bi bi-check-circle me-2"></i>Approve Refund
+                                                    </button>
+                                                <?php endif; ?>
                                             </ul>
                                         </div>
                                         <br>
@@ -1100,6 +1106,47 @@ $calendarEvents = getCalendarEvents();
                 });
             });
         });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+    // Handle refund approval
+    document.querySelectorAll('.approve-refund').forEach(button => {
+        button.addEventListener('click', function() {
+            const receiptId = this.getAttribute('data-receipt-id');
+            const products = JSON.parse(this.getAttribute('data-products'));
+            
+            if (confirm('Are you sure you want to approve this refund request? This will update product stock quantities.')) {
+                approveRefund(receiptId, products);
+            }
+        });
+    });
+
+    function approveRefund(receiptId, products) {
+        fetch('approve_refund.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                receipt_id: receiptId,
+                products: products
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showBootstrapAlert('Refund approved successfully', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showBootstrapAlert(data.message || 'Error approving refund', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showBootstrapAlert('Error approving refund', 'danger');
+        });
+    }
+});
     </script>
 
 

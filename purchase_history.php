@@ -21,7 +21,7 @@ $fullName = $user['student_fname'] . ' ' . $user['student_mname'] . ' ' . $user[
 
 // Pagination settings
 $items_per_page = 5;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $items_per_page;
 
 // Get total number of orders
@@ -42,7 +42,9 @@ $orders_sql = "
            r.receipt_id,
            v.id as product_variant_id,  
            CASE WHEN rv.id IS NOT NULL THEN 1 ELSE 0 END as has_review,
-           CASE WHEN ori.id IS NOT NULL THEN 1 ELSE 0 END as has_receipt
+           CASE WHEN ori.id IS NOT NULL THEN 1 ELSE 0 END as has_receipt,
+           CASE WHEN rr.id IS NOT NULL THEN 1 ELSE 0 END as refund_requested,
+           rr.status as refund_status
     FROM orders o
     LEFT JOIN products p ON o.product_id = p.id
     LEFT JOIN product_variants v 
@@ -50,6 +52,7 @@ $orders_sql = "
     LEFT JOIN order_receipt r ON o.receipt_no = r.receipt_id
     LEFT JOIN product_reviews rv ON o.id = rv.order_id
     LEFT JOIN order_receipts_images ori ON r.receipt_id = ori.receipt_id
+    LEFT JOIN refund_requests rr ON o.receipt_no = rr.receipt_no
     WHERE o.user_id = ? AND o.receipt_no IS NOT NULL 
     GROUP BY o.id
     ORDER BY o.order_date DESC, o.receipt_no DESC
@@ -71,6 +74,8 @@ while ($row = $result->fetch_assoc()) {
             'order_date' => $row['order_date'],
             'payment_method' => $row['payment_method'],
             'has_receipt' => $row['has_receipt'],
+            'refund_requested' => $row['refund_requested'],
+            'refund_status' => $row['refund_status'],
             'items' => [],
             'total' => 0
         ];
@@ -98,16 +103,18 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <title>VMC Basket-My Purchase</title>
-    <?php include 'links.php';?>
+    <?php include 'links.php'; ?>
     <style>
         /* Navy button for "Buy Again" */
         .custom-navy-btn {
-            background-color: #0d1b52; /* dark navy */
+            background-color: #0d1b52;
+            /* dark navy */
             color: #fff;
             border: none;
             border-radius: 6px;
@@ -116,236 +123,272 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
             margin-left: 8px;
             transition: 0.2s;
         }
+
         .custom-navy-btn:hover {
             background-color: #142674;
         }
+
         /* Modal Styling */
         .rate-review-modal {
-        border-radius: 12px;
-        overflow: hidden;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         /* Left side panel */
         .product-info {
-        width: 40%;
-        background-color: #d5e9f3;
+            width: 40%;
+            background-color: #d5e9f3;
         }
 
         /* Star rating */
         .star-rating i {
-        font-size: 1.5rem;
-        color: #000;
-        cursor: pointer;
+            font-size: 1.5rem;
+            color: #000;
+            cursor: pointer;
         }
 
         /* Upload photo button */
         .photo-upload-btn {
-        width: 120px;
-        height: 90px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+            width: 120px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
+
         #photoPreview .btn {
-        font-weight: bold;
-        background-color: rgba(255, 255, 255, 0.85);
-        border: none;
-        color: #333;
-        z-index: 10;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.85);
+            border: none;
+            color: #333;
+            z-index: 10;
         }
 
         #photoArea img {
-        border-radius: 6px;
+            border-radius: 6px;
         }
 
         .modal-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid #e9ecef;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
         }
 
         #previewContainer img {
-        display: block;
-        margin: 0 auto;
-        border: 1px solid #ddd;
-        padding: 5px;
-        background-color: #fff;
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            background-color: #fff;
         }
 
         .upload-box.bg-light {
-        background-color: #f8f9fa;
+            background-color: #f8f9fa;
         }
+
         .margin-top {
             margin-top: 80px;
         }
-          /* Tablet styles */
-    @media (max-width: 991.98px) {
-        .tab-card{
-            font-size: 0.75rem;
-        }
-         /* Cards */
-        .card {
-            padding: 10px;
-        }
-        .card .d-flex.align-items-center.mb-2 img {
-            width: 50px;
-            height: 50px;
-        }
-        .card strong {
-            font-size: 14px;
-        }
-        .card p, .card small {
-            font-size: 13px;
+
+        /* Tablet styles */
+        @media (max-width: 991.98px) {
+            .tab-card {
+                font-size: 0.75rem;
+            }
+
+            /* Cards */
+            .card {
+                padding: 10px;
+            }
+
+            .card .d-flex.align-items-center.mb-2 img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .card strong {
+                font-size: 14px;
+            }
+
+            .card p,
+            .card small {
+                font-size: 13px;
+            }
+
+            /* Buttons */
+            .card button {
+                font-size: 12px;
+                padding: 6px 18px;
+            }
+
+            /* Product review modal */
+            .product-info {
+                width: 45%;
+                /* shrink left panel */
+            }
+
+            .review-form-content {
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+
+            .star-rating i {
+                font-size: 1.25rem;
+            }
+
+            .product-info {
+                font-size: 0.95rem;
+            }
+
+            .review-form {
+                font-size: 0.95rem;
+            }
         }
 
-        /* Buttons */
-        .card button {
-            font-size: 12px;
-            padding: 6px 18px;
-        }
+        @media (max-width: 575.98px) {
+            .margin-top {
+                margin-top: 20px;
+            }
 
-        /* Product review modal */
-        .product-info {
-            width: 45%; /* shrink left panel */
-        }
-        .review-form-content {
-            padding: 1rem;
-            font-size: 0.95rem;
-        }
-        .star-rating i {
-            font-size: 1.25rem;
-        }
-        .product-info{
-            font-size: 0.95rem;
-        }
-        .review-form{
-            font-size: 0.95rem;
-        }
-    }
-    @media (max-width: 575.98px) {
-        .margin-top {
-            margin-top: 20px;
-        }
-        .text-title{
-            font-size: 0.9rem;
-        }
-        .product-reviews-container{
-            font-size: 0.85rem;
-        }
-        .product-image{
-            width: 150px;
-            height: auto;
-        }
-        
-        .highlight-blue {
-            font-size: 1rem;
-        }
+            .text-title {
+                font-size: 0.9rem;
+            }
 
-        /* Cards become vertical */
-        .card {
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .card .d-flex.align-items-center.mb-2 {
-            flex-direction: column;
-            text-align: center;
-        }
-        .card .d-flex.align-items-center.mb-2 img {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 8px;
-        }
-        .card strong {
-            font-size: 13px;
-        }
-        .card p, .card small {
-            font-size: 12px;
-        }
+            .product-reviews-container {
+                font-size: 0.85rem;
+            }
 
-        /* Buttons stack */
-        .card button {
-            display: block;
-            width: 100%;
-            margin: 6px 0;
-            font-size: 13px;
-            padding: 10px;
-        }
-        .tab-card {
-            flex-direction: column;
-        }
-        .tab-button {
-            width: 50%;
-            margin-bottom: 5px;
-        }
-        /* Product review modal stacked layout */
-        .product-info {
-            width: 100%;
-            padding: 1rem;
-            font-size: 0.9rem;
-        }
-        .review-form-content {
-            width: 100%;
-            padding: 1rem;
-            font-size: 0.9rem;
-        }
-        .star-rating i {
-            font-size: 1.2rem;
-        }
-        .photo-upload-btn {
-            width: 100px;
-            height: 80px;
-        }
-        
-        .navbar-custom {
-            padding: 0.5rem 1rem;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .container-fluid.d-flex.align-items-center {
-            justify-content: start;
-        }
-        .vmc-logo {
-            max-width: 90px;
-        }
-        .search-box {
-            width: 100%;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
-        }
+            .product-image {
+                width: 150px;
+                height: auto;
+            }
 
-        .basket-btn {
-            width: 38px;
-            height: 38px;
-            font-size: 1.2rem;
-            margin-right: 5px;
-        }
+            .highlight-blue {
+                font-size: 1rem;
+            }
 
-        .profile-section img {
-            width: 70px;
-            height: 70px;
-        }
-        footer {
-            font-size: 1rem;
-        }
-        .pagination .page-link {
-            padding: 4px 8px;
-            font-size: 0.85rem;
-        }
-        .form-check-label{
-            font-size: 0.85rem;
-        }
-    }
+            /* Cards become vertical */
+            .card {
+                padding: 8px;
+                border-radius: 8px;
+            }
 
+            .card .d-flex.align-items-center.mb-2 {
+                flex-direction: column;
+                text-align: center;
+            }
 
+            .card .d-flex.align-items-center.mb-2 img {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 8px;
+            }
+
+            .card strong {
+                font-size: 13px;
+            }
+
+            .card p,
+            .card small {
+                font-size: 12px;
+            }
+
+            /* Buttons stack */
+            .card button {
+                display: block;
+                width: 100%;
+                margin: 6px 0;
+                font-size: 13px;
+                padding: 10px;
+            }
+
+            .tab-card {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 50%;
+                margin-bottom: 5px;
+            }
+
+            /* Product review modal stacked layout */
+            .product-info {
+                width: 100%;
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .review-form-content {
+                width: 100%;
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .star-rating i {
+                font-size: 1.2rem;
+            }
+
+            .photo-upload-btn {
+                width: 100px;
+                height: 80px;
+            }
+
+            .navbar-custom {
+                padding: 0.5rem 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .container-fluid.d-flex.align-items-center {
+                justify-content: start;
+            }
+
+            .vmc-logo {
+                max-width: 90px;
+            }
+
+            .search-box {
+                width: 100%;
+                font-size: 0.85rem;
+                margin-top: 0.5rem;
+            }
+
+            .basket-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.2rem;
+                margin-right: 5px;
+            }
+
+            .profile-section img {
+                width: 70px;
+                height: 70px;
+            }
+
+            footer {
+                font-size: 1rem;
+            }
+
+            .pagination .page-link {
+                padding: 4px 8px;
+                font-size: 0.85rem;
+            }
+
+            .form-check-label {
+                font-size: 0.85rem;
+            }
+        }
     </style>
-    
+
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-custom shadow-sm fixed-top">
         <div class="container-fluid d-flex align-items-center">
             <!-- Hamburger -->
-            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+            <button class="btn btn-link text-dark me-3" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sideMenu">
                 <i class="fas fa-bars fa-lg"></i>
             </button>
 
@@ -378,7 +421,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                 $basket_stmt->execute();
                 $basket_result = $basket_stmt->get_result();
                 if ($basket_row = $basket_result->fetch_assoc()) {
-                    $basket_count = (int)$basket_row['total'];
+                    $basket_count = (int) $basket_row['total'];
                 }
                 $basket_stmt->close();
             }
@@ -386,7 +429,8 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
             <a href="basket.php" class="basket-btn text-decoration-none position-relative">
                 <i class="fas fa-shopping-basket"></i>
                 <?php if ($basket_count > 0): ?>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.8rem;">
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="font-size:0.8rem;">
                         <?php echo $basket_count; ?>
                     </span>
                 <?php endif; ?>
@@ -400,42 +444,45 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
     </nav>
 
     <!-- Offcanvas Sidebar -->
-        
+
     <div class="offcanvas offcanvas-start offcanvas-custom" tabindex="-1" id="sideMenu">
         <div class="offcanvas-body p-0">
             <div class="d-flex justify-content-end p-2 close d-block d-lg-none" data-bs-theme="dark">
-                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
             </div>
             <div class="profile-section">
                 <img src="<?php echo htmlspecialchars($profile_pic); ?>" alt="Profile Picture">
                 <h4 class="mt-2"><?php echo htmlspecialchars($full_name); ?></h4>
             </div>
-    
+
             <div class="px-3">
                 <div class="mb-2">
-                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#profileMenu">
-                    Profile
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none"
+                        data-bs-toggle="collapse" data-bs-target="#profileMenu">
+                        Profile
                     </button>
                     <div class="collapse ps-3" id="profileMenu">
-                    <a href="profile.php">My Account</a>
-                    <a href="purchase_history.php">My Purchase</a>
-                    <a href="favorites.php">My Favorites</a>
+                        <a href="profile.php">My Account</a>
+                        <a href="purchase_history.php">My Purchase</a>
+                        <a href="favorites.php">My Favorites</a>
                     </div>
                 </div>
-    
+
                 <a href="home.php">Home</a>
-    
+
                 <div class="mt-2">
-                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none" data-bs-toggle="collapse" data-bs-target="#shopMenu">
-                    Shop
+                    <button class="btn btn-link text-white w-100 text-start dropdown-toggle text-decoration-none"
+                        data-bs-toggle="collapse" data-bs-target="#shopMenu">
+                        Shop
                     </button>
                     <div class="collapse ps-3" id="shopMenu">
-                    <a href="shop_uniforms.php">Uniforms</a>
-                    <a href="shop_supplies.php">School Supplies</a>
-                    <a href="shop_merch.php">School-related Merchandise</a>
+                        <a href="shop_uniforms.php">Uniforms</a>
+                        <a href="shop_supplies.php">School Supplies</a>
+                        <a href="shop_merch.php">School-related Merchandise</a>
                     </div>
                 </div>
-    
+
                 <a href="logout.php" class="mt-3 d-block">Log out</a>
             </div>
         </div>
@@ -443,215 +490,214 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
     <!-- My Profile Side-bar-->
     <div class="d-flex margin-top">
-     <!-- Purchase History -->
-     <div class="purchase-history container mb-5 p-5">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-            <h2 class="mt-4 mb-5">
-                <span class="highlight-blue">My Purchase History</span>
-            </h2>
-             <!-- Desktop: show p and pagination on the right -->
-            <div class="d-flex flex-column justify-content-center align-items-end align-items-sm-end ms-auto text-center">
-                <p class="mb-2">8 out of 100 items shows</p>
-                <!-- Pagination -->
-                <nav aria-label="Page navigation">
-                    <ul class="pagination custom-pagination justify-content-center">
-                        <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                            <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+        <!-- Purchase History -->
+        <div class="purchase-history container mb-5 p-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                <h2 class="mt-4 mb-5">
+                    <span class="highlight-blue">My Purchase History</span>
+                </h2>
+                <!-- Desktop: show p and pagination on the right -->
+                <div
+                    class="d-flex flex-column justify-content-center align-items-end align-items-sm-end ms-auto text-center">
+                    <p class="mb-2">8 out of 100 items shows</p>
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination custom-pagination justify-content-center">
+                            <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $page - 1 ?>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
                             </li>
-                        <?php endfor; ?>
-                        <li class="page-item <?= $page >= $total_pages ? 'disabled' : '' ?>">
-                            <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            <li class="page-item <?= $page >= $total_pages ? 'disabled' : '' ?>">
+                                <a class="page-link" href="?page=<?= $page + 1 ?>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
-        </div>
 
-    <!-- Tabs -->
-     <div class="d-flex tab-card mb-3"> 
-        <button class="tab-button active w-100">All</button> 
-        <button class="tab-button w-100">To Pay</button> 
-        <button class="tab-button w-100">To Pick Up</button> 
-        <button class="tab-button w-100">Completed</button> 
-        <button class="tab-button w-100">Cancelled</button> 
-        <button class="tab-button w-100">Return Refund</button> 
-    </div>
-
-    <!-- Search -->
-    <div class="purchase-search-bar d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <div class="search-input-group input-group mb-2 mb-md-0 w-100">
-            <span class="input-group-text bg-light border-1">
-                <img src="./admin/images/search-icon.png" alt="Search" width="20">
-            </span>
-            <input type="text" class="form-control border-1" placeholder="Search product name...">
-        </div>
-    </div>
-
-    <!-- Purchase History Cards -->
-    <?php foreach($grouped_orders as $order): ?>
-        <div class="card p-3 mb-4 purchase-card" data-status="<?= $order['status'] ?>">
-            <!-- Order Header -->
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <img src="./admin/images/ready-to-pickup.png" alt="Box" width="25" class="me-2">
-                    <div>
-                        <strong>Order #<?= $order['receipt_no'] ?></strong><br>
-                        <small class="text-muted">Ordered on <?= date('M d, Y', strtotime($order['order_date'])) ?></small>
-                    </div>
-                </div>
-                <span class="status-badge <?= strtolower($order['status']) ?>"><?= $order['status'] ?></span>
+            <!-- Tabs -->
+            <div class="d-flex tab-card mb-3">
+                <button class="tab-button active w-100">All</button>
+                <button class="tab-button w-100">To Pay</button>
+                <button class="tab-button w-100">To Pick Up</button>
+                <button class="tab-button w-100">Completed</button>
+                <button class="tab-button w-100">Cancelled</button>
+                <button class="tab-button w-100">Return Refund</button>
             </div>
-            <hr>
-            
-            <!-- Products in this order -->
-            <?php foreach($order['items'] as $item): ?>
-                <div class="d-flex align-items-center mb-3">
-                    <img src="admin/<?= $item['product_image'] ?>" width="60" height="60" 
-                         class="me-3 rounded" alt="<?= $item['product_name'] ?>">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0"><?= $item['product_name'] ?></h6>
-                        <small>Size: <?= $item['size'] ?> | Qty: <?= $item['quantity'] ?></small>
-                    </div>
-                    <div class="text-end">
-                        <strong>₱<?= number_format($item['price'], 2) ?></strong>
-                    </div>
+
+            <!-- Search -->
+            <div class="purchase-search-bar d-flex justify-content-between align-items-center mb-4 flex-wrap">
+                <div class="search-input-group input-group mb-2 mb-md-0 w-100">
+                    <span class="input-group-text bg-light border-1">
+                        <img src="./admin/images/search-icon.png" alt="Search" width="20">
+                    </span>
+                    <input type="text" class="form-control border-1" placeholder="Search product name...">
                 </div>
-            <?php endforeach; ?>
+            </div>
 
-            <hr>
-            <!-- Order Footer -->
-            <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <?php if($order['status'] == 'Pending'): ?>
-                <?php if($order['payment_method'] == 'Send Online Receipt'): ?>
-                    <?php if(!$order['has_receipt']): ?>
-                        <button class="btn btn-outline-danger btn-sm" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#cancelOrderModal" 
-                                data-receipt="<?= $order['receipt_no'] ?>"
-                                data-products='<?= json_encode($order['items']) ?>'>
-                            Cancel Order
-                        </button>
-                    <?php endif; ?>
-                <?php endif; ?>
-           <?php elseif($order['status'] == 'ToPickUp'): ?>
-            <button class="custom-navy-btn btn-sm pickup-btn"
-                data-bs-toggle="modal"
-                data-bs-target="#confirmPickupModal"
-                data-receipt="<?= $order['receipt_no'] ?>"
-                data-products='<?= json_encode($order['items']) ?>'
-                data-total="<?= $order['total'] ?>"
-                data-date="<?= $order['order_date'] ?>">
-                <i class="bi bi-check2-circle"></i> Confirm Pick-up
-            </button>
-        <?php endif; ?>
-
-
-        <!-- Confirm Pick-up Modal -->
-        <div class="modal fade" id="confirmPickupModal" tabindex="-1" aria-labelledby="confirmPickupLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content p-2">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="confirmPickupLabel">
-                    <i class="bi bi-check2-circle me-2 text-success"></i> Confirm Pick-up
-                    </h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body" id="pickupReceiptContent">
-                    <div class="text-center mb-4">
-                    <img src="admin/images/vmc_basket_logo.png" alt="VMC Logo" style="max-width: 100px;">
-                    <h4 class="mt-2 navy-text mb-0">VMC Basket</h4>
-                    <p class="mb-2">Pick-up Confirmation</p>
-                    <p class="text-muted mb-0" id="pickupDateTime"></p>
+            <!-- Purchase History Cards -->
+            <?php foreach ($grouped_orders as $order): ?>
+                <div class="card p-3 mb-4 purchase-card" data-status="<?= $order['status'] ?>">
+                    <!-- Order Header -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="./admin/images/ready-to-pickup.png" alt="Box" width="25" class="me-2">
+                            <div>
+                                <strong>Order #<?= $order['receipt_no'] ?></strong><br>
+                                <small class="text-muted">Ordered on
+                                    <?= date('M d, Y', strtotime($order['order_date'])) ?></small>
+                            </div>
+                        </div>
+                        <span class="status-badge <?= strtolower($order['status']) ?>"><?= $order['status'] ?></span>
+                    </div>
                     <hr>
-                </div>
 
-                <div id="pickupReceiptDetails">
-                <!-- JS will inject details here -->
-                </div>
+                    <!-- Products in this order -->
+                    <?php foreach ($order['items'] as $item): ?>
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="admin/<?= $item['product_image'] ?>" width="60" height="60" class="me-3 rounded"
+                                alt="<?= $item['product_name'] ?>">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0"><?= $item['product_name'] ?></h6>
+                                <small>Size: <?= $item['size'] ?> | Qty: <?= $item['quantity'] ?></small>
+                            </div>
+                            <div class="text-end">
+                                <strong>₱<?= number_format($item['price'], 2) ?></strong>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
 
-                <!-- QR Code Placeholder -->
-                <div class="text-center my-3" id="pickupQrCode">
-                    <!-- QR code will be displayed here -->
-                    <img src="admin/images/qrdummy.png" alt="QR Code" style="max-width:120px;">
-                    <p class="small text-muted mt-2">Scan this QR code for pick-up verification</p>
-                </div>
-            </div>
+                    <hr>
+                    <!-- Order Footer -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <?php if ($order['status'] == 'Pending'): ?>
+                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#cancelOrderModal" data-receipt="<?= $order['receipt_no'] ?>"
+                                    data-products='<?= json_encode($order['items']) ?>'>
+                                    Cancel Order
+                                </button>
+
+                            <?php elseif ($order['status'] == 'ToPickUp'): ?>
+                                <button class="custom-navy-btn btn-sm pickup-btn" data-bs-toggle="modal"
+                                    data-bs-target="#confirmPickupModal" data-receipt="<?= $order['receipt_no'] ?>"
+                                    data-products='<?= json_encode($order['items']) ?>' data-total="<?= $order['total'] ?>"
+                                    data-date="<?= $order['order_date'] ?>">
+                                    <i class="bi bi-check2-circle"></i> Confirm Pick-up
+                                </button>
+                            <?php endif; ?>
 
 
-            </div>
-        </div>
-        </div>
+                            <!-- Confirm Pick-up Modal -->
+                            <div class="modal fade" id="confirmPickupModal" tabindex="-1"
+                                aria-labelledby="confirmPickupLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content p-2">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="confirmPickupLabel">
+                                                <i class="bi bi-check2-circle me-2 text-success"></i> Confirm Pick-up
+                                            </h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const pickupModal = document.getElementById('confirmPickupModal');
-            let currentReceiptNo = null;
+                                        <div class="modal-body" id="pickupReceiptContent">
+                                            <div class="text-center mb-4">
+                                                <img src="admin/images/vmc_basket_logo.png" alt="VMC Logo"
+                                                    style="max-width: 100px;">
+                                                <h4 class="mt-2 navy-text mb-0">VMC Basket</h4>
+                                                <p class="mb-2">Pick-up Confirmation</p>
+                                                <p class="text-muted mb-0" id="pickupDateTime"></p>
+                                                <hr>
+                                            </div>
 
-            // Bootstrap alert helper
-            function showBootstrapAlert(message, type = 'success', duration = 3000) {
-                let alertContainer = document.getElementById('customAlertContainer');
-                if (!alertContainer) {
-                    alertContainer = document.createElement('div');
-                    alertContainer.id = 'customAlertContainer';
-                    alertContainer.style.position = 'fixed';
-                    alertContainer.style.top = '24px';
-                    alertContainer.style.right = '24px';
-                    alertContainer.style.zIndex = '9999';
-                    alertContainer.style.width = '350px';
-                    alertContainer.style.maxWidth = '90vw';
-                    alertContainer.style.pointerEvents = 'none';
-                    document.body.appendChild(alertContainer);
-                }
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-                alertDiv.role = 'alert';
-                alertDiv.innerHTML = `
+                                            <div id="pickupReceiptDetails">
+                                                <!-- JS will inject details here -->
+                                            </div>
+
+                                            <!-- QR Code Placeholder -->
+                                            <div class="text-center my-3" id="pickupQrCode">
+                                                <!-- QR code will be displayed here -->
+                                                <img src="admin/images/qrdummy.png" alt="QR Code" style="max-width:120px;">
+                                                <p class="small text-muted mt-2">Scan this QR code for pick-up verification
+                                                </p>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- confirm pickup js -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const pickupModal = document.getElementById('confirmPickupModal');
+                                    let currentReceiptNo = null;
+
+                                    // Bootstrap alert helper
+                                    function showBootstrapAlert(message, type = 'success', duration = 3000) {
+                                        let alertContainer = document.getElementById('customAlertContainer');
+                                        if (!alertContainer) {
+                                            alertContainer = document.createElement('div');
+                                            alertContainer.id = 'customAlertContainer';
+                                            alertContainer.style.position = 'fixed';
+                                            alertContainer.style.top = '24px';
+                                            alertContainer.style.right = '24px';
+                                            alertContainer.style.zIndex = '9999';
+                                            alertContainer.style.width = '350px';
+                                            alertContainer.style.maxWidth = '90vw';
+                                            alertContainer.style.pointerEvents = 'none';
+                                            document.body.appendChild(alertContainer);
+                                        }
+                                        const alertDiv = document.createElement('div');
+                                        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                                        alertDiv.role = 'alert';
+                                        alertDiv.innerHTML = `
                       <div class="d-flex align-items-center">
                         <span class="me-2">
                           ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
-                            type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
-                            type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
-                            '<i class="bi bi-info-circle-fill text-info"></i>'}
+                                            type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
+                                                type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                                                    '<i class="bi bi-info-circle-fill text-info"></i>'}
                         </span>
                         <span>${message}</span>
                       </div>
                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     `;
-                alertContainer.appendChild(alertDiv);
+                                        alertContainer.appendChild(alertDiv);
 
-                setTimeout(() => {
-                    alertDiv.classList.remove('show');
-                    alertDiv.classList.add('hide');
-                    setTimeout(() => alertDiv.remove(), 500);
-                }, duration);
-            }
+                                        setTimeout(() => {
+                                            alertDiv.classList.remove('show');
+                                            alertDiv.classList.add('hide');
+                                            setTimeout(() => alertDiv.remove(), 500);
+                                        }, duration);
+                                    }
 
-            document.querySelectorAll('[data-bs-target="#confirmPickupModal"]').forEach(button => {
-                button.addEventListener('click', function() {
-                    currentReceiptNo = this.getAttribute('data-receipt');
-                    const products = JSON.parse(this.getAttribute('data-products'));
-                    const total = this.getAttribute('data-total');
-                    const orderDate = this.getAttribute('data-date');
-                    const customerName = this.getAttribute('data-name');
+                                    document.querySelectorAll('[data-bs-target="#confirmPickupModal"]').forEach(button => {
+                                        button.addEventListener('click', function () {
+                                            currentReceiptNo = this.getAttribute('data-receipt');
+                                            const products = JSON.parse(this.getAttribute('data-products'));
+                                            const total = this.getAttribute('data-total');
+                                            const orderDate = this.getAttribute('data-date');
+                                            const customerName = this.getAttribute('data-name');
 
-                    const detailsContainer = pickupModal.querySelector('#pickupReceiptDetails');
-                    const currentDateTime = new Date().toLocaleString('en-PH', { hour12: true });
+                                            const detailsContainer = pickupModal.querySelector('#pickupReceiptDetails');
+                                            const currentDateTime = new Date().toLocaleString('en-PH', { hour12: true });
 
-                    // Set current time display
-                    pickupModal.querySelector('#pickupDateTime').textContent = currentDateTime;
+                                            // Set current time display
+                                            pickupModal.querySelector('#pickupDateTime').textContent = currentDateTime;
 
-                    // Build HTML
-                    let html = `
+                                            // Build HTML
+                                            let html = `
                         <div class="mb-3">
                         <p><strong>Receipt No:</strong> ${currentReceiptNo}</p>
                         <p><strong>Order Date:</strong> ${orderDate}</p>
@@ -661,8 +707,8 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                         <h6 class="fw-bold mb-2">Ordered Items:</h6>
                     `;
 
-                    products.forEach(product => {
-                        html += `
+                                            products.forEach(product => {
+                                                html += `
                         <div class="d-flex align-items-center mb-2">
                         <img src="admin/${product.product_image}" alt="${product.product_name}" 
                             class="img-thumbnail me-3" style="max-width:60px;">
@@ -674,9 +720,9 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                         </div>
                         </div>
                         `;
-                    });
+                                            });
 
-                    html += `
+                                            html += `
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
@@ -685,523 +731,538 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                         </div>
                     `;
 
-                    detailsContainer.innerHTML = html;
+                                            detailsContainer.innerHTML = html;
 
-                    // --- QR CODE GENERATION ---
-                   
- let qrContentArr = [];
-        products.forEach(product => {
-            // Log each product's variant ID
-            console.log('Product:', product.product_name, 'Variant ID:', product.product_variant_id);
-            
-            const variantId = product.product_variant_id;
-            if (!variantId) {
-                console.error('Missing variant ID for:', product);
-            }
-            qrContentArr.push(`${variantId},${currentReceiptNo},${product.quantity}`);
-        });
-        
-        const qrContent = qrContentArr.join('|');
-        console.log('QR Content:', qrContent);
+                                            // --- QR CODE GENERATION ---
 
-        // Generate QR code
-        const qrDiv = pickupModal.querySelector('#pickupQrCode');
-        qrDiv.innerHTML = '';
-        new QRCode(qrDiv, {
-            text: qrContent,
-            width: 120,
-            height: 120,
-        });
-                    // --- END QR CODE GENERATION ---
-                });
-            });
-        });
-    </script>
+                                            let qrContentArr = [];
+                                            products.forEach(product => {
+                                                // Log each product's variant ID
+                                                console.log('Product:', product.product_name, 'Variant ID:', product.product_variant_id);
 
-            
-<?php if($order['status'] == 'Complete'): ?>
-    <?php if(!$item['has_review']): ?>
-        <button class="btn custom-outline-black"
-                data-bs-toggle="modal"
-                data-bs-target="#rateReviewModal"
-                data-receipt="<?= $order['receipt_no'] ?>"
-                data-products='<?= json_encode($order['items']) ?>'>
-            Rate
-        </button>
+                                                const variantId = product.product_variant_id;
+                                                if (!variantId) {
+                                                    console.error('Missing variant ID for:', product);
+                                                }
+                                                qrContentArr.push(`${variantId},${currentReceiptNo},${product.quantity}`);
+                                            });
 
-        <button class="btn custom-navy-btn">
-            Buy Again
-        </button>
+                                            const qrContent = qrContentArr.join('|');
+                                            console.log('QR Content:', qrContent);
 
-        <button class="btn custom-blue-btn"
-                data-bs-toggle="modal"
-                data-bs-target="#returnRequestModal"
-                data-receipt="<?= $order['receipt_no'] ?>"
-                data-products='<?= json_encode($order['items']) ?>'>
-            Request for Refund
-        </button>
-    <?php else: ?>
-        <button class="btn custom-outline-black" disabled>
-             Reviewed
-        </button>
-         <button class="btn custom-navy-btn">
-            Buy Again
-        </button>
-
-        <button class="btn custom-blue-btn"
-                data-bs-toggle="modal"
-                data-bs-target="#returnRequestModal"
-                data-receipt="<?= $order['receipt_no'] ?>"
-                data-products='<?= json_encode($order['items']) ?>'>
-            Request for Refund
-        </button>
-    <?php endif; ?>
-<?php endif; ?>
-
-        </div>
-        <div class="text-end">
-            <small class="text-muted">Total Amount</small><br>
-            <strong class="fs-5">₱<?= number_format($order['total'], 2) ?></strong>
-        </div>
-    </div>
-</div>
-<?php endforeach; ?>
-</div>
-</div>
+                                            // Generate QR code
+                                            const qrDiv = pickupModal.querySelector('#pickupQrCode');
+                                            qrDiv.innerHTML = '';
+                                            new QRCode(qrDiv, {
+                                                text: qrContent,
+                                                width: 120,
+                                                height: 120,
+                                            });
+                                            // --- END QR CODE GENERATION ---
+                                        });
+                                    });
+                                });
+                            </script>
 
 
-<!------------------------ MODALS ----------------------------------------------------------->
+                            <?php if ($order['status'] == 'Complete'): ?>
+                                <?php if (!$item['has_review']): ?>
+                                    <button class="btn custom-outline-black" data-bs-toggle="modal"
+                                        data-bs-target="#rateReviewModal" data-receipt="<?= $order['receipt_no'] ?>"
+                                        data-products='<?= json_encode($order['items']) ?>'>
+                                        Rate
+                                    </button>
+                            
+                                    <button class="btn custom-navy-btn">
+                                        Buy Again
+                                    </button>
+                            
+                                    <?php if (!$order['refund_requested']): ?>
+                                        <button class="btn custom-blue-btn" data-bs-toggle="modal" 
+                                            data-bs-target="#returnRequestModal"
+                                            data-receipt="<?= $order['receipt_no'] ?>"
+                                            data-products='<?= json_encode($order['items']) ?>'>
+                                            Request for Refund
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="badge bg-<?= $order['refund_status'] == 'Approved' ? 'success' : 
+                                                               ($order['refund_status'] == 'Rejected' ? 'danger' : 'info') ?>">
+                                            <?= $order['refund_status'] == 'Pending' ? 'Refund Requested' : 
+                                                'Refund ' . $order['refund_status'] ?>
+                                        </span>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <button class="btn custom-outline-black" disabled>
+                                        Reviewed
+                                    </button>
+                                    <button class="btn custom-navy-btn">
+                                        Buy Again
+                                    </button>
+                            
+                                <?php endif; ?>
+                            <?php endif; ?>
 
-
-<!-- RETURN REFUND MODAL -->
-<div class="modal fade" id="returnRequestModal" tabindex="-1" aria-labelledby="returnRequestLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content return-request-modal">
-    <div class="modal-header shadow-sm">
-        <h4 class="modal-title title-text fw-bold" id="returnRequestLabel">
-            <img src="./admin/images/request-for-return.png" alt="Return Icon"  class="me-2" style="width: 40px; height: 40px;">
-            Request for Return/Refund
-        </h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-      <div class="modal-body d-flex p-0">
-        
-        <!-- Left Side: Product Info -->
-        <div class="product-info p-4 text-start">
-          <img src=" " alt="VMC Shirt" class="img-fluid mb-3" />
-          <h5 class="mb-1">VMC 41st Anniversary Shirt</h5>
-          <p class="text-muted mb-0">Size: L</p>
-        </div>
-
-        <!-- Right Side: Rating Form -->
-        <div class="review-form flex-grow-1 p-4">
-
-        <h5 class="title-text fw-semibold">Reason for Return</h5>
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="returnReason1">
-            <label class="form-check-label" for="returnReason1">Defective or Damage Product</label>
-          </div>
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="returnReason2">
-            <label class="form-check-label" for="returnReason2">Size/Fit Issue</label>
-          </div>
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="returnReason3">
-            <label class="form-check-label" for="returnReason3">Missing Parts or Accessories</label>
-          </div>
-          <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="returnReasonOther">
-            <label class="form-check-label" for="returnReasonOther">Others</label>
-          </div>
-
-          <textarea class="form-control mt-2" placeholder="Please state the reason."></textarea>
-
-          <!-- Photo Upload -->
-          <div class="mb-3 photo-upload-section">
-            <label class="form-label title-text fw-semibold fs-5 mt-3">Add photos</label><br/>
-
-            <!-- Flex container for previews + button -->
-            <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
-                <div class="d-flex flex-wrap photo-preview"></div>
-
-                <!-- Upload Button -->
-                <button type="button" class="btn btn-light border photo-upload-btn">
-                <i class="bi bi-image me-2"></i>Photo
-                </button>
-            </div>
-
-            <input type="file" class="photo-upload-input d-none" multiple accept="image/png, image/jpeg">
-            </div>
-
-          <div class="d-flex justify-content-end mt-4">
-            <button class="btn btn-danger me-2" data-bs-dismiss="modal">Cancel</button>
-            <button class="custom-navy-btn">Send Request</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Rate & Review Modal -->
-<div class="modal fade" id="rateReviewModal" tabindex="-1" aria-labelledby="rateReviewLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content rate-review-modal">
-      <div class="modal-header shadow-sm">
-        <h4 class="modal-title text-title fw-bold" id="rateReviewLabel">
-          <img src="./admin/images/rate-and-review.png" alt="Review Icon" class="me-2" style="width: 40px; height: 40px;">
-          Rate & Review Products
-        </h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <!-- Product Reviews Container -->
-      <div class="modal-body p-0">
-        <div class="product-reviews-container">
-          <!-- Products will be dynamically inserted here -->
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="custom-navy-btn" id="submitAllReviews">Submit Reviews</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Template for individual product review (hidden) -->
-<template id="productReviewTemplate">
-  <div class="product-review-item border-bomb-3">
-    <form class="review-form" data-product-id="" data-order-id="">
-      <div class="d-flex p-0">
-        <!-- Left Side: Product Info -->
-        <div class="product-info p-4 text-center">
-          <img src="" alt="Product Image" class="img-fluid mb-3 product-image" />
-          <h5 class="mb-1 product-name"></h5>
-          <p class="text-muted mb-0 product-size"></p>
-          <div class="d-flex justify-content-center">
-        <div class="form-check mt-4 d-flex align-items-center">
-            <input class="form-check-input me-2" type="checkbox" name="is_anonymous" id="is_anonymous">
-            <label class="form-check-label text-muted" for="is_anonymous">
-            Review Anonymously
-            </label>
-        </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">Total Amount</small><br>
+                            <strong class="fs-5">₱<?= number_format($order['total'], 2) ?></strong>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
-        <!-- Right Side: Rating Form -->
-        <div class="review-form-content flex-grow-1 p-4">
-          <!-- Star Rating -->
-          <div class="mb-3">
-            <label class="form-label text-title fw-semibold">Rate Product</label><br/>
-            <div class="star-rating">
-              <i class="bi bi-star" data-rating="1"></i>
-              <i class="bi bi-star" data-rating="2"></i>
-              <i class="bi bi-star" data-rating="3"></i>
-              <i class="bi bi-star" data-rating="4"></i>
-              <i class="bi bi-star" data-rating="5"></i>
-            </div>
-            <input type="hidden" name="rating" class="selected-rating" value="0">
-          </div>
 
-          <!-- Photo Upload -->
-          <div class="mb-3 photo-upload-section">
-            <label class="form-label text-title fw-semibold">Add photos</label><br/>
-            <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
-              <div class="d-flex flex-wrap photo-preview"></div>
-              <button type="button" class="btn btn-light border photo-upload-btn">
-                <i class="bi bi-image me-2"></i>Photo
-              </button>
-            </div>
-            <input type="file" name="review_images[]" class="photo-upload-input d-none" 
-                   multiple accept="image/png, image/jpeg" data-max-files="3">
-            <small class="text-muted d-block mt-1">You can upload up to 3 images</small>
-          </div>
+    <!------------------------ MODALS ----------------------------------------------------------->
 
-          <!-- Review Text -->
-          <div class="mb-3">
-            <label class="form-label text-title fw-semibold">Write your review</label>
-            <textarea class="form-control" name="review_text" rows="3"></textarea>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-</template>
 
-<!-- CANCEL MODAL -->
-<div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content cancel-order-modal">
-      <div class="modal-header shadow-sm">
-          <h4 class="modal-title text-title fw-bold" id="cancelOrderLabel">
-              <img src="./admin/images/cancel-order.png" alt="Cancel Icon" class="me-2" style="width: 40px; height: 40px;">
-              Cancel Order
-          </h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body d-flex p-0">
-        <!-- Left Side: Product Info -->
-        <div class="product-info p-4 text-center"></div>
+    <!-- RETURN REFUND MODAL -->
+    <div class="modal fade" id="returnRequestModal" tabindex="-1" aria-labelledby="returnRequestLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content return-request-modal">
+                <div class="modal-header shadow-sm">
+                    <h4 class="modal-title title-text fw-bold" id="returnRequestLabel">
+                        <img src="./admin/images/request-for-return.png" alt="Return Icon" class="me-2"
+                            style="width: 40px; height: 40px;">
+                        Request for Return/Refund
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex p-0">
 
-        <!-- Right: Cancel Form -->
-        <div class="review-form flex-grow-1 p-4">
-            <p>Are you sure you want to cancel your order? If yes, please state the reason.</p>
-            <h5 class="mt-2 mb-1 text-title fw-semibold">Reason for Cancel</h5>
+                    <!-- Left Side: Product Info -->
+                    <div class="product-info p-4 text-start">
+                        <img src=" " alt="VMC Shirt" class="img-fluid mb-3" />
+                        <h5 class="mb-1">VMC 41st Anniversary Shirt</h5>
+                        <p class="text-muted mb-0">Size: L</p>
+                    </div>
 
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="cancelReason1">
-              <label class="form-check-label" for="cancelReason1">Wrong Item</label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="cancelReason2">
-              <label class="form-check-label" for="cancelReason2">Wrong Size</label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="cancelReason3">
-              <label class="form-check-label" for="cancelReason3">Change of Mind</label>
-            </div>
-            <div class="form-check mb-2">
-              <input class="form-check-input" type="checkbox" id="cancelReasonOther">
-              <label class="form-check-label" for="cancelReasonOther">Others</label>
-            </div>
+                    <!-- Right Side: Rating Form -->
+                    <div class="review-form flex-grow-1 p-4">
 
-            <textarea class="form-control mt-4" placeholder="Please state the reason."></textarea>
+                        <h5 class="title-text fw-semibold">Reason for Return</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="returnReason1">
+                            <label class="form-check-label" for="returnReason1">Defective or Damage Product</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="returnReason2">
+                            <label class="form-check-label" for="returnReason2">Size/Fit Issue</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="returnReason3">
+                            <label class="form-check-label" for="returnReason3">Missing Parts or Accessories</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="returnReasonOther">
+                            <label class="form-check-label" for="returnReasonOther">Others</label>
+                        </div>
 
-            <div class="d-flex justify-content-between mt-4">
-              <button class="btn btn-danger w-100">Cancel Order</button>
+                        <textarea class="form-control mt-2" placeholder="Please state the reason."></textarea>
+
+                        <!-- Photo Upload -->
+                        <div class="mb-3 photo-upload-section">
+                            <label class="form-label title-text fw-semibold fs-5 mt-3">Add photos</label><br />
+
+                            <!-- Flex container for previews + button -->
+                            <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
+                                <div class="d-flex flex-wrap photo-preview"></div>
+
+                                <!-- Upload Button -->
+                                <button type="button" class="btn btn-light border photo-upload-btn">
+                                    <i class="bi bi-image me-2"></i>Photo
+                                </button>
+                            </div>
+
+                            <input type="file" class="photo-upload-input d-none" multiple
+                                accept="image/png, image/jpeg">
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button class="btn btn-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button class="custom-navy-btn">Send Request</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
+
+    <!-- Rate & Review Modal -->
+    <div class="modal fade" id="rateReviewModal" tabindex="-1" aria-labelledby="rateReviewLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rate-review-modal">
+                <div class="modal-header shadow-sm">
+                    <h4 class="modal-title text-title fw-bold" id="rateReviewLabel">
+                        <img src="./admin/images/rate-and-review.png" alt="Review Icon" class="me-2"
+                            style="width: 40px; height: 40px;">
+                        Rate & Review Products
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Product Reviews Container -->
+                <div class="modal-body p-0">
+                    <div class="product-reviews-container">
+                        <!-- Products will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="custom-navy-btn" id="submitAllReviews">Submit Reviews</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template for individual product review (hidden) -->
+    <template id="productReviewTemplate">
+        <div class="product-review-item border-bomb-3">
+            <form class="review-form" data-product-id="" data-order-id="">
+                <div class="d-flex p-0">
+                    <!-- Left Side: Product Info -->
+                    <div class="product-info p-4 text-center">
+                        <img src="" alt="Product Image" class="img-fluid mb-3 product-image" />
+                        <h5 class="mb-1 product-name"></h5>
+                        <p class="text-muted mb-0 product-size"></p>
+                        <div class="d-flex justify-content-center">
+                            <div class="form-check mt-4 d-flex align-items-center">
+                                <input class="form-check-input me-2" type="checkbox" name="is_anonymous"
+                                    id="is_anonymous">
+                                <label class="form-check-label text-muted" for="is_anonymous">
+                                    Review Anonymously
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Rating Form -->
+                    <div class="review-form-content flex-grow-1 p-4">
+                        <!-- Star Rating -->
+                        <div class="mb-3">
+                            <label class="form-label text-title fw-semibold">Rate Product</label><br />
+                            <div class="star-rating">
+                                <i class="bi bi-star" data-rating="1"></i>
+                                <i class="bi bi-star" data-rating="2"></i>
+                                <i class="bi bi-star" data-rating="3"></i>
+                                <i class="bi bi-star" data-rating="4"></i>
+                                <i class="bi bi-star" data-rating="5"></i>
+                            </div>
+                            <input type="hidden" name="rating" class="selected-rating" value="0">
+                        </div>
+
+                        <!-- Photo Upload -->
+                        <div class="mb-3 photo-upload-section">
+                            <label class="form-label text-title fw-semibold">Add photos</label><br />
+                            <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
+                                <div class="d-flex flex-wrap photo-preview"></div>
+                                <button type="button" class="btn btn-light border photo-upload-btn">
+                                    <i class="bi bi-image me-2"></i>Photo
+                                </button>
+                            </div>
+                            <input type="file" name="review_images[]" class="photo-upload-input d-none" multiple
+                                accept="image/png, image/jpeg" data-max-files="3">
+                            <small class="text-muted d-block mt-1">You can upload up to 3 images</small>
+                        </div>
+
+                        <!-- Review Text -->
+                        <div class="mb-3">
+                            <label class="form-label text-title fw-semibold">Write your review</label>
+                            <textarea class="form-control" name="review_text" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </template>
+
+    <!-- CANCEL MODAL -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content cancel-order-modal">
+                <div class="modal-header shadow-sm">
+                    <h4 class="modal-title text-title fw-bold" id="cancelOrderLabel">
+                        <img src="./admin/images/cancel-order.png" alt="Cancel Icon" class="me-2"
+                            style="width: 40px; height: 40px;">
+                        Cancel Order
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex p-0">
+                    <!-- Left Side: Product Info -->
+                    <div class="product-info p-4 text-center"></div>
+
+                    <!-- Right: Cancel Form -->
+                    <div class="review-form flex-grow-1 p-4">
+                        <p>Are you sure you want to cancel your order? If yes, please state the reason.</p>
+                        <h5 class="mt-2 mb-1 text-title fw-semibold">Reason for Cancel</h5>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="cancelReason1">
+                            <label class="form-check-label" for="cancelReason1">Wrong Item</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="cancelReason2">
+                            <label class="form-check-label" for="cancelReason2">Wrong Size</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="cancelReason3">
+                            <label class="form-check-label" for="cancelReason3">Change of Mind</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="cancelReasonOther">
+                            <label class="form-check-label" for="cancelReasonOther">Others</label>
+                        </div>
+
+                        <textarea class="form-control mt-4" placeholder="Please state the reason."></textarea>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button class="btn btn-danger w-100">Cancel Order</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-<!-- Footer and chat-->
+    <!-- Footer and chat-->
     <?php include 'footer.php'; ?>
     <?php include 'chat.php'; ?>
 
 
 
-<!------------------------ JS SCRIPT ----------------------------------------------------------->
-<script>
-    // TAB FUNCTIONALITY
-   document.addEventListener('DOMContentLoaded', function () {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const cards = document.querySelectorAll('.purchase-card');
-
-    // Status mapping object
-    const statusMap = {
-        'All': 'All',
-        'To Pay': 'Pending',
-        'To Pick Up': 'ToPickUp',
-        'Completed': 'Complete',
-        'Cancelled': 'Cancelled',
-        'Return Refund': 'Refunded'
-    };
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            // Remove active class from all buttons
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            // Add active class to clicked button
-            this.classList.add('active');
-
-            const buttonText = this.textContent.trim();
-            const statusToMatch = statusMap[buttonText];
-
-            cards.forEach(card => {
-                const cardStatus = card.dataset.status;
-                if (statusToMatch === 'All' || cardStatus === statusToMatch) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-});
-
-
-// Unified Photo Upload Handler
-class PhotoUploadHandler {
-    constructor(section, maxFiles = 3) {
-        this.fileInput = section.querySelector(".photo-upload-input");
-        this.uploadBtn = section.querySelector(".photo-upload-btn");
-        this.previewContainer = section.querySelector(".photo-preview");
-        this.maxFiles = maxFiles;
-        this.selectedFiles = [];
-        this.allowedTypes = ["image/png", "image/jpeg"];
-
-        this.init();
-    }
-
-    init() {
-        this.uploadBtn.addEventListener("click", () => this.fileInput.click());
-        this.fileInput.addEventListener("change", () => this.handleFileSelect());
-    }
-
-    handleFileSelect() {
-        const newFiles = Array.from(this.fileInput.files);
-
-        if (!this.validateFiles(newFiles)) return;
-
-        this.addFiles(newFiles);
-        this.fileInput.value = "";
-        this.renderPreviews();
-    }
-
-    validateFiles(files) {
-        for (let file of files) {
-            if (!this.allowedTypes.includes(file.type)) {
-                this.showBootstrapAlert("Only PNG and JPEG files are allowed.", "danger");
-                return false;
-            }
-            if (this.selectedFiles.length >= this.maxFiles) {
-                this.showBootstrapAlert(`You can upload a maximum of ${this.maxFiles} images.`, "warning");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    addFiles(files) {
-        files.forEach(file => {
-            if (this.selectedFiles.length < this.maxFiles) {
-                this.selectedFiles.push(file);
-            }
-        });
-    }
-
-    renderPreviews() {
-        this.previewContainer.innerHTML = "";
-
-        this.selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const preview = this.createPreviewElement(e.target.result, index);
-                this.previewContainer.appendChild(preview);
+    <!------------------------ JS SCRIPT ----------------------------------------------------------->
+    <script>
+        // TAB FUNCTIONALITY
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const cards = document.querySelectorAll('.purchase-card');
+        
+            // Update the statusMap object
+            const statusMap = {
+                'All': 'All',
+                'To Pay': 'Pending',
+                'To Pick Up': 'ToPickUp',
+                'Completed': 'Complete',
+                'Cancelled': 'Cancelled',
+                'Return Refund': ['Refund Requested', 'Refunded']
+                
             };
-            reader.readAsDataURL(file);
-        });
+            
+            // Update the tab click handler logic
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+            
+                    const buttonText = this.textContent.trim();
+                    const statusToMatch = statusMap[buttonText];
+            
+                    cards.forEach(card => {
+                        const cardStatus = card.dataset.status;
+                        if (statusToMatch === 'All') {
+                            card.style.display = 'block';
+                        } else if (Array.isArray(statusToMatch)) {
+                            // Handle array of statuses
+                            card.style.display = statusToMatch.includes(cardStatus) ? 'block' : 'none';
+                        } else {
+                            // Handle single status
+                            card.style.display = cardStatus === statusToMatch ? 'block' : 'none';
+                        }
+                    });
+                });
+            });
+        
+            // Trigger click on "All" tab by default
+            const defaultTab = document.querySelector('.tab-button');
+            if (defaultTab) {
+                defaultTab.click();
+            }
+        }); // End of DOMContentLoaded event listener
 
-        this.uploadBtn.style.display = this.selectedFiles.length >= this.maxFiles ? "none" : "inline-block";
-    }
+        // Unified Photo Upload Handler
+        class PhotoUploadHandler {
+            constructor(section, maxFiles = 3) {
+                this.fileInput = section.querySelector(".photo-upload-input");
+                this.uploadBtn = section.querySelector(".photo-upload-btn");
+                this.previewContainer = section.querySelector(".photo-preview");
+                this.maxFiles = maxFiles;
+                this.selectedFiles = [];
+                this.allowedTypes = ["image/png", "image/jpeg"];
 
-    createPreviewElement(src, index) {
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("position-relative");
-        wrapper.style.width = "80px";
-        wrapper.style.height = "80px";
+                this.init();
+            }
 
-        const img = document.createElement("img");
-        img.src = src;
-        img.classList.add("img-thumbnail");
-        img.style.cssText = "object-fit: cover; width: 100%; height: 100%;";
+            init() {
+                this.uploadBtn.addEventListener("click", () => this.fileInput.click());
+                this.fileInput.addEventListener("change", () => this.handleFileSelect());
+            }
 
-        const closeBtn = document.createElement("button");
-        closeBtn.innerHTML = "&times;";
-        closeBtn.classList.add("btn", "btn-sm", "btn-light", "position-absolute");
-        closeBtn.style.cssText = "top: 0; right: 0; padding: 0.25rem 0.4rem; line-height: 1;";
-        closeBtn.onclick = () => {
-            this.selectedFiles.splice(index, 1);
-            this.renderPreviews();
-        };
+            handleFileSelect() {
+                const newFiles = Array.from(this.fileInput.files);
 
-        wrapper.appendChild(img);
-        wrapper.appendChild(closeBtn);
-        return wrapper;
-    }
+                if (!this.validateFiles(newFiles)) return;
 
-    reset() {
-        this.selectedFiles = [];
-        this.fileInput.value = "";
-        this.previewContainer.innerHTML = "";
-        this.uploadBtn.style.display = "inline-block";
-    }
+                this.addFiles(newFiles);
+                this.fileInput.value = "";
+                this.renderPreviews();
+            }
 
-    getFiles() {
-        return this.selectedFiles;
-    }
+            validateFiles(files) {
+                for (let file of files) {
+                    if (!this.allowedTypes.includes(file.type)) {
+                        this.showBootstrapAlert("Only PNG and JPEG files are allowed.", "danger");
+                        return false;
+                    }
+                    if (this.selectedFiles.length >= this.maxFiles) {
+                        this.showBootstrapAlert(`You can upload a maximum of ${this.maxFiles} images.`, "warning");
+                        return false;
+                    }
+                }
+                return true;
+            }
 
-    showBootstrapAlert(message, type = "info", duration = 3000) {
-        let alertContainer = document.getElementById("customAlertContainer");
-        if (!alertContainer) {
-            alertContainer = document.createElement("div");
-            alertContainer.id = "customAlertContainer";
-            alertContainer.style.position = "fixed";
-            alertContainer.style.top = "24px";
-            alertContainer.style.right = "24px";
-            alertContainer.style.zIndex = "9999";
-            alertContainer.style.width = "350px";
-            alertContainer.style.maxWidth = "90vw";
-            alertContainer.style.pointerEvents = "none";
-            document.body.appendChild(alertContainer);
-        }
-        const alertDiv = document.createElement("div");
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.role = "alert";
-        alertDiv.innerHTML = `
+            addFiles(files) {
+                files.forEach(file => {
+                    if (this.selectedFiles.length < this.maxFiles) {
+                        this.selectedFiles.push(file);
+                    }
+                });
+            }
+
+            renderPreviews() {
+                this.previewContainer.innerHTML = "";
+
+                this.selectedFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = this.createPreviewElement(e.target.result, index);
+                        this.previewContainer.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                this.uploadBtn.style.display = this.selectedFiles.length >= this.maxFiles ? "none" : "inline-block";
+            }
+
+            createPreviewElement(src, index) {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("position-relative");
+                wrapper.style.width = "80px";
+                wrapper.style.height = "80px";
+
+                const img = document.createElement("img");
+                img.src = src;
+                img.classList.add("img-thumbnail");
+                img.style.cssText = "object-fit: cover; width: 100%; height: 100%;";
+
+                const closeBtn = document.createElement("button");
+                closeBtn.innerHTML = "&times;";
+                closeBtn.classList.add("btn", "btn-sm", "btn-light", "position-absolute");
+                closeBtn.style.cssText = "top: 0; right: 0; padding: 0.25rem 0.4rem; line-height: 1;";
+                closeBtn.onclick = () => {
+                    this.selectedFiles.splice(index, 1);
+                    this.renderPreviews();
+                };
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(closeBtn);
+                return wrapper;
+            }
+
+            reset() {
+                this.selectedFiles = [];
+                this.fileInput.value = "";
+                this.previewContainer.innerHTML = "";
+                this.uploadBtn.style.display = "inline-block";
+            }
+
+            getFiles() {
+                return this.selectedFiles;
+            }
+
+            showBootstrapAlert(message, type = "info", duration = 3000) {
+                let alertContainer = document.getElementById("customAlertContainer");
+                if (!alertContainer) {
+                    alertContainer = document.createElement("div");
+                    alertContainer.id = "customAlertContainer";
+                    alertContainer.style.position = "fixed";
+                    alertContainer.style.top = "24px";
+                    alertContainer.style.right = "24px";
+                    alertContainer.style.zIndex = "9999";
+                    alertContainer.style.width = "350px";
+                    alertContainer.style.maxWidth = "90vw";
+                    alertContainer.style.pointerEvents = "none";
+                    document.body.appendChild(alertContainer);
+                }
+                const alertDiv = document.createElement("div");
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                alertDiv.role = "alert";
+                alertDiv.innerHTML = `
             <div class="d-flex align-items-center">
                 <span class="me-2">
                     ${type === "success" ? '<i class="bi bi-check-circle-fill text-success"></i>' :
                         type === "danger" ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
-                        type === "warning" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
-                        '<i class="bi bi-info-circle-fill text-info"></i>'}
+                            type === "warning" ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
+                                '<i class="bi bi-info-circle-fill text-info"></i>'}
                 </span>
                 <span>${message}</span>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
-        alertContainer.appendChild(alertDiv);
+                alertContainer.appendChild(alertDiv);
 
-        setTimeout(() => {
-            alertDiv.classList.remove("show");
-            alertDiv.classList.add("hide");
-            setTimeout(() => alertDiv.remove(), 500);
-        }, duration);
-    }
-}
+                setTimeout(() => {
+                    alertDiv.classList.remove("show");
+                    alertDiv.classList.add("hide");
+                    setTimeout(() => alertDiv.remove(), 500);
+                }, duration);
+            }
+        }
 
-// Initialize photo upload handlers
-document.addEventListener("DOMContentLoaded", function () {
-  
+        // Initialize photo upload handlers
+        document.addEventListener("DOMContentLoaded", function () {
 
-    // Initialize for return/refund modal
-    const returnPhotoUpload = new PhotoUploadHandler(
-        document.querySelector("#returnRequestModal .photo-upload-section"),
-        document.querySelector("#rateReviewModal .photo-upload-section")
-    );
 
-    // Reset handlers when modals are closed
-    ['rateReviewModal', 'returnRequestModal'].forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        modal.addEventListener('hidden.bs.modal', function () {
-            if (modalId === 'rateReviewModal') reviewPhotoUpload.reset();
-            if (modalId === 'returnRequestModal') returnPhotoUpload.reset();
+            // Initialize for return/refund modal
+            const returnPhotoUpload = new PhotoUploadHandler(
+                document.querySelector("#returnRequestModal .photo-upload-section"),
+                document.querySelector("#rateReviewModal .photo-upload-section")
+            );
+
+            // Reset handlers when modals are closed
+            ['rateReviewModal', 'returnRequestModal'].forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                modal.addEventListener('hidden.bs.modal', function () {
+                    if (modalId === 'rateReviewModal') reviewPhotoUpload.reset();
+                    if (modalId === 'returnRequestModal') returnPhotoUpload.reset();
+                });
+            });
         });
-    });
-});
 
-// Cancel Order Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const cancelModal = document.getElementById('cancelOrderModal');
-    let currentReceiptNo = null;
+        // cancel order functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const cancelModal = document.getElementById('cancelOrderModal');
+            let currentReceiptNo = null;
 
-    // When cancel button is clicked, store the receipt number and update product details
-    document.querySelectorAll('[data-bs-target="#cancelOrderModal"]').forEach(button => {
-        button.addEventListener('click', function() {
-            currentReceiptNo = this.getAttribute('data-receipt');
-            const products = JSON.parse(this.getAttribute('data-products'));
-            
-            // Update product details in modal
-            const productInfo = cancelModal.querySelector('.product-info');
-            let productHTML = '';
-            
-            products.forEach(product => {
-                productHTML += `
+            // When cancel button is clicked
+            document.querySelectorAll('[data-bs-target="#cancelOrderModal"]').forEach(button => {
+                button.addEventListener('click', function () {
+                    currentReceiptNo = this.getAttribute('data-receipt');
+                    const products = JSON.parse(this.getAttribute('data-products'));
+
+                    // Update product details in modal
+                    const productInfo = cancelModal.querySelector('.product-info');
+                    let productHTML = '';
+
+                    products.forEach(product => {
+                        productHTML += `
                     <div class="mb-4">
                         <img src="admin/${product.product_image}" alt="${product.product_name}" 
                              class="img-fluid mb-3" style="max-height: 150px;"/>
@@ -1210,307 +1271,326 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p class="mb-0"><strong>₱${parseFloat(product.price).toFixed(2)}</strong></p>
                     </div>
                 `;
+                    });
+
+                    productInfo.innerHTML = productHTML;
+
+                    // Reset form
+                    const otherReasonText = cancelModal.querySelector('textarea');
+                    const checkboxes = cancelModal.querySelectorAll('input[type="checkbox"]');
+                    otherReasonText.value = '';
+                    checkboxes.forEach(cb => cb.checked = false);
+                });
             });
-            
-            productInfo.innerHTML = productHTML;
-            
-            // Reset form
-            const otherReasonText = cancelModal.querySelector('textarea');
-            const checkboxes = cancelModal.querySelectorAll('input[type="checkbox"]');
-            otherReasonText.value = '';
-            checkboxes.forEach(cb => cb.checked = false);
-        });
-    });
 
-    // Handle cancel order submission
-    cancelModal.querySelector('.btn-danger').addEventListener('click', function() {
-        // Get selected reason
-        const checkedBox = cancelModal.querySelector('input[type="checkbox"]:checked');
-        if (!checkedBox) {
-            alert('Please select a reason for cancellation');
-            return;
-        }
+            // Handle cancel order submission
+            cancelModal.querySelector('.btn-danger').addEventListener('click', function () {
+                // Get selected reason
+                const checkedBox = cancelModal.querySelector('input[type="checkbox"]:checked');
+                if (!checkedBox) {
+                    showAlert('Please select a reason for cancellation', 'warning');
+                    return;
+                }
 
-        const reason = checkedBox.nextElementSibling.textContent;
-        const otherReason = cancelModal.querySelector('textarea').value;
-        
-        // Validate other reason if "Others" is selected
-        if (checkedBox.id === 'cancelReasonOther' && !otherReason.trim()) {
-            alert('Please provide a reason for cancellation');
-            return;
-        }
+                const reason = checkedBox.nextElementSibling.textContent;
+                const otherReason = cancelModal.querySelector('textarea').value;
 
-        // Send AJAX request
-        fetch('cancel_order.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `receipt_no=${currentReceiptNo}&reason=${reason}&other_reason=${otherReason}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Order cancelled successfully');
-                location.reload(); // Refresh page to show updated status
-            } else {
-                alert('Error cancelling order: ' + data.message);
+                // Validate other reason if "Others" is selected
+                if (checkedBox.id === 'cancelReasonOther' && !otherReason.trim()) {
+                    showAlert('Please provide a reason for cancellation', 'warning');
+                    return;
+                }
+
+                // Show confirmation dialog
+                if (!confirm('Are you sure you want to cancel this order?')) {
+                    return;
+                }
+
+                // Send AJAX request
+                fetch('cancel_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `receipt_no=${currentReceiptNo}&reason=${reason}&other_reason=${otherReason}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showAlert('Order cancelled successfully', 'success');
+                            // Close modal
+                            const modal = bootstrap.Modal.getInstance(cancelModal);
+                            modal.hide();
+                            // Refresh page after a short delay
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showAlert(data.message || 'Error cancelling order', 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlert('Error cancelling order', 'danger');
+                    });
+            });
+
+            // Helper function to show alerts
+            function showAlert(message, type = 'success') {
+                const alertContainer = document.getElementById('alertContainer') || createAlertContainer();
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type} alert-dismissible fade show`;
+                alert.innerHTML = `
+            <div class="d-flex align-items-center">
+                <span class="me-2">
+                    ${type === 'success' ? '<i class="bi bi-check-circle-fill"></i>' :
+                        type === 'danger' ? '<i class="bi bi-x-circle-fill"></i>' :
+                            '<i class="bi bi-exclamation-triangle-fill"></i>'}
+                </span>
+                <span>${message}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+                alertContainer.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error cancelling order');
-        });
 
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(cancelModal);
-        modal.hide();
-    });
-
-    // Make checkboxes mutually exclusive
-    const checkboxes = cancelModal.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            if (this.checked) {
-                checkboxes.forEach(cb => {
-                    if (cb !== this) cb.checked = false;
-                });
+            function createAlertContainer() {
+                const container = document.createElement('div');
+                container.id = 'alertContainer';
+                container.style.cssText = 'position:fixed; top:20px; right:20px; z-index:9999;';
+                document.body.appendChild(container);
+                return container;
             }
         });
-    });
-});
 
+        // Rate & Review Functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const rateReviewModal = document.getElementById('rateReviewModal');
+            const productReviewsContainer = rateReviewModal.querySelector('.product-reviews-container');
+            const template = document.getElementById('productReviewTemplate');
 
+            // When "Rate & Review" button is clicked
+            document.querySelectorAll('[data-bs-target="#rateReviewModal"]').forEach(button => {
+                button.addEventListener('click', function () {
+                    const products = JSON.parse(this.getAttribute('data-products'));
 
+                    // Clear previous reviews
+                    productReviewsContainer.innerHTML = '';
 
-// Rate & Review Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const rateReviewModal = document.getElementById('rateReviewModal');
-    const productReviewsContainer = rateReviewModal.querySelector('.product-reviews-container');
-    const template = document.getElementById('productReviewTemplate');
+                    // Create review forms for each product
+                    products.forEach(product => {
+                        const reviewElement = createProductReviewElement(product);
+                        productReviewsContainer.appendChild(reviewElement);
+                    });
 
-    // When "Rate & Review" button is clicked
-document.querySelectorAll('[data-bs-target="#rateReviewModal"]').forEach(button => {
-    button.addEventListener('click', function() {
-        const products = JSON.parse(this.getAttribute('data-products'));
-        
-        // Clear previous reviews
-        productReviewsContainer.innerHTML = '';
-        
-        // Create review forms for each product
-        products.forEach(product => {
-            const reviewElement = createProductReviewElement(product);
-            productReviewsContainer.appendChild(reviewElement);
-        });
-
-        // Initialize functionality for all new review forms
-        initializeReviewForms();
-    });
-});
-
-    function createProductReviewElement(product) {
-        const clone = template.content.cloneNode(true);
-        const form = clone.querySelector('.review-form');
-        
-        // Set form data attributes
-        form.dataset.productId = product.product_id;
-        form.dataset.orderId = product.id;
-        
-        // Set product details
-        form.querySelector('.product-image').src = `admin/${product.product_image}`;
-        form.querySelector('.product-name').textContent = product.product_name;
-        form.querySelector('.product-size').textContent = `Size: ${product.size}`;
-        
-        return clone;
-    }
-
-    function initializeReviewForms() {
-        // Initialize star ratings
-        document.querySelectorAll('.star-rating').forEach(ratingContainer => {
-            const stars = ratingContainer.querySelectorAll('i');
-            const ratingInput = ratingContainer.parentElement.querySelector('.selected-rating');
-
-            stars.forEach(star => {
-                star.addEventListener('click', () => {
-                    ratingInput.value = star.dataset.rating;
-                    updateStars(stars, ratingInput.value);
-                });
-
-                star.addEventListener('mouseover', () => {
-                    updateStars(stars, star.dataset.rating);
-                });
-
-                star.addEventListener('mouseout', () => {
-                    updateStars(stars, ratingInput.value);
+                    // Initialize functionality for all new review forms
+                    initializeReviewForms();
                 });
             });
-        });
 
-        // Initialize photo uploads
-        document.querySelectorAll('.photo-upload-section').forEach(section => {
-            const fileInput = section.querySelector('.photo-upload-input');
-            const uploadBtn = section.querySelector('.photo-upload-btn');
-            const previewContainer = section.querySelector('.photo-preview');
+            function createProductReviewElement(product) {
+                const clone = template.content.cloneNode(true);
+                const form = clone.querySelector('.review-form');
 
-            uploadBtn.addEventListener('click', () => fileInput.click());
+                // Set form data attributes
+                form.dataset.productId = product.product_id;
+                form.dataset.orderId = product.id;
 
-            fileInput.addEventListener('change', function() {
-                handleFileSelect(this, previewContainer, uploadBtn);
-            });
-        });
-    }
+                // Set product details
+                form.querySelector('.product-image').src = `admin/${product.product_image}`;
+                form.querySelector('.product-name').textContent = product.product_name;
+                form.querySelector('.product-size').textContent = `Size: ${product.size}`;
 
-    function updateStars(stars, rating) {
-        stars.forEach(star => {
-            const starRating = star.dataset.rating;
-            star.classList.toggle('bi-star-fill', starRating <= rating);
-            star.classList.toggle('bi-star', starRating > rating);
-            star.style.color = starRating <= rating ? '#FFC107' : '#000';
-        });
-    }
+                return clone;
+            }
 
-    function handleFileSelect(input, previewContainer, uploadBtn) {
-        const files = Array.from(input.files);
-        if (files.length > 3) {
-            alert('Maximum 3 images allowed');
-            input.value = '';
-            return;
-        }
+            function initializeReviewForms() {
+                // Initialize star ratings
+                document.querySelectorAll('.star-rating').forEach(ratingContainer => {
+                    const stars = ratingContainer.querySelectorAll('i');
+                    const ratingInput = ratingContainer.parentElement.querySelector('.selected-rating');
 
-        previewContainer.innerHTML = '';
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const preview = document.createElement('div');
-                preview.className = 'position-relative';
-                preview.innerHTML = `
+                    stars.forEach(star => {
+                        star.addEventListener('click', () => {
+                            ratingInput.value = star.dataset.rating;
+                            updateStars(stars, ratingInput.value);
+                        });
+
+                        star.addEventListener('mouseover', () => {
+                            updateStars(stars, star.dataset.rating);
+                        });
+
+                        star.addEventListener('mouseout', () => {
+                            updateStars(stars, ratingInput.value);
+                        });
+                    });
+                });
+
+                // Initialize photo uploads
+                document.querySelectorAll('.photo-upload-section').forEach(section => {
+                    const fileInput = section.querySelector('.photo-upload-input');
+                    const uploadBtn = section.querySelector('.photo-upload-btn');
+                    const previewContainer = section.querySelector('.photo-preview');
+
+                    uploadBtn.addEventListener('click', () => fileInput.click());
+
+                    fileInput.addEventListener('change', function () {
+                        handleFileSelect(this, previewContainer, uploadBtn);
+                    });
+                });
+            }
+
+            function updateStars(stars, rating) {
+                stars.forEach(star => {
+                    const starRating = star.dataset.rating;
+                    star.classList.toggle('bi-star-fill', starRating <= rating);
+                    star.classList.toggle('bi-star', starRating > rating);
+                    star.style.color = starRating <= rating ? '#FFC107' : '#000';
+                });
+            }
+
+            function handleFileSelect(input, previewContainer, uploadBtn) {
+                const files = Array.from(input.files);
+                if (files.length > 3) {
+                    alert('Maximum 3 images allowed');
+                    input.value = '';
+                    return;
+                }
+
+                previewContainer.innerHTML = '';
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const preview = document.createElement('div');
+                        preview.className = 'position-relative';
+                        preview.innerHTML = `
                     <img src="${e.target.result}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
                     <button type="button" class="btn btn-sm btn-light position-absolute" style="top: 0; right: 0;">&times;</button>
                 `;
-                preview.querySelector('button').onclick = () => {
-                    preview.remove();
-                    if (previewContainer.children.length < 3) {
-                        uploadBtn.style.display = 'block';
-                    }
-                };
-                previewContainer.appendChild(preview);
-            };
-            reader.readAsDataURL(file);
-        });
+                        preview.querySelector('button').onclick = () => {
+                            preview.remove();
+                            if (previewContainer.children.length < 3) {
+                                uploadBtn.style.display = 'block';
+                            }
+                        };
+                        previewContainer.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                });
 
-        uploadBtn.style.display = files.length >= 3 ? 'none' : 'block';
-    }
-
-    // Submit all reviews
-    document.getElementById('submitAllReviews').addEventListener('click', async function() {
-        const forms = productReviewsContainer.querySelectorAll('.review-form');
-        let isValid = true;
-
-        forms.forEach(form => {
-            const rating = form.querySelector('.selected-rating').value;
-            if (rating === '0') {
-                alert('Please rate all products');
-                isValid = false;
-                return;
+                uploadBtn.style.display = files.length >= 3 ? 'none' : 'block';
             }
-        });
 
-        if (!isValid) return;
+            // Submit all reviews
+            document.getElementById('submitAllReviews').addEventListener('click', async function () {
+                const forms = productReviewsContainer.querySelectorAll('.review-form');
+                let isValid = true;
 
-        try {
-            // Submit all reviews sequentially
-            for (const form of forms) {
-                const formData = new FormData();
-                
-                // Add basic review data
-                formData.append('product_id', form.dataset.productId);
-                formData.append('order_id', form.dataset.orderId);
-                formData.append('rating', form.querySelector('.selected-rating').value);
-                formData.append('review_text', form.querySelector('textarea[name="review_text"]').value);
-                formData.append('is_anonymous', form.querySelector('input[name="is_anonymous"]').checked ? '1' : '0');
-
-                // Add image files
-                const previewContainer = form.querySelector('.photo-preview');
-                const previews = previewContainer.querySelectorAll('img');
-                
-                const files = [];
-                for (const preview of previews) {
-                    try {
-                        const response = await fetch(preview.src);
-                        const blob = await response.blob();
-                        const file = new File([blob], `review_image_${files.length}.jpg`, { type: 'image/jpeg' });
-                        formData.append('review_images[]', file);
-                    } catch (error) {
-                        console.error('Error processing image:', error);
+                forms.forEach(form => {
+                    const rating = form.querySelector('.selected-rating').value;
+                    if (rating === '0') {
+                        alert('Please rate all products');
+                        isValid = false;
+                        return;
                     }
-                }
+                });
+
+                if (!isValid) return;
 
                 try {
-                    const response = await fetch('submit_review.php', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const result = await response.json();
-                    if (!result.success) {
-                        throw new Error(result.message || 'Error submitting review');
+                    // Submit all reviews sequentially
+                    for (const form of forms) {
+                        const formData = new FormData();
+
+                        // Add basic review data
+                        formData.append('product_id', form.dataset.productId);
+                        formData.append('order_id', form.dataset.orderId);
+                        formData.append('rating', form.querySelector('.selected-rating').value);
+                        formData.append('review_text', form.querySelector('textarea[name="review_text"]').value);
+                        formData.append('is_anonymous', form.querySelector('input[name="is_anonymous"]').checked ? '1' : '0');
+
+                        // Add image files
+                        const previewContainer = form.querySelector('.photo-preview');
+                        const previews = previewContainer.querySelectorAll('img');
+
+                        const files = [];
+                        for (const preview of previews) {
+                            try {
+                                const response = await fetch(preview.src);
+                                const blob = await response.blob();
+                                const file = new File([blob], `review_image_${files.length}.jpg`, { type: 'image/jpeg' });
+                                formData.append('review_images[]', file);
+                            } catch (error) {
+                                console.error('Error processing image:', error);
+                            }
+                        }
+
+                        try {
+                            const response = await fetch('submit_review.php', {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            const result = await response.json();
+                            if (!result.success) {
+                                throw new Error(result.message || 'Error submitting review');
+                            }
+                        } catch (error) {
+                            throw new Error(`Failed to submit review: ${error.message}`);
+                        }
                     }
+
+                    // If we get here, all reviews were submitted successfully
+                    alert('All reviews submitted successfully');
+                    location.reload();
                 } catch (error) {
-                    throw new Error(`Failed to submit review: ${error.message}`);
+                    console.error('Error:', error);
+                    alert(error.message);
                 }
-            }
-
-            // If we get here, all reviews were submitted successfully
-            alert('All reviews submitted successfully');
-            location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-            alert(error.message);
-        }
-    });
-});
-
-
-// Add this to your existing JavaScript code
-function calculateAverageRating(productId) {
-    fetch(`get_product_rating.php?product_id=${productId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update rating display where needed
-                const ratingDisplays = document.querySelectorAll(`.product-rating[data-product-id="${productId}"]`);
-                ratingDisplays.forEach(display => {
-                    updateRatingDisplay(display, data.rating);
-                });
-            }
+            });
         });
-}
 
-function updateRatingDisplay(element, rating) {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = (rating - fullStars) >= 0.5;
-    let html = '';
 
-    // Add full stars
-    for (let i = 0; i < fullStars; i++) {
-        html += '<i class="bi bi-star-fill text-warning"></i>';
-    }
+        // Calculate and display average ratings
+        function calculateAverageRating(productId) {
+            fetch(`get_product_rating.php?product_id=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update rating display where needed
+                        const ratingDisplays = document.querySelectorAll(`.product-rating[data-product-id="${productId}"]`);
+                        ratingDisplays.forEach(display => {
+                            updateRatingDisplay(display, data.rating);
+                        });
+                    }
+                });
+        }
 
-    // Add half star if applicable
-    if (hasHalfStar) {
-        html += '<i class="bi bi-star-half text-warning"></i>';
-    }
+        function updateRatingDisplay(element, rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = (rating - fullStars) >= 0.5;
+            let html = '';
 
-    // Add empty stars
-    const remainingStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    for (let i = 0; i < remainingStars; i++) {
-        html += '<i class="bi bi-star text-warning"></i>';
-    }
+            // Add full stars
+            for (let i = 0; i < fullStars; i++) {
+                html += '<i class="bi bi-star-fill text-warning"></i>';
+            }
 
-    html += `<span class="ms-1">(${rating.toFixed(1)})</span>`;
-    element.innerHTML = html;
-}
-//Collapse Search for small device Script
+            // Add half star if applicable
+            if (hasHalfStar) {
+                html += '<i class="bi bi-star-half text-warning"></i>';
+            }
+
+            // Add empty stars
+            const remainingStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < remainingStars; i++) {
+                html += '<i class="bi bi-star text-warning"></i>';
+            }
+
+            html += `<span class="ms-1">(${rating.toFixed(1)})</span>`;
+            element.innerHTML = html;
+        }
+
+        //Collapse Search for small device Script
         document.addEventListener("DOMContentLoaded", function () {
             const toggleBtn = document.getElementById('mobileSearchToggle');
             const searchBar = document.getElementById('mobileSearchBar');
@@ -1530,6 +1610,193 @@ function updateRatingDisplay(element, rating) {
                 });
             }
         });
-</script>
+
+        // Return/Refund Functionality
+        // Add this inside your existing DOMContentLoaded event listener
+        document.addEventListener("DOMContentLoaded", function () {
+            const returnModal = document.getElementById('returnRequestModal');
+
+            returnModal.addEventListener('click', async function (event) {
+                if (event.target && event.target.id === 'submitRefund') {
+                    event.preventDefault();
+
+                    const form = returnModal.querySelector('#refundForm');
+                    const receipt = form.dataset.receipt;
+                    const checkedReason = form.querySelector('input[type="checkbox"]:checked');
+                    const description = form.querySelector('textarea[name="description"]').value;
+
+                    // Validation
+                    if (!checkedReason) {
+                        showAlert('Please select a reason for return', 'warning');
+                        return;
+                    }
+
+                    if (!description.trim()) {
+                        showAlert('Please provide additional details', 'warning');
+                        return;
+                    }
+
+                    // Create FormData object
+                    const formData = new FormData();
+                    formData.append('receipt_no', receipt);
+                    formData.append('reason', checkedReason.nextElementSibling.textContent.trim());
+                    formData.append('description', description);
+
+                    // Add photos if any
+                    if (returnModal.photoUploadHandler) {
+                        const files = returnModal.photoUploadHandler.getFiles();
+                        files.forEach((file, index) => {
+                            formData.append(`photos[${index}]`, file);
+                        });
+                    }
+
+                    try {
+                        const response = await fetch('submit_refund.php', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showAlert('Refund request submitted successfully', 'success');
+                            const modalInstance = bootstrap.Modal.getInstance(returnModal);
+                            modalInstance.hide();
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showAlert(result.message || 'Error submitting refund request', 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showAlert('Error submitting refund request', 'danger');
+                    }
+                }
+            });
+
+            // Helper function to show alerts
+            function showAlert(message, type = 'success') {
+                const alertContainer = document.getElementById('alertContainer') || createAlertContainer();
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type} alert-dismissible fade show`;
+                alert.innerHTML = `
+            <div class="d-flex align-items-center">
+                <span class="me-2">
+                    ${type === 'success' ? '<i class="bi bi-check-circle-fill"></i>' :
+                        type === 'danger' ? '<i class="bi bi-x-circle-fill"></i>' :
+                            '<i class="bi bi-exclamation-triangle-fill"></i>'}
+                </span>
+                <span>${message}</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+                alertContainer.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+            }
+
+            function createAlertContainer() {
+                const container = document.createElement('div');
+                container.id = 'alertContainer';
+                container.style.cssText = 'position:fixed; top:20px; right:20px; z-index:9999;';
+                document.body.appendChild(container);
+                return container;
+            }
+
+            // When return/refund button is clicked
+            document.querySelectorAll('[data-bs-target="#returnRequestModal"]').forEach(button => {
+                button.addEventListener('click', function () {
+                    const receipt = this.getAttribute('data-receipt');
+                    const products = JSON.parse(this.getAttribute('data-products'));
+
+                    // Update modal content
+                    const modalContent = `
+                                <div class="modal-header shadow-sm">
+                                    <h4 class="modal-title title-text fw-bold" id="returnRequestLabel">
+                                        <img src="./admin/images/request-for-return.png" alt="Return Icon" class="me-2"
+                                            style="width: 40px; height: 40px;">
+                                        Request for Return/Refund
+                                    </h4>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body d-flex p-0">
+                                    <!-- Left Side: Product Info -->
+                                    <div class="product-info p-4 text-start">
+                                        ${products.map(product => `
+                                            <div class="mb-3">
+                                                <img src="admin/${product.product_image}" alt="${product.product_name}" class="img-fluid mb-3"/>
+                                                <h5 class="mb-1">${product.product_name}</h5>
+                                                <p class="text-muted mb-0">Size: ${product.size || 'N/A'} | Qty: ${product.quantity}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                
+                                    <!-- Right Side: Return Form -->
+                                    <div class="review-form flex-grow-1 p-4">
+                                        <form id="refundForm" data-receipt="${receipt}">
+                                            <h5 class="title-text fw-semibold">Reason for Return</h5>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="returnReason1" name="reason">
+                                                <label class="form-check-label" for="returnReason1">Defective or Damage Product</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="returnReason2" name="reason">
+                                                <label class="form-check-label" for="returnReason2">Size/Fit Issue</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="returnReason3" name="reason">
+                                                <label class="form-check-label" for="returnReason3">Missing Parts or Accessories</label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="returnReasonOther" name="reason">
+                                                <label class="form-check-label" for="returnReasonOther">Others</label>
+                                            </div>
+                
+                                            <textarea class="form-control mt-2" name="description" 
+                                                placeholder="Please state the reason." required></textarea>
+                
+                                            <!-- Photo Upload -->
+                                            <div class="mb-3 photo-upload-section">
+                                                <label class="form-label title-text fw-semibold fs-5 mt-3">Add photos</label>
+                                                <div class="d-flex align-items-start flex-wrap gap-2 photo-area">
+                                                    <div class="d-flex flex-wrap photo-preview"></div>
+                                                    <button type="button" class="btn btn-light border photo-upload-btn">
+                                                        <i class="bi bi-image me-2"></i>Photo
+                                                    </button>
+                                                </div>
+                                                <input type="file" class="photo-upload-input d-none" multiple
+                                                    accept="image/png, image/jpeg">
+                                                <small class="text-muted d-block mt-1">You can upload up to 3 images</small>
+                                            </div>
+                
+                                            <div class="d-flex justify-content-end mt-4">
+                                                <button type="button" class="btn btn-danger me-2" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="button" class="btn custom-navy-btn" id="submitRefund">Send Request</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            `;
+
+                    returnModal.querySelector('.modal-content').innerHTML = modalContent;
+
+                    // Initialize photo upload handler
+                    const uploadSection = returnModal.querySelector('.photo-upload-section');
+                    if (uploadSection) {
+                        returnModal.photoUploadHandler = new PhotoUploadHandler(uploadSection, 3);
+                    }
+
+                    // Ensure only one checkbox can be selected at a time
+                    const checkboxes = returnModal.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', function () {
+                            checkboxes.forEach(cb => {
+                                if (cb !== this) cb.checked = false;
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    </script>
 </body>
+
 </html>

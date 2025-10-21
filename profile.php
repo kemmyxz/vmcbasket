@@ -473,9 +473,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       <div class="col-md-12 mb-2">
                         <label class="form-label">Year-level</label>
                         <div class="input-group">
-                            <input type="text" id="year" name="year_level" class="form-control"
-                                value="<?php echo $user['year_level']; ?>" required>
-                            <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button>
+                            <input  id="year" name="year_level" class="form-control"
+                                value="<?php echo $user['year_level']; ?>" readonly tabindex="-1" style="pointer-events: none; background-color: #e9ecef;">
+                            <!-- <button class="changebtn" type="button" onclick="enableEdit('year', this)">Change</button> -->
                         </div>
                     </div>
                 </div>

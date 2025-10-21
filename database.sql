@@ -43,11 +43,14 @@ CREATE TABLE orders (
     image VARCHAR(255) NOT NULL,
     receipt_no VARCHAR(50),
     payment_method ENUM('Cash (Pay at the Counter)', 'Send Online Receipt') NOT NULL DEFAULT 'Cash (Pay at the Counter)',
+    cancellation_reason TEXT NULL,
+    cancelled_at TIMESTAMP NULL,
+    UNIQUE (receipt_no),
 );
 
 CREATE TABLE order_receipt (
     receipt_id VARCHAR(255) UNIQUE PRIMARY KEY,
-    order_status ENUM('Pending', 'ToPickUp', 'Complete', 'Cancelled', 'Refunded') 
+    order_status ENUM('Pending', 'ToPickUp', 'Complete', 'Cancelled', 'Refund Requested', 'Refunded') 
     NOT NULL DEFAULT 'Pending'
 );
 
@@ -192,4 +195,35 @@ CREATE TABLE IF NOT EXISTS inquiries (
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE refund_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    receipt_no VARCHAR(255) NOT NULL,
+    user_id INT NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    description TEXT,
+    status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receipt_no) REFERENCES order_receipt(receipt_id)
+);
+
+CREATE TABLE refund_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    refund_id INT NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (refund_id) REFERENCES refund_requests(id) ON DELETE CASCADE
+);
+
+CREATE TABLE order_cancellations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    receipt_no VARCHAR(50) NOT NULL,
+    user_id INT NOT NULL,
+    reason TEXT NOT NULL,
+    cancelled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receipt_no) REFERENCES orders(receipt_no) ON DELETE CASCADE
 );
