@@ -1,7 +1,19 @@
 <?php
 
 require('admin/inc/config.php');
+session_start();
 
+$user_id = $_SESSION['user_id'];
+$user_query = "SELECT student_fname, student_lname, photo FROM users WHERE id = ?";
+$stmt = $conn->prepare($user_query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+// Set default profile picture if none exists
+$profile_pic = !empty($user['photo']) ? "admin/uploads/" . $user['photo'] : "admin/images/profile_pic.png";
+$full_name = $user['student_fname'] . " " . $user['student_lname'];
 
 
 if (isset($_GET['id'])) {
@@ -119,7 +131,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;
 ?>
 
 <?php
-
 
 // Only allow POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -474,8 +485,8 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
         <button type="button" class="btn-close btn btn-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="profile-section">
-        <img src="admin/images/profile_pic.png">
-        <h4 class="mt-2">Janella Clare Gomez</h4>
+        <img src="<?= htmlspecialchars($profile_pic) ?>" alt="Profile Picture" style="width:60px;height:60px;border-radius:50%;">
+        <h4 class="mt-2"><?= htmlspecialchars($full_name) ?></h4>
       </div>
 
       <div class="px-3">
@@ -541,80 +552,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
           <div class="d-flex justify-content-between align-items-start">
             <h3 class="fw-semibold"><?= htmlspecialchars($product1['product_name']) ?></h3>
 
-            <button class="fav-button" onclick="toggleFavorite(event, this, <?= $product1['id'] ?>)">
-              <i class="bi bi-heart"></i>
-            </button>
-
-            <script>
-              function toggleFavorite(event, btn, productId) {
-                event.stopPropagation(); // Prevents redirection
-
-                let heartImg = btn.querySelector("img");
-                let isFavorited = heartImg.src.includes("heart.png") ? 1 : 0;
-                let newStatus = isFavorited ? 0 : 1; // Toggle the current status
-
-                // Change heart icon immediately
-                heartImg.src = newStatus ? "./admin/images/heart.png" : "./admin/images/heart-outline.png";
-
-                // Prepare the body data for AJAX
-                const data = `product_id=${productId}&favorite=${newStatus}`;
-
-                // Send AJAX request
-                fetch('update_favorites.php', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  },
-                  body: data
-                })
-                  .then(response => response.json())
-                  .then(data => {
-                    if (data.success) {
-                      showBootstrapAlert('Favorite updated!', 'success');
-                    } else {
-                      showBootstrapAlert('Failed to update favorite: ' + (data.error || 'Unknown error.'), 'danger');
-                    }
-                  })
-                  .catch(error => {
-                    showBootstrapAlert('Error updating favorite.', 'danger');
-                  });
-              }
-
-              // Bootstrap 5.3.3 custom alert function
-              function showBootstrapAlert(message, type = 'info') {
-                // Remove any existing alert
-                let oldAlert = document.getElementById('custom-bs-alert');
-                if (oldAlert) oldAlert.remove();
-
-                // Create alert element
-                const alertDiv = document.createElement('div');
-                alertDiv.id = 'custom-bs-alert';
-                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 mt-3 me-3 shadow`;
-                alertDiv.style.zIndex = '9999';
-                alertDiv.style.minWidth = '300px';
-                alertDiv.innerHTML = `
-                  <div class="d-flex align-items-center">
-                    <span class="me-2">
-                      ${type === 'success' ? '<i class="bi bi-check-circle-fill text-success"></i>' :
-                        type === 'danger' ? '<i class="bi bi-x-circle-fill text-danger"></i>' :
-                        type === 'warning' ? '<i class="bi bi-exclamation-triangle-fill text-warning"></i>' :
-                        '<i class="bi bi-info-circle-fill text-info"></i>'}
-                    </span>
-                    <span>${message}</span>
-                  </div>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-
-                document.body.appendChild(alertDiv);
-
-                // Auto-dismiss after 5 seconds
-                setTimeout(() => {
-                  alertDiv.classList.remove('show');
-                  alertDiv.classList.add('hide');
-                  setTimeout(() => alertDiv.remove(), 500);
-                }, 5000);
-              }
-            </script>
           </div>
 
           <h2 class="fw-bold text-dark"> ₱ <?= number_format($product1['price'], 2) ?></h2>
@@ -650,6 +587,7 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
           <?php if ($is_uniform): ?>
             <div class="mb-4 mt-3">
               <p class="mb-1 fw-semibold">Size:</p>
+              <p id="gender-display" class="mb-2"></p>
               <div class="d-flex gap-2 flex-wrap">
                 <?php foreach ($available_sizes as $size):
                   $stock = $variants[$size]['stock'] ?? 0;
@@ -677,27 +615,25 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
             </div>
           <?php endif; ?>
 
+                  
           <script>
             const sizeButtons = document.querySelectorAll('.custom-btn[data-size]');
             const stockDisplay = document.getElementById('stock-display');
-            const genderDisplay = document.getElementById('gender-display');
             let selectedSize = null;
-
+          
             sizeButtons.forEach(btn => {
               btn.addEventListener('click', () => {
                 // Remove selected class from all buttons
                 sizeButtons.forEach(b => b.classList.remove('selected'));
-
+          
                 // Add selected class to clicked button
                 btn.classList.add('selected');
                 selectedSize = btn.dataset.size;
-
-                // Update stock and gender display
+          
+                // Update stock display only
                 const stock = btn.dataset.stock;
-                const gender = btn.dataset.gender;
                 stockDisplay.textContent = `Stock Available: ${stock} pieces`;
-                genderDisplay.textContent = ` ${gender}`;
-
+          
                 // Update quantity input max value
                 const quantityInput = document.querySelector('.quantity-value');
                 quantityInput.max = stock;
@@ -1115,14 +1051,6 @@ $is_supplies = stripos($product1['type'], 'Supplies') !== false;  // Check if pr
   <?php include 'chat.php'; ?>
 
 
-  <script>
-
-    // Run on page load and every 10 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-      checkNewChatMessages();
-      setInterval(checkNewChatMessages, 10000);
-    });
-  </script>
 
 
   <!-- Collapse Search for small device Script -->

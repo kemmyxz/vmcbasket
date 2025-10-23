@@ -254,7 +254,6 @@ $calendarEvents = getCalendarEvents();
             background-color: #ADD8E6;
             color: #00527F;
             border: none;
-
         }
 
 

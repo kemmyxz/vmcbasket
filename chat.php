@@ -71,26 +71,5 @@ function chatInit() {
     console.log('Chat initialized');
 }
 
-function checkNewChatMessages() {
-    if (!document.getElementById('chatBox').classList.contains('show')) {
-        return; // Don't check if chat is closed
-    }
-    loadChatMessages();
-}
-
-function loadChatMessages() {
-    // Fetch messages from server
-    fetch('get_messages.php')
-        .then(response => response.json())
-        .then(messages => {
-            const chatBody = document.getElementById('chatBody');
-            // Update chat messages
-            // ... message display logic ...
-        })
-        .catch(error => console.error('Error loading messages:', error));
-}
-
-// Initialize chat when document is ready
-document.addEventListener('DOMContentLoaded', chatInit);
 </script>
 

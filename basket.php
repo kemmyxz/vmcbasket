@@ -431,11 +431,11 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                                 <div class="basket-card d-flex flex-column position-relative mb-3 p-3"
                                     style="min-height: 140px;">
 
-                                    <button class="trash-btn position-absolute top-0 end-0 m-2" onclick="removeItem(<?php echo $row['id']; ?>)">
+                                    <!-- <button class="trash-btn position-absolute top-0 end-0 m-2" onclick="removeItem(<?php echo $row['id']; ?>)">
                                         <i class="bi bi-trash"></i>
-                                    </button>
+                                    </button> -->
 
-                <script>
+                <!-- <script>
                 function removeItem(itemId) {
                     // Create Bootstrap modal HTML if not exists
                     let modal = document.getElementById('removeConfirmModal');
@@ -522,7 +522,7 @@ $basket_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         setTimeout(() => alertDiv.remove(), 500);
                     }, 3000);
                 }
-            </script>
+            </script> -->
     
             <div class="d-flex w-100 mb-2">
             <input

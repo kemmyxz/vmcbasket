@@ -2,6 +2,13 @@
 session_start(); // Start session
 require 'inc/config.php'; // Include database connection
 
+
+// If user is already logged in, redirect to home page
+if (isset($_SESSION['admin_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $admin_name = trim($_POST["AdminName"]);

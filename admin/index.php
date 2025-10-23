@@ -1,6 +1,7 @@
 <?php
 require 'inc/config.php';
 
+
 // Get dashboard statistics
 function getDashboardStats() {
     global $conn;
@@ -585,17 +586,7 @@ $chartData = getBestSellers();
     </div>
 </div>
 
-                    <!-- Ratings & Reviews
-                    <div class="col-md-3">
-                        <div class="dashboard-card gradient-yellow p-3 h-100 position-relative">
-                            <h6 class="fw-semibold">Rating & Reviews</h6>
-                            <h2 class="stat-number2">
-                                <?php echo $dashboardStats['new_reviews']; ?> 
-                                <span class="unit-label">new reviews</span>
-                            </h2>
-                            <a href="ratings.php" class="icon-float"><i class="bi bi-star"></i></a>
-                        </div>
-                    </div> -->
+                  
                 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>

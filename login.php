@@ -5,7 +5,7 @@ require 'admin/inc/config.php';
 
 // If user is already logged in, redirect to index.php
 if (isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+    header("Location: home.php");
     exit();
 }
 

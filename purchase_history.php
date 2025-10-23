@@ -579,7 +579,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                     <!-- Order Footer -->
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <?php if ($order['status'] == 'Pending'): ?>
+                            <?php if ($order['status'] == 'Pending' && $order['payment_method'] == 'Cash (Pay at the Counter)'): ?>
                                 <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
                                     data-bs-target="#cancelOrderModal" data-receipt="<?= $order['receipt_no'] ?>"
                                     data-products='<?= json_encode($order['items']) ?>'>
@@ -737,17 +737,20 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
                                             let qrContentArr = [];
                                             products.forEach(product => {
-                                                // Log each product's variant ID
-                                                console.log('Product:', product.product_name, 'Variant ID:', product.product_variant_id);
-
                                                 const variantId = product.product_variant_id;
-                                                if (!variantId) {
-                                                    console.error('Missing variant ID for:', product);
-                                                }
-                                                qrContentArr.push(`${variantId},${currentReceiptNo},${product.quantity}`);
+                                                const quantity = product.quantity;
+                                                qrContentArr.push({
+                                                    variant_id: parseInt(variantId), // ensure integer
+                                                    quantity: quantity
+                                                });
                                             });
 
-                                            const qrContent = qrContentArr.join('|');
+                                            const qrData = {
+                                                receipt_id: currentReceiptNo,
+                                                items: qrContentArr
+                                            };
+
+                                            const qrContent = JSON.stringify(qrData);
                                             console.log('QR Content:', qrContent);
 
                                             // Generate QR code
@@ -758,6 +761,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                                                 width: 120,
                                                 height: 120,
                                             });
+
                                             // --- END QR CODE GENERATION ---
                                         });
                                     });
@@ -772,22 +776,21 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                                         data-products='<?= json_encode($order['items']) ?>'>
                                         Rate
                                     </button>
-                            
+
                                     <button class="btn custom-navy-btn">
                                         Buy Again
                                     </button>
-                            
+
                                     <?php if (!$order['refund_requested']): ?>
-                                        <button class="btn custom-blue-btn" data-bs-toggle="modal" 
-                                            data-bs-target="#returnRequestModal"
+                                        <button class="btn custom-blue-btn" data-bs-toggle="modal" data-bs-target="#returnRequestModal"
                                             data-receipt="<?= $order['receipt_no'] ?>"
                                             data-products='<?= json_encode($order['items']) ?>'>
                                             Request for Refund
                                         </button>
                                     <?php else: ?>
-                                        <span class="badge bg-<?= $order['refund_status'] == 'Approved' ? 'success' : 
-                                                               ($order['refund_status'] == 'Rejected' ? 'danger' : 'info') ?>">
-                                            <?= $order['refund_status'] == 'Pending' ? 'Refund Requested' : 
+                                        <span class="badge bg-<?= $order['refund_status'] == 'Approved' ? 'success' :
+                                            ($order['refund_status'] == 'Rejected' ? 'danger' : 'info') ?>">
+                                            <?= $order['refund_status'] == 'Pending' ? 'Refund Requested' :
                                                 'Refund ' . $order['refund_status'] ?>
                                         </span>
                                     <?php endif; ?>
@@ -798,7 +801,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                                     <button class="btn custom-navy-btn">
                                         Buy Again
                                     </button>
-                            
+
                                 <?php endif; ?>
                             <?php endif; ?>
 
@@ -858,7 +861,8 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
 
                         <label for="returnOtherReason" class="form-label mt-2">Other reason</label>
-                        <textarea id="returnOtherReason" name="other_reason" class="form-control mt-2" placeholder="Please state the reason."></textarea>
+                        <textarea id="returnOtherReason" name="other_reason" class="form-control mt-2"
+                            placeholder="Please state the reason."></textarea>
 
                         <!-- Photo Upload -->
                         <div class="mb-3 photo-upload-section">
@@ -1039,7 +1043,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
         document.addEventListener('DOMContentLoaded', function () {
             const tabButtons = document.querySelectorAll('.tab-button');
             const cards = document.querySelectorAll('.purchase-card');
-        
+
             // Update the statusMap object
             const statusMap = {
                 'All': 'All',
@@ -1048,20 +1052,20 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                 'Completed': 'Complete',
                 'Cancelled': 'Cancelled',
                 'Return Refund': ['Refund Requested', 'Refunded']
-                
+
             };
-            
+
             // Update the tab click handler logic
             tabButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function () {
                     // Remove active class from all buttons
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     // Add active class to clicked button
                     this.classList.add('active');
-            
+
                     const buttonText = this.textContent.trim();
                     const statusToMatch = statusMap[buttonText];
-            
+
                     cards.forEach(card => {
                         const cardStatus = card.dataset.status;
                         if (statusToMatch === 'All') {
@@ -1076,7 +1080,7 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
                     });
                 });
             });
-        
+
             // Trigger click on "All" tab by default
             const defaultTab = document.querySelector('.tab-button');
             if (defaultTab) {

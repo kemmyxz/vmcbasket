@@ -65,7 +65,7 @@
     <?php
     session_start();
     require 'inc/config.php';
-
+    date_default_timezone_set('Asia/Manila');
     // Fetch all unique users who have sent messages
     $query = "SELECT 
     i.user_id, 
