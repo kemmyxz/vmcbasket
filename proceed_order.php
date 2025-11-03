@@ -492,162 +492,253 @@ $products = getProducts();
       </div>
   </div>
 
- <script>
-    // Function to toggle the note display
-    function toggleNote(show) {
-        const note = document.getElementById('onlineNote');
-        note.style.display = show ? 'block' : 'none';
+<script>
+  // Function to toggle the note display
+  function toggleNote(show) {
+    const note = document.getElementById('onlineNote');
+    note.style.display = show ? 'block' : 'none';
+  }
+
+  // Function to update payment method display
+  function updatePaymentMethod(method) {
+    const paymentMethodText = document.getElementById('paymentMethodText');
+    const paymentMethodIcon = document.getElementById('paymentMethodIcon');
+    const selectedMethod = method.trim();
+
+    // Update UI
+    if (selectedMethod === 'Send Online Receipt') {
+      paymentMethodText.textContent = selectedMethod;
+      paymentMethodIcon.src = './admin/images/Gcash-icon.png';
+    } else {
+      paymentMethodText.textContent = selectedMethod;
+      paymentMethodIcon.src = './admin/images/Cash.png';
     }
 
-    // Function to update payment method display
-    function updatePaymentMethod(method) {
-        const paymentMethodText = document.getElementById('paymentMethodText');
-        const paymentMethodIcon = document.getElementById('paymentMethodIcon');
-        const selectedMethod = method.trim();
+    // Send AJAX request to update payment method
+    fetch('update_payment_method.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'payment_method=' + encodeURIComponent(selectedMethod)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (!data.success) {
+        console.error('Failed to update payment method:', data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
 
-        // Update UI
-        if (selectedMethod === 'Send Online Receipt') {
-            paymentMethodText.textContent = selectedMethod;
-            paymentMethodIcon.src = './admin/images/Gcash-icon.png';
-        } else {
-            paymentMethodText.textContent = selectedMethod;
-            paymentMethodIcon.src = './admin/images/Cash.png';
-        }
-
-        // Send AJAX request to update payment method
-        fetch('update_payment_method.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'payment_method=' + encodeURIComponent(selectedMethod)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.error('Failed to update payment method:', data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    // Add validation before form submission
+  // Add validation before form submission
 document.querySelector('a[href="order_complete.php"]').addEventListener('click', async function(e) {
-    e.preventDefault();
-    
-    try {
-        const onlinePaymentSelected = document.querySelector('input[name="paymentMethod"][value="Send Online Receipt"]').checked;
-        const hasUploadedReceipt = document.querySelector('#previewContainer img') !== null;
+  e.preventDefault();
 
-        if (onlinePaymentSelected && !hasUploadedReceipt) {
-            alert('Please upload your GCash e-receipt before proceeding with the order.');
-            return;
-        }
+  try {
+  const onlinePaymentSelected = document.querySelector('input[name="paymentMethod"][value="Send Online Receipt"]').checked;
+  const hasUploadedReceipt = document.querySelector('#previewContainer img') !== null;
 
-        let formData = new FormData();
-        formData.append('payment_method', onlinePaymentSelected ? 'Send Online Receipt' : 'Cash (Pay at the Counter)');
+  if (onlinePaymentSelected && !hasUploadedReceipt) {
+    showBootstrapAlert('Please upload your GCash e-receipt before proceeding with the order.', 'warning');
+    return;
+  }
 
-        // If online payment, append receipt file
-        if (onlinePaymentSelected && hasUploadedReceipt) {
-            const receiptFile = document.querySelector('#gcashReceiptInput').files[0];
-            if (receiptFile) {
-                formData.append('receipt_image', receiptFile);
-            }
-        }
+  let formData = new FormData();
+  formData.append('payment_method', onlinePaymentSelected ? 'Send Online Receipt' : 'Cash (Pay at the Counter)');
 
-        // Process the order
-        const response = await fetch('process_order.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error(data.message || 'Order processing failed');
-        }
-
-        // If everything is successful, redirect to order completion page
-        window.location.href = 'order_complete.php';
-
-    } catch (error) {
-        console.error('Error during order processing:', error);
-        alert('Order processing failed: ' + error.message);
+  // If online payment, append receipt file
+  if (onlinePaymentSelected && hasUploadedReceipt) {
+    const receiptFile = document.querySelector('#gcashReceiptInput').files[0];
+    if (receiptFile) {
+    formData.append('receipt_image', receiptFile);
     }
+  }
+
+  // Process the order
+  const response = await fetch('process_order.php', {
+    method: 'POST',
+    body: formData
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error(data.message || 'Order processing failed');
+  }
+
+  // If everything is successful, redirect to order completion page
+  window.location.href = 'order_complete.php';
+
+  } catch (error) {
+  console.error('Error during order processing:', error);
+  showBootstrapAlert('Order processing failed: ' + error.message, 'danger', 7000);
+  }
 });
+
+// Bootstrap-styled alert helper (compatible with Bootstrap 5.x)
+function ensureAlertContainer() {
+  let container = document.getElementById('bs-alert-container');
+  if (!container) {
+  container = document.createElement('div');
+  container.id = 'bs-alert-container';
+  container.setAttribute('aria-live', 'polite');
+  container.setAttribute('aria-atomic', 'true');
+  container.style.position = 'fixed';
+  container.style.top = '1rem';
+  container.style.right = '1rem';
+  container.style.zIndex = '10800';
+  container.style.width = 'auto';
+  container.style.maxWidth = '420px';
+  document.body.appendChild(container);
+  }
+  return container;
+}
+
+/**
+ * Get inline SVG icon HTML for alert types
+ */
+function getAlertIconHtml(type) {
+  // Common attributes for icons
+  const baseStyle = 'width:1.25rem;height:1.25rem;margin-right:.5rem;flex-shrink:0';
+  switch (type) {
+  case 'success':
+    return `<svg xmlns="http://www.w3.org/2000/svg" style="${baseStyle}" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16" aria-hidden="true"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.97 11.03a.75.75 0 0 0 1.07-.02L11.03 8.06a.75.75 0 1 0-1.06-1.06L7.5 9.44 6.03 7.97A.75.75 0 0 0 4.97 9.03l2 2z"/></svg>`;
+  case 'warning':
+    return `<svg xmlns="http://www.w3.org/2000/svg" style="${baseStyle}" fill="currentColor" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16" aria-hidden="true"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.89 0 1.438-.99.982-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>`;
+  case 'info':
+    return `<svg xmlns="http://www.w3.org/2000/svg" style="${baseStyle}" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM8.93 4.58a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM6.002 6.5a.5.5 0 0 1 .5-.5h2.5a.5.5 0 0 1 0 1H8.5v4a.5.5 0 0 1-1 0v-4H6.502a.5.5 0 0 1-.5-.5z"/></svg>`;
+  case 'danger':
+  default:
+    return `<svg xmlns="http://www.w3.org/2000/svg" style="${baseStyle}" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16" aria-hidden="true"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.646 4.646a.5.5 0 0 0 0 .708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646a.5.5 0 0 0-.708 0z"/></svg>`;
+  }
+}
+
+/**
+ * Show Bootstrap alert with an icon
+ * @param {string} message
+ * @param {string} type - 'primary'|'secondary'|'success'|'danger'|'warning'|'info'|'light'|'dark'
+ * @param {number} timeout - milliseconds before auto-dismiss (set 0 to persist)
+ */
+function showBootstrapAlert(message, type = 'danger', timeout = 5000) {
+  const container = ensureAlertContainer();
+
+  // Map some Bootstrap contexts to icon types (use simplified mapping)
+  const iconTypeMap = {
+  success: 'success',
+  danger: 'danger',
+  warning: 'warning',
+  info: 'info',
+  primary: 'info',
+  secondary: 'info',
+  light: 'info',
+  dark: 'danger'
+  };
+  const iconHtml = getAlertIconHtml(iconTypeMap[type] || 'danger');
+
+  const wrapper = document.createElement('div');
+  wrapper.className = `alert alert-${type} alert-dismissible fade show d-flex align-items-start`;
+  wrapper.role = 'alert';
+  wrapper.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
+  wrapper.innerHTML = `
+  <div class="d-flex align-items-start" style="gap:.5rem; width:100%">
+    <div aria-hidden="true">${iconHtml}</div>
+    <div style="flex:1; min-width:0">${message}</div>
+    <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  `;
+
+  container.appendChild(wrapper);
+
+  if (timeout > 0) {
+  setTimeout(() => {
+    try {
+    // Use Bootstrap's Alert disposal if available
+    if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+      const alertInstance = bootstrap.Alert.getInstance(wrapper) || new bootstrap.Alert(wrapper);
+      alertInstance.close();
+    } else {
+      wrapper.remove();
+    }
+    } catch (err) {
+    wrapper.remove();
+    }
+  }, timeout);
+  }
+}
 
 // Update the original GCash upload handling
 document.addEventListener("DOMContentLoaded", function () {
-    const fileInput = document.getElementById("gcashReceiptInput");
-    const dropArea = document.getElementById("dropArea");
-    const uploadPrompt = document.getElementById("uploadPrompt");
-    const previewContainer = document.getElementById("previewContainer");
-    const allowedExtensions = ["jpg", "jpeg", "png"];
+  const fileInput = document.getElementById("gcashReceiptInput");
+  const dropArea = document.getElementById("dropArea");
+  const uploadPrompt = document.getElementById("uploadPrompt");
+  const previewContainer = document.getElementById("previewContainer");
+  const allowedExtensions = ["jpg", "jpeg", "png"];
 
-    function resetUpload() {
-        fileInput.value = "";
-        previewContainer.innerHTML = "";
-        uploadPrompt.style.display = "block";
-    }
+  function resetUpload() {
+  fileInput.value = "";
+  previewContainer.innerHTML = "";
+  uploadPrompt.style.display = "block";
+  }
 
-    function handleFile(file) {
-        const fileExtension = file.name.split(".").pop().toLowerCase();
+  function handleFile(file) {
+  const fileExtension = file.name.split(".").pop().toLowerCase();
 
-        if (!allowedExtensions.includes(fileExtension)) {
-            alert("Invalid file type. Please upload a JPG, JPEG, or PNG image.");
-            return;
-        }
+  if (!allowedExtensions.includes(fileExtension)) {
+    showBootstrapAlert("Invalid file type. Please upload a JPG, JPEG, or PNG image.", "warning");
+    return;
+  }
 
-        if (file.size > 50 * 1024 * 1024) {
-            alert("File is too large. Please upload an image up to 50MB.");
-            return;
-        }
+  if (file.size > 50 * 1024 * 1024) {
+    showBootstrapAlert("File is too large. Please upload an image up to 50MB.", "warning");
+    return;
+  }
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            uploadPrompt.style.display = "none";
-            previewContainer.innerHTML = `
-                <img src="${e.target.result}" class="img-fluid rounded mb-3" style="max-height: 250px;" alt="Uploaded Preview">
-                <br>
-                <button type="button" class="btn btn-danger btn-sm" id="removeImageBtn">Remove Image</button>
-            `;
-            document.getElementById("removeImageBtn").addEventListener("click", resetUpload);
-        };
-        reader.readAsDataURL(file);
-    }
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    uploadPrompt.style.display = "none";
+    previewContainer.innerHTML = `
+    <img src="${e.target.result}" class="img-fluid rounded mb-3" style="max-height: 250px;" alt="Uploaded Preview">
+    <br>
+    <button type="button" class="btn btn-danger btn-sm" id="removeImageBtn">Remove Image</button>
+    `;
+    document.getElementById("removeImageBtn").addEventListener("click", resetUpload);
+  };
+  reader.readAsDataURL(file);
+  }
 
-    // File input change handler
-    fileInput.addEventListener("change", function () {
-        if (fileInput.files.length > 0) {
-            handleFile(fileInput.files[0]);
-        }
-    });
+  // File input change handler
+  fileInput.addEventListener("change", function () {
+  if (fileInput.files.length > 0) {
+    handleFile(fileInput.files[0]);
+  }
+  });
 
-    // Drag & Drop handling
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropArea.addEventListener(eventName, e => {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-    });
+  // Drag & Drop handling
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropArea.addEventListener(eventName, e => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  });
 
-    dropArea.addEventListener("dragover", () => dropArea.classList.add("bg-light"));
-    dropArea.addEventListener("dragleave", () => dropArea.classList.remove("bg-light"));
+  dropArea.addEventListener("dragover", () => dropArea.classList.add("bg-light"));
+  dropArea.addEventListener("dragleave", () => dropArea.classList.remove("bg-light"));
 
-    dropArea.addEventListener("drop", e => {
-        dropArea.classList.remove("bg-light");
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files.length > 0) {
-            handleFile(files[0]);
-        }
-    });
+  dropArea.addEventListener("drop", e => {
+  dropArea.classList.remove("bg-light");
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  if (files.length > 0) {
+    handleFile(files[0]);
+  }
+  });
 });
 
 // Prevent using browser back button

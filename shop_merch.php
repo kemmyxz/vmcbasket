@@ -100,10 +100,10 @@ $search = $_GET['search'] ?? '';
         }
 
         @media (max-width: 991.98px) {
-
-            /* Tablet: 3 columns for product cards */
+              /* Tablet: 3 columns for product cards */
             .product-card img {
-                height: 180px;
+                height: 200px;
+                object-fit: cover;
             }
 
             .col-lg-3,
@@ -136,7 +136,9 @@ $search = $_GET['search'] ?? '';
             }
 
             .badges .badge {
-                font-size: 0.55rem;
+                font-size: 0.60rem;
+                padding: 0.15rem 0.35rem;
+                margin-bottom: 4px;
             }
 
             .price {
@@ -162,18 +164,99 @@ $search = $_GET['search'] ?? '';
 
         @media (max-width: 575.98px) {
             .margin-top {
-                margin-top: 50px;
+                margin-top: 100px;
             }
 
-            /* Extra small: 1 column for product cards */
+            /* Keep 2 columns across all phone sizes */
             .col-md-4,
             .col-lg-3 {
-                flex: 0 0 100%;
-                max-width: 100%;
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-left: 4px;
+            padding-right: 4px;
+            box-sizing: border-box;
             }
 
+            /* More compact card spacing */
+            .product-card {
+            margin: 4px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            }
+
+             /* Phone: 2 columns for product cards, smaller card */
             .product-card img {
-                height: 180px;
+            height: 250px;
+            object-fit: cover;
+            }
+
+
+            .product-info {
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            }
+
+            .product-info h3 {
+            font-size: 0.82rem;
+            line-height: 1.05;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            }
+
+            .product-info p {
+            font-size: 0.7rem;
+            margin: 0;
+            color: #444;
+            }
+
+            .price {
+            font-size: 0.78rem;
+            font-weight: 600;
+            }
+
+            .rating {
+            font-size: 0.68rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            }
+
+            .rating i {
+            font-size: 0.75rem;
+            }
+
+            .badges .badge {
+            font-size: 0.55rem;
+            padding: 0.15rem 0.35rem;
+            margin-bottom: 4px;
+            }
+
+            .icon-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            }
+
+             .fav-button {
+                width: 35px;
+                height: 35px;
+                padding: 4px;
+                font-size: 0.9rem;
+                border-radius: 25px;
+            }
+
+            .basket-button {
+                padding: 6px 8px;
+                font-size: 0.9rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
             }
 
             .highlight-yellow {
@@ -214,9 +297,43 @@ $search = $_GET['search'] ?? '';
                 font-size: 1rem;
             }
         }
-    </style>
 
+         /* Extra small screens: enforce 2 columns even on the smallest devices */
+        @media (max-width: 420px) {
+            .col-md-4,
+            .col-lg-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-left: 3px;
+            padding-right: 3px;
+            box-sizing: border-box;
+            }
 
+           .product-card img {
+            height: 200px;
+            }
+
+            .product-info h3 {
+            font-size: 0.78rem;
+            }
+
+            .price { font-size: 0.72rem; }
+            .rating { font-size: 0.65rem; }
+
+            .fav-button {
+                width: 35px;
+                height: 35px;
+                padding: 4px;
+                font-size: 0.8rem;
+                border-radius: 25px;
+            }
+
+            .basket-button {
+            padding: 2px 4px;
+            font-size: 0.6rem;
+            }
+
+        }
     </style>
 
 </head>
@@ -328,7 +445,7 @@ $search = $_GET['search'] ?? '';
     </div>
 
     <!--Content -->
-    <div class="container-fluid p-lg-5 p-md-3 p-5 margin-top">
+    <div class="container-fluid p-lg-5 p-md-3 margin-top">
         <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='%236c757d'/%3E%3C/svg%3E&#34;);"
             aria-label="breadcrumb">
             <ol class="breadcrumb">

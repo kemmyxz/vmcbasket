@@ -399,16 +399,12 @@ $full_name = $user['student_fname'] . " " . $user['student_lname'];
 
             <!-- Search bar (desktop) -->
             <div class="flex-grow-1 position-relative me-3 d-none d-sm-block">
-                <input type="text" class="form-control search-box" placeholder="Search products here...">
-                <i class="fas fa-search search-icon"></i>
+               
             </div>
 
             <!-- Right-aligned buttons for small devices -->
             <div class="d-flex d-sm-none ms-auto align-items-center" style="margin-right: 10px;">
-                <!-- Search icon (mobile) -->
-                <button class="btn p-0" type="button" id="mobileSearchToggle">
-                    <i class="fas fa-search fa-lg"></i>
-                </button>
+                
             </div>
             <!-- Cart -->
             <?php

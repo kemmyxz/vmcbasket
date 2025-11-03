@@ -173,95 +173,144 @@ while ($row = $result->fetch_assoc()) {
             <main class="col-md-9 ms-sm-auto col-lg-10 content p-3">
                 
                 <!-- Content -->
-                <div class="container p-5 overflow-hidden position-relative mt-5">
-                    <div class="bottom-label text-start p-3 position-absolute top-0 start-0 w-100">
-                        <h2>Receipt Form</h2>
-                        <p>Receipt for Walk-in Students</p>
-                    </div>
-                    <div style="margin-top: 100px;"></div><!-- Add space for the label height -->
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <label for="customerName" class="form-label">Customer Name</label>
-                                <input type="text" class="form-control" id="customerName" placeholder="Enter Name">
-                            </div>
+            <div class="container p-5 overflow-hidden position-relative mt-5">
+                <form id="receiptForm">
+                <div class="bottom-label text-start p-3 position-absolute top-0 start-0 w-100">
+                    <h2>Receipt Form</h2>
+                    <p>Receipt for Walk-in Students</p>
+                </div>
+                <div style="margin-top: 100px;"></div><!-- Add space for the label height -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="customerName" class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" id="customerName" placeholder="Enter Name">
                         </div>
-                        
-                        <div id="product-group">
-                            <div class="row mb-3 product-item align-items-end">
-                                <div class="col-md-4">
-                                    <label for="productName" class="form-label">Product Name</label>
-                                    <select class="form-select product-select with-search-icon" name="product[]">
-                                        <option value="" disabled selected>Select Product</option>
-                                        <?php foreach ($products as $product): ?>
-                                            <option value="<?= $product['id'] ?>" 
-                                                    data-type="<?= $product['type'] ?>"
-                                                    data-price="<?= $product['price'] ?>"
-                                                    data-variants='<?= json_encode($product['variants']) ?>'>
-                                                <?= htmlspecialchars($product['name']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                    </div>
+                    
+                    <div id="product-group">
+                        <div class="row mb-3 product-item align-items-end">
+                            <div class="col-md-4">
+                                <label for="productName" class="form-label">Product Name</label>
+                                <select class="form-select product-select with-search-icon" name="product[]">
+                                    <option value="" disabled selected>Select Product</option>
+                                    <?php foreach ($products as $product): ?>
+                                        <option value="<?= $product['id'] ?>" 
+                                                data-type="<?= $product['type'] ?>"
+                                                data-price="<?= $product['price'] ?>"
+                                                data-variants='<?= json_encode($product['variants']) ?>'>
+                                            <?= htmlspecialchars($product['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
 
-                                <div class="col-md-2">
-                                    <label class="form-label">Size</label>
-                                    <select class="form-select" name="size[]">
-                                        <option value="" disabled selected>Select Size</option>
-                                    </select>
-                                    <input type="hidden" name="variant_id[]" class="variant-id">
-                                </div>
-
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <div class="w-100">
-                                        <label class="form-label">Price</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₱</span>
-                                            <input type="number" class="form-control" name="price[]" min="0" step="0.01" placeholder="0.00" readonly>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Size</label>
+                                <select class="form-select" name="size[]">
+                                    <option value="" disabled selected>Select Size</option>
+                                </select>
+                                <input type="hidden" name="variant_id[]" class="variant-id">
+                            </div>
 
                             <div class="col-md-3 d-flex align-items-end">
                                 <div class="w-100">
-                                    <label class="form-label">Quantity</label>
+                                    <label class="form-label">Price</label>
                                     <div class="input-group">
-                                    <input type="number" class="form-control" name="quantity[]" min="1">
-                                    <button type="button" class="btn btn-outline-danger remove-item d-none">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                        <span class="input-group-text">₱</span>
+                                        <input type="number" class="form-control" name="price[]" min="0" step="0.01" placeholder="0.00" readonly>
+                                    </div>
                                 </div>
+                            </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="w-100">
+                                <label class="form-label">Quantity</label>
+                                <div class="input-group">
+                                <input type="number" class="form-control" name="quantity[]" min="1">
+                                <button type="button" class="btn btn-outline-danger remove-item d-none">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                    <!-- Add More Button -->
-                    <div class="mb-4 text-end">
-                        <button type="button" class="btn btn-outline-secondary" id="addItemBtn">+ Add Item</button>
+                <!-- Add More Button -->
+                <div class="mb-4 text-end">
+                    <button type="button" class="btn btn-outline-secondary" id="addItemBtn">+ Add Item</button>
+                </div>
+
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="paymentMode" class="form-label">Mode of Payment</label>
+                        <select class="form-select" id="paymentMode">
+                            <option selected disabled>Select Mode</option>
+                            <option value="Cash (Pay at the Counter)">Cash</option>
+                            <option value="Send Online Receipt">GCash</option>
+                        </select>
                     </div>
-
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="paymentMode" class="form-label">Mode of Payment</label>
-                            <select class="form-select" id="paymentMode">
-                                <option selected disabled>Select Mode</option>
-                                <option value="Cash (Pay at the Counter)">Cash</option>
-                                <option value="Send Online Receipt">GCash</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label d-block fw-bold">Total:</label>
-                            <div class="form-control bg-light fw-bold" id="totalAmount">₱ 0.00</div>
-                        </div>
+                    <div class="col-md-6">
+                        <label class="form-label d-block fw-bold">Total:</label>
+                        <div class="form-control bg-light fw-bold" id="totalAmount">₱ 0.00</div>
                     </div>
+                </div>
 
-                    <div class="text-end">
-                        <button type="button" class="admin-btn" id="submitBtn">Submit</button>
-                    </div>
+                <div class="text-end">
+                    <button type="button" class="admin-btn" id="submitBtn">Submit</button>
+                </div>
                 </form>
             </div>
-        </main>
+            <div class="mt-5 text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#returnModal">
+                    Refund form for Walk-in Customers
+                </button>
+            </div>
+            <!-- Return Request Modal -->
+            <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                    <form id="returnForm" class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h4 class="modal-title" id="returnModalLabel">Refund Form for Walk-in Customers</h4>
+                           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    <div class="modal-body">
+            <form id="returnForm">
+
+            <!-- Order ID -->
+            <div class="mb-3">
+                <label for="orderID" class="form-label fw-semibold">Order ID</label>
+                <input type="text" class="form-control" id="orderID" placeholder="Search Order ID...">
+            </div>
+
+            <!-- Reason Dropdown -->
+            <div class="mb-3">
+                <label for="reason" class="form-label fw-semibold">Reason for Refund</label>
+                <select class="form-select" id="reason" required>
+                <option value="" selected disabled>-- Select Reason --</option>
+                <option value="Defective">Defective or Damage Product</option>
+                <option value="Wrong Item">Size/Fit Issue</option>
+                <option value="Incomplete">Missing Parts or Accessories</option>
+                <option value="Others">Others</option>
+                </select>
+            </div>
+
+                <!-- Hidden Textarea (appears if 'Others' selected) -->
+                <div class="mb-3" id="otherReasonContainer" style="display: none;">
+                    <label for="otherReason" class="form-label fw-semibold">Please specify</label>
+                    <textarea class="form-control" id="otherReason" rows="3" placeholder="Enter reason here..."></textarea>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="returnForm" class="btn btn-primary">Submit Refund</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </main>
     </div>
 </div>
 
@@ -297,9 +346,22 @@ while ($row = $result->fetch_assoc()) {
     </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+<script>
+    const reasonSelect = document.getElementById('reason');
+    const otherContainer = document.getElementById('otherReasonContainer');
+
+    reasonSelect.addEventListener('change', function () {
+    if (this.value === 'Others') {
+        otherContainer.style.display = 'block';
+    } else {
+        otherContainer.style.display = 'none';
+    }
+    });
+</script>
 
 <script>
 
@@ -600,14 +662,52 @@ while ($row = $result->fetch_assoc()) {
         const currentDate = new Date().toLocaleString();
         const items = [];
 
+        // Helper: show Bootstrap 5 alert with icon (uses Bootstrap Icons classes)
+        // Alerts will be placed in a global fixed container at top-right of the page
+        function showBootstrapAlert(type, title, message, timeout = 5000) {
+            // Ensure global container exists
+            if ($('#globalAlertContainer').length === 0) {
+                $('body').prepend('<div id="globalAlertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10555; width: 360px;"></div>');
+            }
+
+            // type: 'success' | 'warning' | 'danger' | 'info'
+            const icons = {
+                success: 'bi-check-circle-fill',
+                warning: 'bi-exclamation-triangle-fill',
+                danger: 'bi-x-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+            const iconClass = icons[type] || icons.info;
+
+            const $alert = $(`
+                <div class="alert alert-${type} d-flex align-items-start alert-dismissible fade show" role="alert" style="gap: .75rem; margin-bottom: .75rem;">
+                    <i class="bi ${iconClass}" style="font-size:1.25rem; margin-top: 0.125rem;"></i>
+                    <div>
+                        <strong>${title}</strong><div>${message}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `);
+
+            // Insert into global container (top-right)
+            $('#globalAlertContainer').append($alert);
+
+            // Auto remove after timeout
+            if (timeout > 0) {
+                setTimeout(() => {
+                    $alert.alert('close');
+                }, timeout);
+            }
+        }
+
         // Validations
         if (!customerName) {
-            alert("Please enter the customer's name.");
+            showBootstrapAlert('warning', 'Missing Customer Name', "Please enter the customer's name.");
             return;
         }
 
         if (!paymentMode || paymentMode === "Select Mode") {
-            alert("Please select a mode of payment.");
+            showBootstrapAlert('warning', 'Missing Payment Mode', "Please select a mode of payment.");
             return;
         }
 
@@ -677,7 +777,7 @@ while ($row = $result->fetch_assoc()) {
         </div>`;
 
         if (!isValid) {
-            alert('Please complete all product and quantity fields.');
+            showBootstrapAlert('danger', 'Incomplete Fields', 'Please complete all product and quantity fields.');
             return;
         }
 
@@ -797,9 +897,6 @@ function updateDateTime() {
 // Update immediately and then every second
 updateDateTime();
 setInterval(updateDateTime, 1000);
-
-
-
 
 </script>
 </body>

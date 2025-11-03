@@ -59,7 +59,7 @@ $rec_result = $stmt->get_result();
     <?php include 'links.php'; ?>
     <style>
         .highlight-yellow {
-            background-color: #fff4bf
+            background-color: #fff4bf;
             padding: 0.3rem 1rem;
             border-radius: 6px;
             border: 1px solid black;
@@ -92,6 +92,8 @@ $rec_result = $stmt->get_result();
             border: 1px solid #eee;
             border-radius: 10px;
             transition: 0.3s;
+            box-sizing: border-box;
+            background: #fff;
         }
 
         .product-card:hover {
@@ -102,6 +104,7 @@ $rec_result = $stmt->get_result();
         .product-card img {
             border-radius: 10px 10px 0 0;
             width: 100%;
+            display: block;
         }
 
         .product-info {
@@ -112,7 +115,7 @@ $rec_result = $stmt->get_result();
         .faq-section {
             background: #FFF4C2;
             padding: 2rem;
-            border: 1px solid black
+            border: 1px solid black;
         }
 
         .tagline {
@@ -157,7 +160,8 @@ $rec_result = $stmt->get_result();
 
             /* Tablet: 3 columns for product cards */
             .product-card img {
-                height: 180px;
+                height: 200px;
+                object-fit: cover;
             }
 
             .col-lg-3,
@@ -190,7 +194,7 @@ $rec_result = $stmt->get_result();
             }
 
             .badges .badge {
-                font-size: 0.55rem;
+                font-size: 0.60rem;
             }
 
             .price {
@@ -210,101 +214,225 @@ $rec_result = $stmt->get_result();
 
             /* Phone: 2 columns for product cards, smaller card */
             .product-card img {
-                height: 180px;
+            height: 250px;
+            object-fit: cover;
             }
 
             .col-md-4,
             .col-lg-3 {
-                flex: 0 0 50%;
-                max-width: 50%;
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            box-sizing: border-box;
             }
 
             .product-info h3 {
-                font-size: 0.95rem;
+            font-size: 0.95rem;
             }
 
             .product-info p,
             .price,
             .rating {
-                font-size: 0.8rem;
+            font-size: 0.8rem;
             }
 
             .icon-buttons .basket-button {
-                padding: 0 10px;
-                font-size: 0.9rem;
+            padding: 0 10px;
+            font-size: 0.9rem;
             }
         }
 
         @media (max-width: 575.98px) {
-
             .margin {
-                margin-top: 0px;
-                margin-bottom: 0px;
-                padding: 20px 50px 50px 20px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding: 12px 8px 24px 8px;
             }
 
             .fade-section {
-                opacity: 1;
-                transform: translateY(0);
+            opacity: 1;
+            transform: translateY(0);
             }
 
-            /* Extra small: 1 column for product cards */
+            /* Keep 2 columns across all phone sizes */
             .col-md-4,
             .col-lg-3 {
-                flex: 0 0 100%;
-                max-width: 100%;
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-left: 4px;
+            padding-right: 4px;
+            box-sizing: border-box;
             }
 
+            /* More compact card spacing */
+            .product-card {
+            margin: 4px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            }
+
+             /* Phone: 2 columns for product cards, smaller card */
             .product-card img {
-                height: 180px;
+            height: 250px;
+            object-fit: cover;
+            }
+
+            .product-info {
+            padding: 6px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            }
+
+            .product-info h3 {
+            font-size: 0.82rem;
+            line-height: 1.05;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            }
+
+            .product-info p {
+            font-size: 0.7rem;
+            margin: 0;
+            color: #444;
+            }
+
+            .price {
+            font-size: 0.78rem;
+            font-weight: 600;
+            }
+
+            .rating {
+            font-size: 0.68rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            }
+
+            .rating i {
+            font-size: 0.75rem;
+            }
+
+            .badges .badge {
+            font-size: 0.55rem;
+            padding: 0.15rem 0.35rem;
+            margin-bottom: 4px;
+            }
+
+            .icon-buttons {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            }
+
+            .fav-button {
+                width: 35px;
+                height: 35px;
+                padding: 4px;
+                font-size: 0.9rem;
+                border-radius: 25px;
+            }
+
+            .basket-button {
+                padding: 6px 8px;
+                font-size: 0.9rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
             }
 
             .highlight-pink,
             .highlight-blue,
             .highlight-yellow {
-                font-size: 1rem;
+            font-size: 0.95rem;
             }
 
             .tagline {
-                font-size: 0.8rem;
-                text-align: center;
+            font-size: 0.78rem;
+            text-align: center;
+            padding: 8px;
             }
 
             .navbar-custom {
-                padding: 0.5rem 1rem;
-                flex-direction: column;
-                align-items: flex-start;
+            padding: 0.4rem 0.6rem;
+            flex-direction: row;
+            align-items: center;
             }
 
             .container-fluid.d-flex.align-items-center {
-                justify-content: start;
+            justify-content: space-between;
             }
 
             .vmc-logo {
-                max-width: 90px;
+            max-width: 80px;
             }
 
             .search-box {
-                width: 100%;
-                font-size: 0.85rem;
-                margin-top: 0.5rem;
+            width: 100%;
+            font-size: 0.82rem;
+            margin-top: 0.25rem;
             }
 
             .basket-btn {
-                width: 38px;
-                height: 38px;
-                font-size: 1.2rem;
-                margin-right: 5px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.05rem;
+            margin-right: 4px;
             }
 
             .profile-section img {
-                width: 70px;
-                height: 70px;
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
             }
 
             footer {
-                font-size: 1rem;
+            font-size: 0.95rem;
             }
+        }
+
+        /* Extra small screens: enforce 2 columns even on the smallest devices */
+        @media (max-width: 420px) {
+            .col-md-4,
+            .col-lg-3 {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+            padding-left: 3px;
+            padding-right: 3px;
+            box-sizing: border-box;
+            }
+
+            .product-card img {
+            height: 200px;
+            }
+
+            .product-info h3 {
+            font-size: 0.78rem;
+            }
+
+            .price { font-size: 0.72rem; }
+            .rating { font-size: 0.65rem; }
+
+            .fav-button {
+                width: 35px;
+                height: 35px;
+                padding: 4px;
+                font-size: 0.8rem;
+                border-radius: 25px;
+            }
+
+            .basket-button {
+            padding: 2px 4px;
+            font-size: 0.6rem;
+            }
+
+            .highlight-yellow {
+            font-size: 0.83rem;
+            }
+
         }
     </style>
 </head>
@@ -888,7 +1016,7 @@ $rec_result = $stmt->get_result();
             },
             body: JSON.stringify({
                 product_id: productId
-            })
+            }),
             })
             .then(response => response.json())
             .then(data => {
@@ -964,6 +1092,7 @@ $rec_result = $stmt->get_result();
                 }
             });
         });
+
     </script>
 
     <!-- Animation Script -->

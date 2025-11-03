@@ -1,4 +1,4 @@
-<?php include 'links.php'; ?>
+
 <!-- footer.php -->
  <footer class="footer">
         <div class="container p-5">
@@ -59,4 +59,3 @@
             </div>
         </div>
     </footer>
-
